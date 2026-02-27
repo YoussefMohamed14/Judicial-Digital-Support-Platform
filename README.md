@@ -4,5 +4,3 @@ The Judicial Digital Support Platform (JDSP) is a digital solution designed to m
 JDSP enables users to submit legal requests, track case progress, manage court appointments, and access official judicial documents electronically. By leveraging modern web technologies and secure backend services, the system improves communication between stakeholders while ensuring data privacy and compliance with legal standards.
 
 The platform focuses on digitizing routine judicial procedures, allowing courts to operate more efficiently while providing citizens with easy, anytime access to legal services without requiring physical presence.   
-
-
