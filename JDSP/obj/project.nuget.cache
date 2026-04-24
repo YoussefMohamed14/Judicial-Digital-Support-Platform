@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "72UNZkxsv60=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ym051\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.3\\microsoft.aspnetcore.openapi.10.0.3.nupkg.sha512",
+    "C:\\Users\\ym051\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
