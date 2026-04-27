@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\onedrive\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\onedrive\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\onedrive\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\onedrive\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\models\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:models\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\onedrive\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,19 +22,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": ".gitignore",
-              "DocumentMoniker": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\.gitignore",
-              "RelativeDocumentMoniker": ".gitignore",
-              "ToolTip": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\.gitignore",
-              "RelativeToolTip": ".gitignore",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-04-24T18:18:52.04Z",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-24T18:23:31.039Z",
               "EditorCaption": ""
             },
             {
@@ -43,7 +43,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Models\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Models\\AppDbContext.cs",
@@ -56,13 +56,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-24T17:58:04.559Z",
               "EditorCaption": ""
