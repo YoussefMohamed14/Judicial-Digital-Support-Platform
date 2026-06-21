@@ -1,0 +1,45 @@
+﻿<ul class="navbar-nav ms-auto">
+    @if (User.Identity != null && User.Identity.IsAuthenticated) {
+        @if (User.IsInRole("Admin")) {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Dashboard" asp-action="AdminDashboard">Admin Dashboard</a>
+            </li>
+        }
+
+        @if (User.IsInRole("CourtEmployee")) {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Dashboard" asp-action="CourtEmployeeDashboard">Court Dashboard</a>
+            </li>
+        }
+
+        @if (User.IsInRole("Lawyer")) {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Dashboard" asp-action="LawyerDashboard">Lawyer Dashboard</a>
+            </li>
+        }
+
+        @if (User.IsInRole("Client")) {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Dashboard" asp-action="ClientDashboard">Client Dashboard</a>
+            </li>
+        }
+
+        <li class="nav-item">
+            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-link nav-link">
+                    Logout
+                </button>
+            </form>
+        </li>
+    }
+    else {
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+        </li>
+    }
+</ul>
