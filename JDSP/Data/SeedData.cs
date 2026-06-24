@@ -18,11 +18,11 @@ namespace JDSP.Data {
                 Roles.Client
             };
 
-            foreach (var role in roles) {
-                if (!await roleManager.RoleExistsAsync(role)) {
-                    await roleManager.CreateAsync(new IdentityRole(role));
-                }
-            }
+            //foreach (var role in roles) {
+            //    if (!await roleManager.RoleExistsAsync(role)) {
+            //        await roleManager.CreateAsync(new IdentityRole(role));
+            //    }
+            //}
 
             await CreateUserIfNotExists(
                 userManager,
