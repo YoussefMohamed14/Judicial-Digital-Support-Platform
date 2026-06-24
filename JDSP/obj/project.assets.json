@@ -3129,11 +3129,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
+      "projectUniqueName": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
       "projectName": "JDSP",
-      "projectPath": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
+      "projectPath": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
       "packagesPath": "C:\\Users\\ym051\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ym051\\OneDrive\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\obj\\",
+      "outputPath": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3214,7 +3214,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

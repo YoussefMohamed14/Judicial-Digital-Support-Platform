@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JDSP.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260621202521_InitialIdentitySetup")]
+    [Migration("20260623093239_InitialIdentitySetup")]
     partial class InitialIdentitySetup
     {
         /// <inheritdoc />
