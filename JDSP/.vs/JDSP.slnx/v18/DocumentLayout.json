@@ -1,29 +1,69 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\",
+  "WorkspaceRootPath": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\models\\caselawyer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:models\\caselawyer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\viewmodel\\account\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:viewmodel\\account\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\models\\case.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:models\\case.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\views\\lawyers\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:views\\lawyers\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\viewmodel\\lawyerlistviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:viewmodel\\lawyerlistviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\controllers\\lawyerscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:controllers\\lawyerscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\views\\cases\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:views\\cases\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\data\\seeddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:data\\seeddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\controllers\\casecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:controllers\\casecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\viewmodel\\createcaseviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:viewmodel\\createcaseviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\viewmodel\\account\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:viewmodel\\account\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|c:\\users\\ym051\\desktop\\graduation project\\judicial-digital-support-platform\\jdsp\\migrations\\20260623093239_initialidentitysetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\migrations\\20260623093239_initialidentitysetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:migrations\\20260623093239_initialidentitysetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -34,41 +74,179 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": ".gitignore",
-              "DocumentMoniker": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\.gitignore",
-              "RelativeDocumentMoniker": ".gitignore",
-              "ToolTip": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\.gitignore",
-              "RelativeToolTip": ".gitignore",
-              "ViewState": "AgIAABAAAAAAAAAAAAAuwFYAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-06-24T19:12:38.434Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "CaseLawyer.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Models\\CaseLawyer.cs",
+              "RelativeDocumentMoniker": "Models\\CaseLawyer.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Models\\CaseLawyer.cs",
+              "RelativeToolTip": "Models\\CaseLawyer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-25T14:45:16.147Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Home\\Index.cshtml",
-              "RelativeToolTip": "Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABsAAAAAAAAAA==",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Lawyers\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Lawyers\\Index.cshtml",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Lawyers\\Index.cshtml",
+              "RelativeToolTip": "Views\\Lawyers\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-06-23T09:35:40.02Z",
+              "WhenOpened": "2026-06-25T12:51:32.028Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "Case.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Models\\Case.cs",
+              "RelativeDocumentMoniker": "Models\\Case.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Models\\Case.cs",
+              "RelativeToolTip": "Models\\Case.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T19:20:04.936Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T20:23:52.767Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "LawyerListViewModel.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\LawyerListViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModel\\LawyerListViewModel.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\LawyerListViewModel.cs",
+              "RelativeToolTip": "ViewModel\\LawyerListViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-25T12:21:43.955Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LawyersController.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Controllers\\LawyersController.cs",
+              "RelativeDocumentMoniker": "Controllers\\LawyersController.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Controllers\\LawyersController.cs",
+              "RelativeToolTip": "Controllers\\LawyersController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-25T12:41:35.507Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Cases\\Create.cshtml",
+              "RelativeDocumentMoniker": "Views\\Cases\\Create.cshtml",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Cases\\Create.cshtml",
+              "RelativeToolTip": "Views\\Cases\\Create.cshtml",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAAEAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-24T21:00:27.715Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CaseController.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Controllers\\CaseController.cs",
+              "RelativeDocumentMoniker": "Controllers\\CaseController.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Controllers\\CaseController.cs",
+              "RelativeToolTip": "Controllers\\CaseController.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAkwEUAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T19:57:04.075Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "SeedData.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Data\\SeedData.cs",
+              "RelativeDocumentMoniker": "Data\\SeedData.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Data\\SeedData.cs",
+              "RelativeToolTip": "Data\\SeedData.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAhwBkAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T21:09:50.82Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "CreateCaseViewModel.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\CreateCaseViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModel\\CreateCaseViewModel.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\CreateCaseViewModel.cs",
+              "RelativeToolTip": "ViewModel\\CreateCaseViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T19:55:19.983Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEUAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-23T09:23:21.71Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": ".gitignore",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\.gitignore",
+              "RelativeDocumentMoniker": ".gitignore",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\.gitignore",
+              "RelativeToolTip": ".gitignore",
+              "ViewState": "AgIAABAAAAAAAAAAAAAuwFYAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-06-24T19:12:38.434Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Home\\Index.cshtml",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-23T09:35:40.02Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
               "Title": "LoginViewModel.cs",
-              "DocumentMoniker": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\Account\\LoginViewModel.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\Account\\LoginViewModel.cs",
               "RelativeDocumentMoniker": "ViewModel\\Account\\LoginViewModel.cs",
-              "ToolTip": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\Account\\LoginViewModel.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\Account\\LoginViewModel.cs",
               "RelativeToolTip": "ViewModel\\Account\\LoginViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -76,11 +254,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 15,
               "Title": "20260623093239_InitialIdentitySetup.cs",
-              "DocumentMoniker": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Migrations\\20260623093239_InitialIdentitySetup.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Migrations\\20260623093239_InitialIdentitySetup.cs",
               "RelativeDocumentMoniker": "Migrations\\20260623093239_InitialIdentitySetup.cs",
-              "ToolTip": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Migrations\\20260623093239_InitialIdentitySetup.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Migrations\\20260623093239_InitialIdentitySetup.cs",
               "RelativeToolTip": "Migrations\\20260623093239_InitialIdentitySetup.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -88,27 +266,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 14,
               "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\appsettings.json",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\appsettings.json",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\appsettings.json",
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2026-06-23T09:27:55.098Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAADAAAAAAAAAAAAAAADcAAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-23T09:23:21.71Z"
             }
           ]
         }

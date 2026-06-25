@@ -1,0 +1,54 @@
+﻿@*
+    //دا تست فقط
+*@
+@model JDSP.ViewModel.CreateCaseViewModel
+@{
+    ViewData["Title"] = "Create New Case";
+}
+
+<div class="container mt-4" style="max-width:680px">
+    <h2 class="mb-1">Submit a New Case</h2>
+    <p class="text-muted mb-4">Fill in your case details. You will choose a lawyer in the next step.</p>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="CaseName" class="form-label fw-semibold"></label>
+            <input asp-for="CaseName" class="form-control"
+                   placeholder="e.g. Property dispute with neighbor" />
+            <span asp-validation-for="CaseName" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CaseType" class="form-label fw-semibold"></label>
+            <select asp-for="CaseType" class="form-select">
+                <option value="">-- Select type --</option>
+                <option value="Civil">Civil</option>
+                <option value="Criminal">Criminal</option>
+                <option value="Family">Family</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Administrative">Administrative</option>
+            </select>
+            <span asp-validation-for="CaseType" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label fw-semibold"></label>
+            <textarea asp-for="Description" class="form-control" rows="6"
+                      placeholder="Describe your case in detail..."></textarea>
+            <span asp-validation-for="Description" class="text-danger small"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4">Next: Choose a Lawyer →</button>
+            <a asp-action="MyCases" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
