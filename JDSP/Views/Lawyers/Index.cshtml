@@ -1,0 +1,43 @@
+﻿@*
+    // this is only for test it will be changed later
+*@
+
+
+
+@model IEnumerable<JDSP.ViewModel.LawyerListViewModel>
+@{
+    ViewData["Title"] = "Choose a Lawyer";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-1">Choose a Lawyer</h2>
+    <p class="text-muted mb-4">Select a lawyer to handle your case.</p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No lawyers are available at the moment.</div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var lawyer in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">@lawyer.FullName</h5>
+                            <p class="text-muted small mb-3">@lawyer.Email</p>
+                            <a asp-controller="LawyerRequests"
+                               asp-action="Confirm"
+                               asp-route-caseId="@lawyer.CaseId"
+                               asp-route-lawyerId="@lawyer.LawyerId"
+                               class="btn btn-primary btn-sm w-100">
+                                Select this Lawyer →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

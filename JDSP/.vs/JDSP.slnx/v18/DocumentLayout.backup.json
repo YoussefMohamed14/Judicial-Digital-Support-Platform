@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\data\\seeddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:data\\seeddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|e:\\depi\\project\\depi_project\\judicial-digital-support-platform\\jdsp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A8F06889-F400-0C69-C464-2A38988CB3B3}|JDSP.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -54,7 +58,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -62,7 +66,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "SeedData.cs",
+              "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Data\\SeedData.cs",
+              "RelativeDocumentMoniker": "Data\\SeedData.cs",
+              "ToolTip": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Data\\SeedData.cs*",
+              "RelativeToolTip": "Data\\SeedData.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T21:09:50.82Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Create.cshtml",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Cases\\Create.cshtml",
               "RelativeDocumentMoniker": "Views\\Cases\\Create.cshtml",
@@ -75,7 +92,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "CaseController.cs",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Controllers\\CaseController.cs",
               "RelativeDocumentMoniker": "Controllers\\CaseController.cs",
@@ -88,7 +105,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "CreateCaseViewModel.cs",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\CreateCaseViewModel.cs",
               "RelativeDocumentMoniker": "ViewModel\\CreateCaseViewModel.cs",
@@ -101,7 +118,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -114,7 +131,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
@@ -127,7 +144,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "Case.cs",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Models\\Case.cs",
               "RelativeDocumentMoniker": "Models\\Case.cs",
@@ -140,7 +157,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": ".gitignore",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\.gitignore",
               "RelativeDocumentMoniker": ".gitignore",
@@ -153,7 +170,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "Index.cshtml",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "Views\\Home\\Index.cshtml",
@@ -165,7 +182,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "LoginViewModel.cs",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\ViewModel\\Account\\LoginViewModel.cs",
               "RelativeDocumentMoniker": "ViewModel\\Account\\LoginViewModel.cs",
@@ -177,7 +194,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "20260623093239_InitialIdentitySetup.cs",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\Migrations\\20260623093239_InitialIdentitySetup.cs",
               "RelativeDocumentMoniker": "Migrations\\20260623093239_InitialIdentitySetup.cs",
@@ -189,7 +206,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "appsettings.json",
               "DocumentMoniker": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
