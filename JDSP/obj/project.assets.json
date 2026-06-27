@@ -3123,23 +3123,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ym051\\.nuget\\packages\\": {},
+    "C:\\Users\\Fares\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
+      "projectUniqueName": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
       "projectName": "JDSP",
-      "projectPath": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
-      "packagesPath": "C:\\Users\\ym051\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ym051\\Desktop\\Graduation Project\\Judicial-Digital-Support-Platform\\JDSP\\obj\\",
+      "projectPath": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\JDSP.csproj",
+      "packagesPath": "C:\\Users\\Fares\\.nuget\\packages\\",
+      "outputPath": "E:\\DEPI\\project\\Depi_project\\Judicial-Digital-Support-Platform\\JDSP\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\ym051\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Fares\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
