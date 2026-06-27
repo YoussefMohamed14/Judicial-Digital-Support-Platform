@@ -55,6 +55,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyUmVxdWVzdHNcQ29uZmlybS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/LawyerRequests/IncomingRequests.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyUmVxdWVzdHNcSW5jb21pbmdSZXF1ZXN0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/LawyerRequests/MyRequests.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyUmVxdWVzdHNcTXlSZXF1ZXN0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/LawyerRequests/OfferDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyUmVxdWVzdHNcT2ZmZXJEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/LawyerRequests/ProposePrice.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyUmVxdWVzdHNcUHJvcG9zZVByaWNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/Lawyers/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -65,6 +81,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/Subscriptions/Confirmation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3Vic2NyaXB0aW9uc1xDb25maXJtYXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/DEPI/project/Depi_project/Judicial-Digital-Support-Platform/JDSP/Views/_ViewImports.cshtml]
