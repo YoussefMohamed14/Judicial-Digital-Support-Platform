@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace JDSP.Data {
-        public class ApplicationDbContext : IdentityDbContext<ApplicationUser> {
-            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser> {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Case> Cases { get; set; }
@@ -44,17 +44,6 @@ namespace JDSP.Data {
                     .WithMany()
                     .HasForeignKey(cls => cls.CaseLawyerId)
                     .OnDelete(DeleteBehavior.Cascade);
-                
-                builder.Entity<Document>()
-                    .HasOne(d => d.Case)
-                    .WithMany()
-                    .HasForeignKey(d => d.CaseId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                builder.Entity<Document>()
-                    .HasOne(d => d.UploadedBy)
-                    .WithMany()
-                    .HasForeignKey(d => d.UploadedById)
-                    .OnDelete(DeleteBehavior.Restrict);
-            }
-        } 
+        }
+    } 
 }

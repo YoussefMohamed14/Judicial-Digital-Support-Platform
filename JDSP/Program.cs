@@ -33,22 +33,16 @@ builder.Services.ConfigureApplicationCookie(options => {
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthorization();
-app.UseAuthentication();
 
 // Seed roles and default users
 await SeedData.InitializeAsync(app.Services);
 
 // Middleware
 if (!app.Environment.IsDevelopment()) {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Account/Error");
     app.UseHsts();
 }
 
@@ -63,7 +57,7 @@ app.UseAuthorization();
 // Routing
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 
 app.Run();

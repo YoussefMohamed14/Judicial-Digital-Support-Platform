@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JDSP.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260626132641_initialCreate")]
-    partial class initialCreate
+    [Migration("20260627230504_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -197,6 +197,78 @@ namespace JDSP.Migrations
                     b.ToTable("CaseLawyers");
                 });
 
+            modelBuilder.Entity("JDSP.Models.CaseLawyerSubscription", b =>
+                {
+                    b.Property<int>("CaseLawyerSubscriptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CaseLawyerSubscriptionId"));
+
+                    b.Property<string>("BillingCycle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CaseLawyerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("CaseLawyerSubscriptionId");
+
+                    b.HasIndex("CaseLawyerId");
+
+                    b.ToTable("CaseLawyerSubscriptions");
+                });
+
+            modelBuilder.Entity("JDSP.Models.Document", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CaseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UploadedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.HasIndex("UploadedById");
+
+                    b.ToTable("Documents");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -360,6 +432,36 @@ namespace JDSP.Migrations
                     b.Navigation("Lawyer");
                 });
 
+            modelBuilder.Entity("JDSP.Models.CaseLawyerSubscription", b =>
+                {
+                    b.HasOne("JDSP.Models.CaseLawyer", "Caselawyer")
+                        .WithMany()
+                        .HasForeignKey("CaseLawyerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Caselawyer");
+                });
+
+            modelBuilder.Entity("JDSP.Models.Document", b =>
+                {
+                    b.HasOne("JDSP.Models.Case", "Case")
+                        .WithMany("Documents")
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JDSP.Models.ApplicationUser", "UploadedBy")
+                        .WithMany("UploadedDocuments")
+                        .HasForeignKey("UploadedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+
+                    b.Navigation("UploadedBy");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -409,6 +511,16 @@ namespace JDSP.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("JDSP.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("UploadedDocuments");
+                });
+
+            modelBuilder.Entity("JDSP.Models.Case", b =>
+                {
+                    b.Navigation("Documents");
                 });
 #pragma warning restore 612, 618
         }

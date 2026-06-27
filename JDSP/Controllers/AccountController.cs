@@ -137,5 +137,8 @@ namespace JDSP.Controllers {
 
             return RedirectToAction("Index", "Home");
         }
+        public IActionResult Error() {
+            return View();
+        }
     }
 }

@@ -8,12 +8,12 @@ using JDSP.ViewModel;
 namespace JDSP.Controllers
 {
     [Authorize]
-    public class CaseController : Controller
+    public class CasesController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CaseController(ApplicationDbContext context, 
+        public CasesController(ApplicationDbContext context, 
             UserManager<ApplicationUser> userManager)
         {
             _context = context;
@@ -26,9 +26,10 @@ namespace JDSP.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> Create(CreateCaseViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -36,7 +37,7 @@ namespace JDSP.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return View(model);
+                return RedirectToAction("Login","Account");
             }
 
             var newCase = new Case
@@ -55,7 +56,9 @@ namespace JDSP.Controllers
             TempData["SuccessMessage"] = "Case created successfully!";
             return RedirectToAction("Index", "Lawyers", new { caseId = newCase.CaseID });
         }
-
+        /*
+            for fares: create mycases view like MyCases.cshtml in Case folder to view cases and return view 
+        */
         public async Task<IActionResult> MyCases()
         {
             var user = await _userManager.GetUserAsync(User);

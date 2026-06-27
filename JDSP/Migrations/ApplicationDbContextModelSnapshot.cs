@@ -194,6 +194,43 @@ namespace JDSP.Migrations
                     b.ToTable("CaseLawyers");
                 });
 
+            modelBuilder.Entity("JDSP.Models.CaseLawyerSubscription", b =>
+                {
+                    b.Property<int>("CaseLawyerSubscriptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CaseLawyerSubscriptionId"));
+
+                    b.Property<string>("BillingCycle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CaseLawyerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("CaseLawyerSubscriptionId");
+
+                    b.HasIndex("CaseLawyerId");
+
+                    b.ToTable("CaseLawyerSubscriptions");
+                });
+
             modelBuilder.Entity("JDSP.Models.Document", b =>
                 {
                     b.Property<int>("Id")
@@ -390,6 +427,17 @@ namespace JDSP.Migrations
                     b.Navigation("Case");
 
                     b.Navigation("Lawyer");
+                });
+
+            modelBuilder.Entity("JDSP.Models.CaseLawyerSubscription", b =>
+                {
+                    b.HasOne("JDSP.Models.CaseLawyer", "Caselawyer")
+                        .WithMany()
+                        .HasForeignKey("CaseLawyerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Caselawyer");
                 });
 
             modelBuilder.Entity("JDSP.Models.Document", b =>

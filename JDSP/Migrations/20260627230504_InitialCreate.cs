@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace JDSP.Migrations
 {
     /// <inheritdoc />
-    public partial class initialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -215,6 +215,59 @@ namespace JDSP.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CaseId = table.Column<int>(type: "int", nullable: false),
+                    UploadedById = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Documents_AspNetUsers_UploadedById",
+                        column: x => x.UploadedById,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "CaseID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CaseLawyerSubscriptions",
+                columns: table => new
+                {
+                    CaseLawyerSubscriptionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CaseLawyerId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BillingCycle = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseLawyerSubscriptions", x => x.CaseLawyerSubscriptionId);
+                    table.ForeignKey(
+                        name: "FK_CaseLawyerSubscriptions_CaseLawyers_CaseLawyerId",
+                        column: x => x.CaseLawyerId,
+                        principalTable: "CaseLawyers",
+                        principalColumn: "CaseLawyerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -271,9 +324,24 @@ namespace JDSP.Migrations
                 column: "LawyerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseLawyerSubscriptions_CaseLawyerId",
+                table: "CaseLawyerSubscriptions",
+                column: "CaseLawyerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Cases_CreatedBy_Id",
                 table: "Cases",
                 column: "CreatedBy_Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_CaseId",
+                table: "Documents",
+                column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_UploadedById",
+                table: "Documents",
+                column: "UploadedById");
         }
 
         /// <inheritdoc />
@@ -295,10 +363,16 @@ namespace JDSP.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CaseLawyers");
+                name: "CaseLawyerSubscriptions");
+
+            migrationBuilder.DropTable(
+                name: "Documents");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "CaseLawyers");
 
             migrationBuilder.DropTable(
                 name: "Cases");

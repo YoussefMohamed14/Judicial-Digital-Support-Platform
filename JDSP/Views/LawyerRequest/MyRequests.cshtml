@@ -42,7 +42,7 @@
                                     "Pending" => "warning",
                                     "Accepted" => "success",
                                     "Rejected" => "danger",
-                                    "PriceProposed" => "info",
+                                    "Price Proposed" => "info",
                                     "OfferAccepted" => "primary",
                                     _ => "secondary"
                                 };
@@ -55,7 +55,7 @@
                                 : "—")
                         </td>
                         <td>
-                            @if (req.Status == "PriceProposed")
+                            @if (req.Status == "Price Proposed")
                             {
                                 <a asp-action="OfferDetails"
                                    asp-route-caseLawyerId="@req.CaseLawyerId"

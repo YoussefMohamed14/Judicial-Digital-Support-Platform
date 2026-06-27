@@ -115,12 +115,13 @@ namespace JDSP.Controllers
                     CaseLawyerId = cl.CaseLawyerId,
                     CaseName = cl.Case!.CaseName,
                     LawyerName = cl.Lawyer!.FirstName + " " + cl.Lawyer.MiddleName + " " + cl.Lawyer.LastName,
-                    Status = cl.Status
+                    Status = cl.Status,
+                    ProposedPrice = cl.ProposedPrice
                 }).ToList();
             return View(requests);
         }
 
-        public async Task<IActionResult> ProposePrice( int caseLawyerId)
+        public async Task<IActionResult> ProposePrice(int caseLawyerId)
         {
             var request = _context.CaseLawyers
                 .Where(cl => cl.CaseLawyerId == caseLawyerId && cl.Status == "Accepted")
