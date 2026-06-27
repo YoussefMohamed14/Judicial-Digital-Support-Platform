@@ -9,6 +9,7 @@ namespace JDSP.Data {
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Case> Cases { get; set; }
         public DbSet<CaseLawyer> CaseLawyers { get; set; }
+        public DbSet<CaseLawyerSubscription> CaseLawyerSubscriptions { get; set; }
         protected override void OnModelCreating(ModelBuilder builder) {
                 base.OnModelCreating(builder);
 
@@ -16,6 +17,7 @@ namespace JDSP.Data {
                     .HasIndex(u => u.NationalNumber)
                     .IsUnique();
                 
+                //Case -> ApplicationUser (Creator)
                 builder.Entity<Case>()
                     .HasOne(c => c.Creator)
                     .WithMany()
@@ -34,6 +36,13 @@ namespace JDSP.Data {
                     .WithMany()
                     .HasForeignKey(cl => cl.LawyerId)
                     .OnDelete(DeleteBehavior.Restrict);
+                
+                // CaseLawyerSubscription -> CaseLawyer
+                builder.Entity<CaseLawyerSubscription>()
+                    .HasOne(cls => cls.Caselawyer)
+                    .WithMany()
+                    .HasForeignKey(cls => cls.CaseLawyerId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
             }
         } 

@@ -1,4 +1,5 @@
-﻿@model JDSP.ViewModels.Account.LoginViewModel
+﻿@page
+@model JDSP.ViewModels.Account.LoginViewModel
 
 @{
     ViewData["Title"] = "Login";
@@ -42,4 +43,6 @@
     </a>
 </form>
 
-
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
