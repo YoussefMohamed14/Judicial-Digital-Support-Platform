@@ -55,6 +55,6 @@ namespace JDSP.Data {
                     .WithMany()
                     .HasForeignKey(d => d.UploadedById)
                     .OnDelete(DeleteBehavior.Restrict);
-        }
+            }
         } 
 }
