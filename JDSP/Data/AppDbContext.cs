@@ -10,6 +10,7 @@ namespace JDSP.Data {
         public DbSet<Case> Cases { get; set; }
         public DbSet<CaseLawyer> CaseLawyers { get; set; }
         public DbSet<CaseLawyerSubscription> CaseLawyerSubscriptions { get; set; }
+        public DbSet<Document> Documents { get; set; }
         protected override void OnModelCreating(ModelBuilder builder) {
                 base.OnModelCreating(builder);
 
@@ -43,7 +44,17 @@ namespace JDSP.Data {
                     .WithMany()
                     .HasForeignKey(cls => cls.CaseLawyerId)
                     .OnDelete(DeleteBehavior.Cascade);
-
-            }
+                
+                builder.Entity<Document>()
+                    .HasOne(d => d.Case)
+                    .WithMany()
+                    .HasForeignKey(d => d.CaseId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                builder.Entity<Document>()
+                    .HasOne(d => d.UploadedBy)
+                    .WithMany()
+                    .HasForeignKey(d => d.UploadedById)
+                    .OnDelete(DeleteBehavior.Restrict);
+        }
         } 
 }
