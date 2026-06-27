@@ -23,5 +23,8 @@ namespace JDSP.Models {
         public string AccountStatus { get; set; } = "Active";
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+
+        public ICollection<Document> UploadedDocuments { get; set; } = new List<Document>();
     }
 }

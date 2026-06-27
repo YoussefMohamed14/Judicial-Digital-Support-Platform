@@ -30,5 +30,8 @@ namespace JDSP.Models
         
         [ForeignKey("CreatedBy_Id")]
         public ApplicationUser? Creator { get; set; }
+
+
+        public ICollection<Document> Documents { get; set; } = new List<Document>();
     }
 }
