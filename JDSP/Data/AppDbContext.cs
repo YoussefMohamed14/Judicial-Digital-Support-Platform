@@ -11,39 +11,61 @@ namespace JDSP.Data {
         public DbSet<CaseLawyer> CaseLawyers { get; set; }
         public DbSet<CaseLawyerSubscription> CaseLawyerSubscriptions { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<LawyerProfile> LawyerProfiles { get; set; }
+        public DbSet<LawyerFollow> LawyerFollows { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder) {
-                base.OnModelCreating(builder);
+            base.OnModelCreating(builder);
 
-                builder.Entity<ApplicationUser>()
-                    .HasIndex(u => u.NationalNumber)
-                    .IsUnique();
-                
-                //Case -> ApplicationUser (Creator)
-                builder.Entity<Case>()
-                    .HasOne(c => c.Creator)
-                    .WithMany()
-                    .HasForeignKey(c => c.CreatedBy_Id)
-                    .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete to avoid deleting users when a case is deleted مهمة دى
+            builder.Entity<ApplicationUser>()
+                .HasIndex(u => u.NationalNumber)
+                .IsUnique();
 
-                // CaseLawyer -> Case
-                builder.Entity<CaseLawyer>()
-                    .HasOne(cl => cl.Case)
-                    .WithMany()
-                    .HasForeignKey(cl => cl.CaseId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                // CaseLawyer -> Lawyer 
-                builder.Entity<CaseLawyer>()
-                    .HasOne(cl => cl.Lawyer)
-                    .WithMany()
-                    .HasForeignKey(cl => cl.LawyerId)
-                    .OnDelete(DeleteBehavior.Restrict);
-                
-                // CaseLawyerSubscription -> CaseLawyer
-                builder.Entity<CaseLawyerSubscription>()
-                    .HasOne(cls => cls.Caselawyer)
-                    .WithMany()
-                    .HasForeignKey(cls => cls.CaseLawyerId)
-                    .OnDelete(DeleteBehavior.Cascade);
+            //Case -> ApplicationUser (Creator)
+            builder.Entity<Case>()
+                .HasOne(c => c.Creator)
+                .WithMany()
+                .HasForeignKey(c => c.CreatedBy_Id)
+                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete to avoid deleting users when a case is deleted مهمة دى
+
+            // CaseLawyer -> Case
+            builder.Entity<CaseLawyer>()
+                .HasOne(cl => cl.Case)
+                .WithMany()
+                .HasForeignKey(cl => cl.CaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // CaseLawyer -> Lawyer 
+            builder.Entity<CaseLawyer>()
+                .HasOne(cl => cl.Lawyer)
+                .WithMany()
+                .HasForeignKey(cl => cl.LawyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // CaseLawyerSubscription -> CaseLawyer
+            builder.Entity<CaseLawyerSubscription>()
+                .HasOne(cls => cls.Caselawyer)
+                .WithMany()
+                .HasForeignKey(cls => cls.CaseLawyerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<LawyerProfile>()
+                .HasIndex(x => x.UserId)
+                .IsUnique();
+
+            builder.Entity<LawyerFollow>()
+                .HasIndex(x => new { x.FollowerId, x.LawyerId })
+                .IsUnique();
+
+            builder.Entity<LawyerFollow>()
+                .HasOne(x => x.Follower)
+                .WithMany()
+                .HasForeignKey(x => x.FollowerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<LawyerFollow>()
+                .HasOne(x => x.Lawyer)
+                .WithMany()
+                .HasForeignKey(x => x.LawyerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
-    } 
+    }
 }

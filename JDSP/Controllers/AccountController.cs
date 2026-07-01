@@ -106,7 +106,7 @@ namespace JDSP.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout() {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Account", "Login");
         }
 
         [HttpGet]
@@ -135,7 +135,7 @@ namespace JDSP.Controllers {
             if (await _userManager.IsInRoleAsync(user, Roles.Client))
                 return RedirectToAction("ClientDashboard", "Dashboard");
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Account", "Login");
         }
         public IActionResult Error() {
             return View();

@@ -27,13 +27,21 @@
 
                     @if (User.IsInRole("Lawyer")) {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="LawyerDashboard">Lawyer Dashboard</a>
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="CreateProfile">Create Profile</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="EditProfile">Edit Profile</a>
                         </li>
                     }
 
                     @if (User.IsInRole("Client")) {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="ClientDashboard">Client Dashboard</a>
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="Index">Browse Lawyers</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="FollowedLawyers">Followed Lawyers</a>
                         </li>
                     }
 

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JDSP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+daecec1f8d8fd01c8600c373567d55948b0b8e93")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7371eb05d431413a3d30892a6e6f086662f714f1")]
 [assembly: System.Reflection.AssemblyProductAttribute("JDSP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JDSP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

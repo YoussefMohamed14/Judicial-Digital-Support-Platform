@@ -44,7 +44,7 @@ namespace JDSP.Controllers
         public async Task<IActionResult> Confirm(SendRequestViewModel vm)
         {
             bool alreadyExists = _context.CaseLawyers.Any(cl =>
-                        cl.CaseLawyerId == vm.CaseId &&
+                        cl.CaseId == vm.CaseId &&
                         cl.LawyerId == vm.LawyerId &&
                         cl.Status != "Rejected");
             if (alreadyExists)

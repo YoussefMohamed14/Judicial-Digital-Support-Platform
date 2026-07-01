@@ -1,0 +1,37 @@
+﻿@model JDSP.ViewModels.Lawyers.LawyerListItemViewModel
+
+<h2>@Model.FullName</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Specialization:</strong> @Model.Specialization</p>
+        <p><strong>Experience:</strong> @Model.YearsOfExperience years</p>
+        <p><strong>Consultation Price:</strong> @Model.ConsultationPrice</p>
+        <p><strong>Status:</strong> @(Model.IsAvailable ? "Available" : "Not Available")</p>
+
+        <hr />
+
+        <h5>Bio</h5>
+        <p>@ViewBag.Bio</p>
+
+        @if (User.IsInRole("Client")) {
+            if (Model.IsFollowed) {
+                <form asp-action="Unfollow" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="lawyerProfileId" value="@Model.LawyerProfileId" />
+                    <button type="submit" class="btn btn-warning">Unfollow</button>
+                </form>
+            }
+            else {
+                <form asp-action="Follow" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="lawyerProfileId" value="@Model.LawyerProfileId" />
+                    <button type="submit" class="btn btn-success">Follow</button>
+                </form>
+            }
+        }
+
+        <a asp-action="Index" class="btn btn-secondary mt-3">Back</a>
+    </div>
+</div>

@@ -91,6 +91,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyUmVxdWVzdFxQcm9wb3NlUHJpY2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/ym051/Desktop/Graduation Project/Judicial-Digital-Support-Platform/JDSP/Views/Lawyers/CreateProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyc1xDcmVhdGVQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ym051/Desktop/Graduation Project/Judicial-Digital-Support-Platform/JDSP/Views/Lawyers/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ym051/Desktop/Graduation Project/Judicial-Digital-Support-Platform/JDSP/Views/Lawyers/EditProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyc1xFZGl0UHJvZmlsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ym051/Desktop/Graduation Project/Judicial-Digital-Support-Platform/JDSP/Views/Lawyers/FollowedLawyers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyc1xGb2xsb3dlZExhd3llcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/ym051/Desktop/Graduation Project/Judicial-Digital-Support-Platform/JDSP/Views/Lawyers/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGF3eWVyc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
