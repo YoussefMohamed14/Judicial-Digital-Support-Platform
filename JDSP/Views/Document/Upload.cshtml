@@ -1,0 +1,27 @@
+@model JDSP.ViewModel.Document.UploadDocumentViewModel
+@{ Layout = User.IsInRole("Client") ? "_ClientLayout" : "_Layout"; }
+
+<h2>Upload Document</h2>
+
+<form asp-action="Upload"
+      asp-controller="Document"
+      method="post"
+      enctype="multipart/form-data">
+
+    <div class="mb-3">
+        <label asp-for="CaseId"></label>
+        <input asp-for="CaseId" class="form-control" />
+        <span asp-validation-for="CaseId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="File"></label>
+        <input asp-for="File" class="form-control" type="file" />
+        <span asp-validation-for="File" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Upload
+    </button>
+
+</form>

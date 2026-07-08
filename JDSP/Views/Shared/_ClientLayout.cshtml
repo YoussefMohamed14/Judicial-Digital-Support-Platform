@@ -1,0 +1,73 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var fullName = user == null ? (User.Identity?.Name ?? "User") : $"{user.FirstName} {user.LastName}";
+    var initials = user == null ? "U" : $"{user.FirstName.FirstOrDefault()}{user.LastName.FirstOrDefault()}".ToUpperInvariant();
+}
+<!DOCTYPE html>
+<html lang="@(ar ? "ar" : "en")" dir="@(ar ? "rtl" : "ltr")">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - JDSP</title>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('jdsp-theme')||'light');</script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/client-layout.css" asp-append-version="true" />
+</head>
+<body class="client-body">
+<div class="client-shell">
+    <aside class="client-sidebar" id="clientSidebar">
+        <a class="client-brand" asp-controller="Dashboard" asp-action="ClientDashboard"><span>J</span> JDSP</a>
+        <div class="workspace-label">@(ar ? "مساحة العميل" : "CLIENT WORKSPACE")</div>
+        <nav>
+            <a asp-controller="Dashboard" asp-action="ClientDashboard">⌂ <span>@(ar ? "لوحة التحكم" : "Dashboard")</span></a>
+            <a asp-controller="Cases" asp-action="MyCases">▣ <span>@(ar ? "القضايا" : "Cases")</span></a>
+            <a asp-controller="Lawyers" asp-action="Index">⚖ <span>@(ar ? "البحث عن محامين" : "Find lawyers")</span></a>
+            <a asp-controller="ServiceRequests" asp-action="CreatePublic">◎ <span>@(ar ? "طلب عام" : "Public request")</span></a>
+            <a asp-controller="ServiceRequests" asp-action="MyRequests">⇄ <span>@(ar ? "طلباتي" : "My requests")</span></a>
+            <a asp-controller="Lawyers" asp-action="FollowedLawyers">☆ <span>@(ar ? "المحامون المتابعون" : "Followed lawyers")</span></a>
+            <a asp-controller="Messages" asp-action="Index">✉ <span>@(ar ? "الرسائل" : "Messages")</span></a>
+        </nav>
+        <div class="sidebar-note">
+            <strong>@(ar ? "إنشاء القضايا" : "Case creation")</strong>
+            <small>@(ar ? "يقوم موظف المحكمة فقط بإنشاء القضية الرسمية وإسنادها إلى حسابك." : "Only a Court Employee creates an official case and assigns it to your account.")</small>
+        </div>
+    </aside>
+    <div class="client-main">
+        <header class="client-topbar">
+            <button class="btn sidebar-toggle" id="sidebarToggle">☰</button>
+            <span class="text-muted small">@(ar ? "منصة الدعم القضائي الرقمي" : "Judicial Digital Support Platform")</span>
+            <div class="ms-auto dropdown">
+                <button class="btn user-menu dropdown-toggle" data-bs-toggle="dropdown">
+                    @if (!string.IsNullOrWhiteSpace(user?.PhotoPath)) { <img src="@user.PhotoPath" class="avatar" alt="@fullName" /> }
+                    else { <span class="avatar avatar-fallback">@initials</span> }
+                    <span class="d-none d-sm-inline">@fullName</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">@(ar ? "الملف الشخصي" : "Profile")</a></li>
+                    <li><a class="dropdown-item" asp-controller="Settings" asp-action="Index">@(ar ? "الإعدادات" : "Settings")</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><form asp-controller="Account" asp-action="Logout" method="post">@Html.AntiForgeryToken()<button class="dropdown-item text-danger">@(ar ? "تسجيل الخروج" : "Logout")</button></form></li>
+                </ul>
+            </div>
+        </header>
+        <main class="client-content">
+            @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+            @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success">@TempData["SuccessMessage"]</div> }
+            @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+            @if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger">@TempData["ErrorMessage"]</div> }
+            @RenderBody()
+        </main>
+    </div>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/theme.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

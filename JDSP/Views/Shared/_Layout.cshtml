@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - JDSP</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">JDSP</a>
+
+            <ul class="navbar-nav ms-auto">
+                @if (User.Identity != null && User.Identity.IsAuthenticated) {
+                    @if (User.IsInRole("Admin")) {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="AdminDashboard">Admin Dashboard</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("CourtEmployee")) {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="CourtEmployeeDashboard">Court Dashboard</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Lawyer")) {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="CreateProfile">Create Profile</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="EditProfile">Edit Profile</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Client")) {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="Index">Browse Lawyers</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="FollowedLawyers">Followed Lawyers</a>
+                        </li>
+                    }
+
+                    <li class="nav-item">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                        </form>
+                    </li>
+                }
+                else {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

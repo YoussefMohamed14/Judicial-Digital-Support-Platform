@@ -1,0 +1,35 @@
+@model JDSP.ViewModels.Cases.LawyerAssignedCasesViewModel
+@{ Layout = "_LawyerLayout"; ViewData["Title"] = "Assigned cases"; }
+
+<div class="page-head"><span class="eyebrow">Cases</span><h1>Assigned cases</h1><p>View-only case information assigned to your lawyer account.</p></div>
+
+<div class="filters">
+    <a asp-action="AssignedCases" class="@(string.IsNullOrWhiteSpace(Model.StatusFilter) ? "active" : "")">All</a>
+    @foreach (var status in new[] { "Open", "Pending", "In Progress", "Closed" }) {
+        <a asp-action="AssignedCases" asp-route-status="@status" class="@(Model.StatusFilter == status ? "active" : "")">@status</a>
+    }
+</div>
+
+@if (Model.Cases.Count == 0) {
+    <section class="card-panel empty"><b>▣</b><h3>No assigned cases</h3><p>Cases assigned by the court or accepted through the platform will appear here.</p></section>
+}
+else {
+    <div class="row g-4">
+        @foreach (var item in Model.Cases) {
+            <div class="col-md-6 col-xl-4">
+                <article class="case-card">
+                    <div class="d-flex justify-content-between align-items-start gap-2"><span class="case-icon">▣</span><span class="status @item.Status.ToLower().Replace(" ", "-")">@item.Status</span></div>
+                    <h2>@item.CaseName</h2>
+                    <div class="case-type">@item.CaseType</div>
+                    <p class="case-desc">@item.Description</p>
+                    <div class="case-meta">
+                        <div><span>Client</span><strong>@item.ClientName</strong></div>
+                        <div><span>Assigned</span><strong>@item.AssignedAt.ToString("dd MMM yyyy")</strong></div>
+                        <div><span>Next hearing</span><strong>@(item.NextHearingDate?.ToString("dd MMM yyyy, h:mm tt") ?? "Not scheduled")</strong></div>
+                    </div>
+                    <a asp-action="LawyerDetails" asp-route-id="@item.CaseId" class="btn btn-outline-primary mt-3">View details</a>
+                </article>
+            </div>
+        }
+    </div>
+}

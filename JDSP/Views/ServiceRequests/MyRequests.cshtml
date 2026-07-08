@@ -1,0 +1,30 @@
+@model IReadOnlyList<JDSP.ViewModels.ServiceRequests.ServiceRequestListItemViewModel>
+@{ Layout = "_ClientLayout"; ViewData["Title"] = "My requests"; var filter = ViewBag.TypeFilter as string; }
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div><span class="eyebrow">Requests</span><h1>My requests</h1><p>Track direct requests sent to lawyers and public requests open for proposals.</p></div>
+    <div class="d-flex gap-2"><a asp-action="CreatePublic" class="btn btn-primary">+ Public request</a><a asp-controller="Lawyers" asp-action="Index" class="btn btn-outline-primary">Find lawyer</a></div>
+</div>
+
+<div class="filters"><a asp-action="MyRequests" class="@(string.IsNullOrWhiteSpace(filter) ? "active" : "")">All</a><a asp-action="MyRequests" asp-route-type="Direct" class="@(filter == "Direct" ? "active" : "")">Direct</a><a asp-action="MyRequests" asp-route-type="Public" class="@(filter == "Public" ? "active" : "")">Public</a></div>
+
+@if (Model.Count == 0) {
+    <section class="card-panel empty"><b>⇄</b><h3>No requests yet</h3><p>Choose a lawyer for a direct request or publish a request for multiple lawyers.</p></section>
+}
+else {
+    <div class="row g-4">
+    @foreach (var item in Model) {
+        <div class="col-md-6 col-xl-4"><article class="case-card request-card">
+            <div class="d-flex justify-content-between align-items-start gap-2"><span class="request-type">@item.RequestType</span><span class="status @item.Status.ToLower().Replace(" ", "-")">@item.Status</span></div>
+            <h2>@item.Subject</h2>
+            <p class="case-desc">@item.Brief</p>
+            <div class="case-meta">
+                <div><span>@(item.RequestType == "Direct" ? "Lawyer" : "Proposals")</span><strong>@(item.RequestType == "Direct" ? (item.LawyerName ?? "Not available") : item.ProposalCount.ToString())</strong></div>
+                <div><span>Sent</span><strong>@item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</strong></div>
+                <div><span>File</span><strong>@(item.OriginalFileName ?? "No file")</strong></div>
+            </div>
+            <a asp-action="Details" asp-route-id="@item.RequestId" class="btn btn-outline-primary mt-3">View request</a>
+        </article></div>
+    }
+    </div>
+}

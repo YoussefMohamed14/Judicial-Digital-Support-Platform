@@ -1,0 +1,20 @@
+@model JDSP.ViewModels.Account.RegisterViewModel
+@{ Layout = "_PublicLayout"; ViewData["Title"] = "Create account"; }
+<section class="auth-section"><div class="container py-5"><div class="auth-card auth-wide mx-auto">
+<div class="progress-steps mb-4"><div class="active"><span>1</span><b>Account details</b></div><i></i><div><span>2</span><b>Photo and bio</b></div></div>
+<div class="text-center mb-4"><h1 class="h3 fw-bold">Create your JDSP account</h1><p class="text-secondary">Use the information shown on your official documents.</p></div>
+<form asp-action="Register" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+<div class="row g-3">
+<div class="col-md-4"><label asp-for="FirstName" class="form-label fw-semibold">First name</label><input asp-for="FirstName" class="form-control"/><span asp-validation-for="FirstName" class="text-danger small"></span></div>
+<div class="col-md-4"><label asp-for="MiddleName" class="form-label fw-semibold">Middle name</label><input asp-for="MiddleName" class="form-control"/><span asp-validation-for="MiddleName" class="text-danger small"></span></div>
+<div class="col-md-4"><label asp-for="LastName" class="form-label fw-semibold">Last name</label><input asp-for="LastName" class="form-control"/><span asp-validation-for="LastName" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Email" class="form-label fw-semibold"></label><input asp-for="Email" class="form-control" autocomplete="email"/><span asp-validation-for="Email" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="PhoneNumber" class="form-label fw-semibold">Phone number</label><input asp-for="PhoneNumber" class="form-control"/><span asp-validation-for="PhoneNumber" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="NationalNumber" class="form-label fw-semibold">National number</label><input asp-for="NationalNumber" class="form-control" maxlength="20"/><span asp-validation-for="NationalNumber" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Role" class="form-label fw-semibold">Register as</label><select asp-for="Role" asp-items="ViewBag.Roles" class="form-select"><option value="">Select role</option></select><span asp-validation-for="Role" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Password" class="form-label fw-semibold"></label><input asp-for="Password" class="form-control" autocomplete="new-password"/><span asp-validation-for="Password" class="text-danger small"></span><small class="text-secondary">Uppercase, lowercase, number, and symbol.</small></div>
+<div class="col-md-6"><label asp-for="ConfirmPassword" class="form-label fw-semibold">Confirm password</label><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password"/><span asp-validation-for="ConfirmPassword" class="text-danger small"></span></div>
+</div><button class="btn btn-primary btn-lg w-100 mt-4">Continue to profile setup</button></form>
+<p class="text-center text-secondary mt-4 mb-0">Already have an account? <a asp-action="Login" class="fw-semibold text-decoration-none">Sign in</a></p>
+</div></div></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

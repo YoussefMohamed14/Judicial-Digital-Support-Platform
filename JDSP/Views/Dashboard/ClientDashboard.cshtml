@@ -1,0 +1,79 @@
+@model JDSP.ViewModels.Dashboard.ClientDashboardViewModel
+@{ Layout = "_ClientLayout"; ViewData["Title"] = "Client dashboard"; }
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <span class="eyebrow">Client workspace</span>
+        <h1>Welcome back, @Model.ClientName</h1>
+        <p>Track court-created cases, contact lawyers, and manage your legal requests.</p>
+    </div>
+    <a asp-controller="ServiceRequests" asp-action="CreatePublic" class="btn btn-primary px-4">+ Post a public request</a>
+</div>
+
+<div class="row g-3 stats-row">
+    <div class="col-sm-6 col-xl"><div class="stat"><span>▣</span><div><small>Total cases</small><strong>@Model.TotalCases</strong></div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat"><span>●</span><div><small>Active cases</small><strong>@Model.ActiveCases</strong></div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat"><span>☆</span><div><small>Followed lawyers</small><strong>@Model.FollowedLawyers</strong></div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat"><span>◎</span><div><small>Public requests</small><strong>@Model.PublicRequests</strong></div></div></div>
+    <div class="col-sm-6 col-xl"><div class="stat"><span>⇄</span><div><small>Pending requests</small><strong>@Model.PendingRequests</strong></div></div></div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-8">
+        <section class="card-panel h-100">
+            <div class="panel-head">
+                <div><h2>Recent cases</h2><p>Official cases created for you by a Court Employee.</p></div>
+                <a asp-controller="Cases" asp-action="MyCases" class="btn btn-sm btn-outline-secondary">View all</a>
+            </div>
+            @if (Model.RecentCases.Count == 0) {
+                <div class="empty">
+                    <b>▣</b>
+                    <h3>No official cases yet</h3>
+                    <p>A Court Employee creates the official case and assigns it to your account. You can still contact a lawyer or publish a request now.</p>
+                    <div class="d-flex justify-content-center flex-wrap gap-2">
+                        <a asp-controller="Lawyers" asp-action="Index" class="btn btn-primary">Find a lawyer</a>
+                        <a asp-controller="ServiceRequests" asp-action="CreatePublic" class="btn btn-outline-primary">Post public request</a>
+                    </div>
+                </div>
+            }
+            else {
+                <div class="table-responsive">
+                    <table class="table align-middle clean-table">
+                        <thead><tr><th>Case</th><th>Type</th><th>Status</th><th>Created</th><th></th></tr></thead>
+                        <tbody>
+                        @foreach (var item in Model.RecentCases) {
+                            <tr>
+                                <td class="fw-semibold">@item.CaseName</td>
+                                <td>@item.CaseType</td>
+                                <td><span class="status @item.Status.ToLower().Replace(" ", "-")">@item.Status</span></td>
+                                <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                                <td><a asp-controller="Cases" asp-action="Details" asp-route-id="@item.CaseId" class="btn btn-sm btn-light">Details</a></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <section class="card-panel mb-4">
+            <div class="panel-head"><div><h2>Next hearing</h2><p>Your nearest scheduled hearing.</p></div></div>
+            @if (Model.NextHearingDate.HasValue) {
+                <div class="hearing"><b>@Model.NextHearingDate.Value.Day</b><div><strong>@Model.NextHearingDate.Value.ToString("MMMM yyyy")</strong><small>@Model.NextHearingDate.Value.ToString("dddd, h:mm tt")</small></div></div>
+                <div class="info-row"><span>Case</span><strong>@Model.NextHearingCaseName</strong></div>
+                <div class="info-row"><span>Location</span><strong>@(Model.NextHearingLocation ?? "To be confirmed")</strong></div>
+            }
+            else { <div class="empty compact"><b>◷</b><p>No upcoming hearing.</p></div> }
+        </section>
+        <section class="card-panel">
+            <div class="panel-head"><div><h2>Quick actions</h2><p>Start from the action you need.</p></div></div>
+            <div class="quick">
+                <a asp-controller="Lawyers" asp-action="Index">⚖ <span><strong>Find lawyers</strong><small>Choose a lawyer, attach your file, and send a brief</small></span></a>
+                <a asp-controller="ServiceRequests" asp-action="CreatePublic">◎ <span><strong>Public request</strong><small>Let available lawyers send proposals</small></span></a>
+                <a asp-controller="ServiceRequests" asp-action="MyRequests">⇄ <span><strong>My requests</strong><small>Review direct and public requests</small></span></a>
+                <a asp-controller="Messages" asp-action="Index">✉ <span><strong>Messages</strong><small>Messaging logic will be connected later</small></span></a>
+            </div>
+        </section>
+    </div>
+</div>

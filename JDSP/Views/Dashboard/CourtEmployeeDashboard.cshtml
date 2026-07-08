@@ -1,0 +1,8 @@
+@{ ViewData["Title"] = "Court Employee Dashboard"; }
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div><span class="text-uppercase text-primary fw-bold small">Court employee workspace</span><h1 class="mt-2">Case administration</h1><p class="text-muted mb-0">Create official cases and assign each case to the correct client account.</p></div>
+        <a asp-controller="Cases" asp-action="Create" class="btn btn-primary px-4">+ Create official case</a>
+    </div>
+    <div class="alert alert-info">Clients cannot create official cases. The create action is protected by the CourtEmployee role.</div>
+</div>

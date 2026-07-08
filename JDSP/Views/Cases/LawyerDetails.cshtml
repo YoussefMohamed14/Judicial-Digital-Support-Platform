@@ -1,0 +1,17 @@
+@model JDSP.ViewModels.Cases.LawyerAssignedCaseListItemViewModel
+@{ Layout = "_LawyerLayout"; ViewData["Title"] = "Case details"; }
+
+<a asp-action="AssignedCases" class="back-link">← Back to assigned cases</a>
+<div class="page-head mt-3"><span class="eyebrow">View only</span><h1>@Model.CaseName</h1><p>Official case information. Changes are managed by the Court Employee.</p></div>
+
+<section class="card-panel mb-4">
+    <div class="panel-head"><div><h2>Case overview</h2><p>Assignment and status information.</p></div><span class="status large @Model.Status.ToLower().Replace(" ", "-")">@Model.Status</span></div>
+    <div class="detail-grid">
+        <div><span>Case type</span><strong>@Model.CaseType</strong></div>
+        <div><span>Client</span><strong>@Model.ClientName</strong></div>
+        <div><span>Assigned on</span><strong>@Model.AssignedAt.ToString("dd MMMM yyyy")</strong></div>
+        <div><span>Next hearing</span><strong>@(Model.NextHearingDate?.ToString("dd MMMM yyyy, h:mm tt") ?? "Not scheduled")</strong></div>
+        <div><span>Hearing location</span><strong>@(Model.NextHearingLocation ?? "To be confirmed")</strong></div>
+    </div>
+</section>
+<section class="card-panel"><div class="description"><span>Case description</span><p>@Model.Description</p></div></section>

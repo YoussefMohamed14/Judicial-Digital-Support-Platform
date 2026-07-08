@@ -1,0 +1,11 @@
+@model JDSP.ViewModels.Account.CompleteProfileViewModel
+@{ Layout = "_PublicLayout"; ViewData["Title"] = "Complete profile"; }
+<section class="auth-section"><div class="container py-5"><div class="auth-card mx-auto">
+<div class="progress-steps mb-4"><div class="done"><span>✓</span><b>Account details</b></div><i></i><div class="active"><span>2</span><b>Photo and bio</b></div></div>
+<div class="text-center mb-4"><h1 class="h3 fw-bold">Complete your profile</h1><p class="text-secondary">Add a clear photo and short introduction.</p></div>
+<form asp-action="CompleteProfile" method="post" enctype="multipart/form-data">@Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+<div class="upload-box mb-4"><div class="photo-preview" id="photoPreview">+</div><div><label asp-for="Photo" class="form-label fw-semibold">Profile photo</label><input asp-for="Photo" class="form-control" accept="image/jpeg,image/png,image/webp" id="photoInput"/><small class="text-secondary">JPG, PNG, WEBP · Max 5 MB</small><span asp-validation-for="Photo" class="text-danger small d-block"></span></div></div>
+<div class="mb-4"><label asp-for="Bio" class="form-label fw-semibold">Short bio</label><textarea asp-for="Bio" class="form-control" rows="5" placeholder="Tell people a little about yourself."></textarea><span asp-validation-for="Bio" class="text-danger small"></span></div>
+<button class="btn btn-primary btn-lg w-100">Finish setup</button></form>
+</div></div></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script>document.getElementById('photoInput')?.addEventListener('change',function(){const f=this.files?.[0],p=document.getElementById('photoPreview');if(!f||!p)return;const r=new FileReader();r.onload=e=>p.innerHTML=`<img src="${e.target.result}" alt="Preview">`;r.readAsDataURL(f);});</script> }

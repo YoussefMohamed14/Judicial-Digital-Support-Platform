@@ -1,0 +1,63 @@
+@model List<JDSP.ViewModels.Lawyers.LawyerListItemViewModel>
+@{
+    Layout = "_ClientLayout";
+    ViewData["Title"] = "Followed lawyers";
+}
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <span class="eyebrow">Following</span>
+        <h1>Followed lawyers</h1>
+        <p>Quickly return to lawyers you follow and send a request when you are ready.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-primary px-4">Find more lawyers</a>
+</div>
+
+@if (!Model.Any()) {
+    <section class="card-panel empty">
+        <b>☆</b>
+        <h3>You are not following any lawyers yet</h3>
+        <p>Open the lawyer directory and follow the profiles you want to keep.</p>
+        <a asp-action="Index" class="btn btn-primary">Find lawyers</a>
+    </section>
+}
+else {
+    <div class="row g-4">
+        @foreach (var lawyer in Model) {
+            var initials = string.Join("", lawyer.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+            <div class="col-md-6 col-xl-4">
+                <article class="followed-lawyer-card">
+                    <div class="followed-lawyer-head">
+                        @if (!string.IsNullOrWhiteSpace(lawyer.PhotoPath)) {
+                            <img src="@lawyer.PhotoPath" class="lawyer-avatar" alt="@lawyer.FullName" />
+                        }
+                        else {
+                            <div class="lawyer-avatar avatar-fallback">@initials</div>
+                        }
+                        <div>
+                            <h2>@lawyer.FullName</h2>
+                            <span class="case-type">@lawyer.Specialization</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-grid compact-grid">
+                        <div><span>Experience</span><strong>@lawyer.YearsOfExperience years</strong></div>
+                        <div><span>Price</span><strong>@lawyer.ConsultationPrice.ToString("N2")</strong></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="status @(lawyer.IsAvailable ? "open" : "closed")">@(lawyer.IsAvailable ? "Available" : "Unavailable")</span>
+                        <span class="small text-secondary">★ Followed</span>
+                    </div>
+
+                    <div class="lawyer-card-actions">
+                        <a asp-action="Details" asp-route-id="@lawyer.LawyerProfileId" class="btn btn-outline-primary">Details</a>
+                        @if (lawyer.IsAvailable) {
+                            <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@lawyer.LawyerProfileId" class="btn btn-primary">Send request</a>
+                        }
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}

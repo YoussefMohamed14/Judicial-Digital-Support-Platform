@@ -1,0 +1,73 @@
+@*
+   //this is only for test and it will be changed in the future
+
+*@
+
+
+@model IEnumerable<JDSP.ViewModel.MyRequestStatusViewModel>
+@{
+    Layout = User.IsInRole("Client") ? "_ClientLayout" : "_Layout";
+    ViewData["Title"] = "My Requests";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-1">My Requests</h2>
+    <p class="text-muted mb-4">Track the status of your lawyer requests.</p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">You have not sent any requests yet.</div>
+    }
+    else
+    {
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Case</th>
+                    <th>Lawyer</th>
+                    <th>Status</th>
+                    <th>Proposed Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var req in Model)
+                {
+                    <tr>
+                        <td>@req.CaseName</td>
+                        <td>@req.LawyerName</td>
+                        <td>
+                            @{
+                                var badge = req.Status switch
+                                {
+                                    "Pending" => "warning",
+                                    "Accepted" => "success",
+                                    "Rejected" => "danger",
+                                    "Price Proposed" => "info",
+                                    "OfferAccepted" => "primary",
+                                    _ => "secondary"
+                                };
+                            }
+                            <span class="badge bg-@badge">@req.Status</span>
+                        </td>
+                        <td>
+                            @(req.ProposedPrice.HasValue
+                                ? req.ProposedPrice.Value.ToString("C")
+                                : "—")
+                        </td>
+                        <td>
+                            @if (req.Status == "Price Proposed")
+                            {
+                                <a asp-action="OfferDetails"
+                                   asp-route-caseLawyerId="@req.CaseLawyerId"
+                                   class="btn btn-primary btn-sm">
+                                    View Offer →
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

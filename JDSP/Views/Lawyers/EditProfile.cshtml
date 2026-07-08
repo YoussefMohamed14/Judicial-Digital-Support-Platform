@@ -1,0 +1,22 @@
+@model JDSP.ViewModels.Lawyers.LawyerProfileViewModel
+@{ Layout = "_LawyerLayout"; ViewData["Title"] = "Professional profile"; }
+
+<div class="page-head"><span class="eyebrow">Lawyer profile</span><h1>Edit professional profile</h1><p>These details are shown to clients when they browse lawyers and decide who to contact.</p></div>
+<div class="row g-4">
+    <div class="col-xl-8">
+        <section class="card-panel">
+            <form asp-action="EditProfile" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="LawyerProfileId" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+                <div class="mb-3"><label asp-for="Specialization" class="form-label fw-semibold"></label><input asp-for="Specialization" class="form-control" placeholder="e.g. Family law" /><span asp-validation-for="Specialization" class="text-danger small"></span></div>
+                <div class="mb-3"><label asp-for="Bio" class="form-label fw-semibold"></label><textarea asp-for="Bio" class="form-control" rows="7" placeholder="Describe your background and the legal services you provide..."></textarea><span asp-validation-for="Bio" class="text-danger small"></span></div>
+                <div class="row g-3"><div class="col-md-6"><label asp-for="YearsOfExperience" class="form-label fw-semibold"></label><input asp-for="YearsOfExperience" class="form-control" /><span asp-validation-for="YearsOfExperience" class="text-danger small"></span></div><div class="col-md-6"><label asp-for="ConsultationPrice" class="form-label fw-semibold"></label><input asp-for="ConsultationPrice" class="form-control" /><span asp-validation-for="ConsultationPrice" class="text-danger small"></span></div></div>
+                <div class="form-check form-switch my-4"><input asp-for="IsAvailable" class="form-check-input" /><label asp-for="IsAvailable" class="form-check-label fw-semibold">Available to receive new requests</label></div>
+                <button type="submit" class="btn btn-primary px-4">Save professional profile</button>
+            </form>
+        </section>
+    </div>
+    <div class="col-xl-4"><section class="card-panel"><div class="panel-head"><div><h2>Identity and photo</h2><p>Update your photo and general bio from the account profile.</p></div></div><p class="text-secondary">Legal identity fields remain locked and require Court Employee approval to change.</p><a asp-controller="Profile" asp-action="Index" class="btn btn-outline-primary w-100">Open account profile</a></section></div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

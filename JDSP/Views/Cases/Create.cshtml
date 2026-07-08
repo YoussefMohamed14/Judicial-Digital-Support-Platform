@@ -1,0 +1,62 @@
+@model JDSP.ViewModel.CreateCaseViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Create case";
+}
+
+<div class="container py-4" style="max-width:760px">
+    <div class="mb-4">
+        <span class="text-uppercase text-primary fw-bold small">Court employee only</span>
+        <h1 class="h2 mt-2">Create an official case</h1>
+        <p class="text-muted">Select the client account that owns the case. Clients cannot create official cases themselves.</p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="ClientId" class="form-label fw-semibold"></label>
+                    <select asp-for="ClientId" asp-items="ViewBag.Clients" class="form-select">
+                        <option value="">-- Select client --</option>
+                    </select>
+                    <span asp-validation-for="ClientId" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CaseName" class="form-label fw-semibold"></label>
+                    <input asp-for="CaseName" class="form-control" placeholder="e.g. Property dispute" />
+                    <span asp-validation-for="CaseName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CaseType" class="form-label fw-semibold"></label>
+                    <select asp-for="CaseType" class="form-select">
+                        <option value="">-- Select type --</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Criminal">Criminal</option>
+                        <option value="Family">Family</option>
+                        <option value="Commercial">Commercial</option>
+                        <option value="Administrative">Administrative</option>
+                    </select>
+                    <span asp-validation-for="CaseType" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label fw-semibold"></label>
+                    <textarea asp-for="Description" class="form-control" rows="6" placeholder="Enter the official case description..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4">Create case</button>
+                    <a asp-controller="Dashboard" asp-action="CourtEmployeeDashboard" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

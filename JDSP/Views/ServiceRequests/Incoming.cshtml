@@ -1,0 +1,24 @@
+@model IReadOnlyList<JDSP.ViewModels.ServiceRequests.ServiceRequestListItemViewModel>
+@{ Layout = "_LawyerLayout"; ViewData["Title"] = "Client requests"; }
+
+<div class="page-head"><span class="eyebrow">Direct requests</span><h1>Client requests</h1><p>Clients selected your profile, uploaded a case file, and sent a brief directly to you.</p></div>
+
+<div class="rule-banner"><b>⚠ Hearing conflict rule</b><span>Before accepting, verify that the client's hearing date does not conflict with another active client's hearing. Automated checking can be connected when request-to-case scheduling is implemented.</span></div>
+
+@if (Model.Count == 0) {
+    <section class="card-panel empty"><b>⇄</b><h3>No direct requests</h3><p>New client requests will appear here.</p></section>
+}
+else {
+    <div class="row g-4">
+    @foreach (var item in Model) {
+        <div class="col-lg-6"><article class="card-panel request-inbox-card h-100">
+            <div class="d-flex justify-content-between gap-3"><div><span class="eyebrow">From @item.ClientName</span><h2 class="mt-2">@item.Subject</h2></div><span class="status @item.Status.ToLower().Replace(" ", "-")">@item.Status</span></div>
+            <p class="request-brief">@item.Brief</p>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top pt-3"><div class="small text-secondary">Received @item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, h:mm tt")</div>@if (!string.IsNullOrWhiteSpace(item.FilePath)) { <a asp-action="Download" asp-route-id="@item.RequestId" class="btn btn-sm btn-outline-secondary">Download case file</a> }</div>
+            @if (item.Status == "Pending") {
+                <div class="d-flex gap-2 mt-3"><form asp-action="RespondDirect" method="post" class="flex-fill">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@item.RequestId"/><input type="hidden" name="decision" value="Accepted"/><button class="btn btn-success w-100">Accept</button></form><form asp-action="RespondDirect" method="post" class="flex-fill">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@item.RequestId"/><input type="hidden" name="decision" value="Rejected"/><button class="btn btn-outline-danger w-100">Reject</button></form></div>
+            }
+        </article></div>
+    }
+    </div>
+}

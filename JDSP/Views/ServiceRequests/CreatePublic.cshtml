@@ -1,0 +1,23 @@
+@model JDSP.ViewModels.ServiceRequests.CreateServiceRequestViewModel
+@{ Layout = "_ClientLayout"; ViewData["Title"] = "Public request"; }
+
+<div class="page-head"><span class="eyebrow">Public requests</span><h1>Post a public legal request</h1><p>Your brief and file will be visible to lawyers who can send proposals. The official case remains Court Employee-only.</p></div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <section class="card-panel request-form-card">
+            <form asp-action="CreatePublic" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+                <div class="mb-3"><label asp-for="Subject" class="form-label fw-semibold"></label><input asp-for="Subject" class="form-control" placeholder="e.g. Need a family-law lawyer" /><span asp-validation-for="Subject" class="text-danger small"></span></div>
+                <div class="mb-3"><label asp-for="Brief" class="form-label fw-semibold"></label><textarea asp-for="Brief" class="form-control" rows="8" placeholder="Describe the legal issue without publishing unnecessary sensitive details..."></textarea><span asp-validation-for="Brief" class="text-danger small"></span></div>
+                <div class="mb-4"><label asp-for="CaseFile" class="form-label fw-semibold"></label><input asp-for="CaseFile" class="form-control" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" /><small class="text-secondary">PDF, DOC, DOCX, TXT, JPG or PNG. Maximum 10 MB.</small><span asp-validation-for="CaseFile" class="text-danger small d-block"></span></div>
+                <div class="d-flex flex-wrap gap-2"><button class="btn btn-primary px-4">Publish request</button><a asp-action="MyRequests" class="btn btn-outline-secondary">View my requests</a></div>
+            </form>
+        </section>
+    </div>
+    <div class="col-xl-4">
+        <section class="card-panel"><div class="panel-head"><div><h2>Before publishing</h2><p>Keep your request useful and safe.</p></div></div><div class="guideline-list"><div><b>1</b><span>Explain the problem and what kind of lawyer you need.</span></div><div><b>2</b><span>Include important dates, but avoid posting passwords or bank details.</span></div><div><b>3</b><span>Review proposals from lawyers before choosing who to contact.</span></div></div></section>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,38 @@
+@model JDSP.ViewModels.ServiceRequests.CreateServiceRequestViewModel
+@{ Layout = "_ClientLayout"; ViewData["Title"] = "Send request"; }
+
+<div class="page-head"><span class="eyebrow">Direct request</span><h1>Send a request to @Model.LawyerName</h1><p>Attach the case file and write a clear brief. This is a pre-case request; the official case is created only by a Court Employee.</p></div>
+
+<div class="row justify-content-center"><div class="col-xl-8">
+<section class="card-panel request-form-card">
+    <form asp-action="SendToLawyer" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input asp-for="LawyerProfileId" type="hidden" />
+        <input asp-for="LawyerId" type="hidden" />
+        <input asp-for="LawyerName" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+
+        <div class="mb-3">
+            <label asp-for="Subject" class="form-label fw-semibold"></label>
+            <input asp-for="Subject" class="form-control" placeholder="Short description of what you need" />
+            <span asp-validation-for="Subject" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Brief" class="form-label fw-semibold"></label>
+            <textarea asp-for="Brief" class="form-control" rows="8" placeholder="Explain the situation, important dates, and the help you need..."></textarea>
+            <span asp-validation-for="Brief" class="text-danger small"></span>
+        </div>
+        <div class="mb-4">
+            <label asp-for="CaseFile" class="form-label fw-semibold"></label>
+            <input asp-for="CaseFile" class="form-control" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" />
+            <small class="text-secondary">PDF, DOC, DOCX, TXT, JPG or PNG. Maximum 10 MB.</small>
+            <span asp-validation-for="CaseFile" class="text-danger small d-block"></span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-primary px-4">Send to lawyer</button>
+            <a asp-controller="Lawyers" asp-action="Details" asp-route-id="@Model.LawyerProfileId" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</section>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

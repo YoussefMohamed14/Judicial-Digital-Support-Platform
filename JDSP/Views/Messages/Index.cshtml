@@ -1,0 +1,39 @@
+@model IReadOnlyList<JDSP.ViewModels.Messages.MessageContactViewModel>
+@{
+    Layout = User.IsInRole("Lawyer") ? "_LawyerLayout" : "_ClientLayout";
+    ViewData["Title"] = "Messages";
+}
+
+<div class="page-head"><span class="eyebrow">Communication</span><h1>Messages</h1><p>Current @(User.IsInRole("Lawyer") ? "clients" : "lawyers") are prepared as conversation contacts. Message delivery logic will be added later.</p></div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <section class="card-panel h-100">
+            <div class="panel-head"><div><h2>Contacts</h2><p>Accepted requests and active case relationships.</p></div><span class="role-pill">@Model.Count</span></div>
+            @if (Model.Count == 0) {
+                <div class="empty compact"><b>◉</b><p>No current contacts yet. A contact appears after a request is accepted or a lawyer is assigned to a case.</p></div>
+            }
+            else {
+                <div class="message-contact-list">
+                @foreach (var contact in Model) {
+                    var initials = string.Join("", contact.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+                    <button type="button" class="message-contact" disabled>
+                        @if (!string.IsNullOrWhiteSpace(contact.PhotoPath)) { <img src="@contact.PhotoPath" class="avatar" alt="@contact.FullName" /> }
+                        else { <span class="avatar avatar-fallback">@initials</span> }
+                        <span><strong>@contact.FullName</strong><small>@contact.Relationship</small></span>
+                    </button>
+                }
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-lg-8">
+        <section class="card-panel messages-placeholder h-100">
+            <div class="message-shell-preview">
+                <aside><div class="fake-search"></div><div class="fake-contact active"></div><div class="fake-contact"></div><div class="fake-contact"></div></aside>
+                <main><div class="fake-message left"></div><div class="fake-message right"></div><div class="fake-message left short"></div><div class="fake-composer"></div></main>
+            </div>
+            <div class="empty compact"><b>✉</b><h3>Messaging interface prepared</h3><p>Contact discovery and navigation are included. Conversation storage, sending, real-time updates, and unread states will be implemented later.</p></div>
+        </section>
+    </div>
+</div>

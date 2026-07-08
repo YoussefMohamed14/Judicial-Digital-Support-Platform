@@ -1,0 +1,13 @@
+@model JDSP.ViewModels.Account.LoginViewModel
+@{ Layout = "_PublicLayout"; ViewData["Title"] = "Login"; }
+<section class="auth-section"><div class="container py-5"><div class="auth-card mx-auto">
+<div class="text-center mb-4"><div class="auth-icon">↗</div><h1 class="h3 fw-bold mt-3">Welcome back</h1><p class="text-secondary">Sign in to continue to your JDSP workspace.</p></div>
+<form asp-action="Login" method="post">@Html.AntiForgeryToken()
+<div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+<div class="mb-3"><label asp-for="Email" class="form-label fw-semibold"></label><input asp-for="Email" class="form-control form-control-lg" autocomplete="email" placeholder="name@example.com"/><span asp-validation-for="Email" class="text-danger small"></span></div>
+<div class="mb-3"><label asp-for="Password" class="form-label fw-semibold"></label><input asp-for="Password" class="form-control form-control-lg" autocomplete="current-password" placeholder="Enter your password"/><span asp-validation-for="Password" class="text-danger small"></span></div>
+<div class="form-check mb-4"><input asp-for="RememberMe" class="form-check-input"/><label asp-for="RememberMe" class="form-check-label">Keep me signed in</label></div>
+<button class="btn btn-primary btn-lg w-100">Sign in</button></form>
+<p class="text-center text-secondary mt-4 mb-0">New to JDSP? <a asp-action="Register" class="fw-semibold text-decoration-none">Create an account</a></p>
+</div></div></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

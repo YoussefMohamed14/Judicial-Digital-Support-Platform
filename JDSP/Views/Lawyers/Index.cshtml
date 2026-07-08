@@ -1,0 +1,40 @@
+@model JDSP.ViewModels.Lawyers.LawyerSearchViewModel
+@{
+    Layout = User.IsInRole("Client") ? "_ClientLayout" : User.IsInRole("Lawyer") ? "_LawyerLayout" : "_Layout";
+    ViewData["Title"] = "Find lawyers";
+}
+
+<div class="page-head"><span class="eyebrow">Lawyer directory</span><h1>Find a lawyer</h1><p>Browse professional profiles, follow lawyers, or send a direct request with your brief and case file.</p></div>
+
+<section class="card-panel mb-4">
+    <form method="get" asp-action="Index">
+        <div class="row g-3">
+            <div class="col-md-5"><label class="form-label fw-semibold">Name or keyword</label><input name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Search by name or specialization" /></div>
+            <div class="col-md-5"><label class="form-label fw-semibold">Specialization</label><input name="specialization" value="@Model.Specialization" class="form-control" placeholder="e.g. Family law" /></div>
+            <div class="col-md-2 d-grid align-self-end"><button type="submit" class="btn btn-primary">Search</button></div>
+        </div>
+    </form>
+</section>
+
+@if (!Model.Lawyers.Any()) {
+    <section class="card-panel empty"><b>⚖</b><h3>No lawyers found</h3><p>Try a different name or specialization.</p></section>
+}
+else {
+    <div class="row g-4">
+        @foreach (var lawyer in Model.Lawyers) {
+            var initials = string.Join("", lawyer.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+            <div class="col-md-6 col-xl-4">
+                <article class="card-panel lawyer-card h-100">
+                    <div class="lawyer-card-head">
+                        @if (!string.IsNullOrWhiteSpace(lawyer.PhotoPath)) { <img src="@lawyer.PhotoPath" class="lawyer-avatar" alt="@lawyer.FullName" /> }
+                        else { <div class="lawyer-avatar avatar-fallback">@initials</div> }
+                        <div><h2>@lawyer.FullName</h2><span class="case-type">@lawyer.Specialization</span></div>
+                    </div>
+                    <div class="detail-grid compact-grid mt-3"><div><span>Experience</span><strong>@lawyer.YearsOfExperience years</strong></div><div><span>Consultation</span><strong>@lawyer.ConsultationPrice.ToString("N2")</strong></div></div>
+                    <div class="d-flex justify-content-between align-items-center mt-3"><span class="status @(lawyer.IsAvailable ? "open" : "closed")">@(lawyer.IsAvailable ? "Available" : "Unavailable")</span>@if (lawyer.IsFollowed) { <span class="small text-secondary">★ Followed</span> }</div>
+                    <a asp-action="Details" asp-route-id="@lawyer.LawyerProfileId" class="btn btn-outline-primary mt-3">View profile</a>
+                </article>
+            </div>
+        }
+    </div>
+}
