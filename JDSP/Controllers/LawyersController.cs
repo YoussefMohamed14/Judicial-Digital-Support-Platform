@@ -21,7 +21,7 @@ namespace JDSP.Controllers {
 
         [Authorize(Roles = Roles.Client)]
         [HttpGet]
-        public async Task<IActionResult> Index(string? searchTerm, string? specialization, int? caseId) {
+        public async Task<IActionResult> Index(string? searchTerm, string? specialization) {
             var currentUserId = _userManager.GetUserId(User);
 
             // The lawyer directory must be based on accounts that actually have the Lawyer role,
@@ -87,13 +87,12 @@ namespace JDSP.Controllers {
                 Lawyers = lawyers
             };
 
-            ViewBag.CaseId = caseId;
             return View(model);
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> Details(int id, int? caseId) {
+        public async Task<IActionResult> Details(int id) {
             var lawyer = await _context.LawyerProfiles
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.LawyerProfileId == id);
@@ -136,7 +135,6 @@ namespace JDSP.Controllers {
             };
 
             ViewBag.Bio = lawyer.Bio;
-            ViewBag.CaseId = caseId;
 
             return View(model);
         }

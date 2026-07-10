@@ -1,4 +1,4 @@
-﻿using JDSP.Data;
+using JDSP.Data;
 using JDSP.Helpers;
 using JDSP.Models;
 using JDSP.ViewModels.Account;
@@ -157,6 +157,75 @@ namespace JDSP.Controllers {
             return await DashboardAsync(user);
         }
 
+        [AllowAnonymous, HttpGet]
+        public IActionResult ForgotPassword(string? email = null) {
+            return View(new ForgotPasswordViewModel { Email = email ?? string.Empty });
+        }
+
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model) {
+            if (!ModelState.IsValid) return View(model);
+
+            var email = model.Email.Trim();
+            var user = await _users.FindByEmailAsync(email);
+
+            // Keep the user-facing result generic so the page does not reveal whether an email exists.
+            if (user != null && user.AccountStatus == "Active") {
+                var token = await _users.GeneratePasswordResetTokenAsync(user);
+                var resetLink = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token }, Request.Scheme);
+
+                // Development/demo fallback: the project does not have an email sender yet,
+                // so the link is shown on the confirmation screen for the team to test.
+                TempData["PasswordResetLink"] = resetLink;
+            }
+
+            TempData["Success"] = Text(
+                "If this email exists, a password reset link has been prepared.",
+                "إذا كان هذا البريد موجوداً، تم تجهيز رابط إعادة تعيين كلمة المرور.");
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        [AllowAnonymous, HttpGet]
+        public IActionResult ForgotPasswordConfirmation() => View();
+
+        [AllowAnonymous, HttpGet]
+        public IActionResult ResetPassword(string? email = null, string? token = null) {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token)) {
+                TempData["Error"] = Text("Invalid password reset link.", "رابط إعادة تعيين كلمة المرور غير صالح.");
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            return View(new ResetPasswordViewModel { Email = email, Token = token });
+        }
+
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model) {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _users.FindByEmailAsync(model.Email.Trim());
+            if (user == null || user.AccountStatus != "Active") {
+                TempData["Success"] = Text(
+                    "If this email exists, the password reset request has been processed.",
+                    "إذا كان هذا البريد موجوداً، تمت معالجة طلب إعادة تعيين كلمة المرور.");
+                return RedirectToAction(nameof(Login));
+            }
+
+            var result = await _users.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            if (!result.Succeeded) {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return View(model);
+            }
+
+            if (user.MustChangePassword) {
+                user.MustChangePassword = false;
+                await _users.UpdateAsync(user);
+            }
+
+            TempData["Success"] = Text("Password reset successfully. You can sign in now.", "تمت إعادة تعيين كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.");
+            return RedirectToAction(nameof(Login));
+        }
+
         [Authorize, HttpGet]
         public async Task<IActionResult> LawyerPendingApproval() {
             var user = await _users.GetUserAsync(User);
@@ -226,6 +295,8 @@ namespace JDSP.Controllers {
             ViewData["LoginError"] = message;
             return View(model);
         }
+
+        private string Text(string en, string ar) => ResolveRequestedLanguage() == "ar" ? ar : en;
 
         private string ResolveRequestedLanguage() {
             var feature = HttpContext.Features.Get<IRequestCultureFeature>();

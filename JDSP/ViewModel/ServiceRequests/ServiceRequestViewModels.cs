@@ -6,8 +6,6 @@ namespace JDSP.ViewModels.ServiceRequests {
         public int? LawyerProfileId { get; set; }
         public string? LawyerId { get; set; }
         public string? LawyerName { get; set; }
-        public int? CaseId { get; set; }
-        public string? CaseName { get; set; }
 
         [Required, StringLength(180, MinimumLength = 5)]
         [Display(Name = "Request subject")]
@@ -34,8 +32,6 @@ namespace JDSP.ViewModels.ServiceRequests {
         public string? OriginalFileName { get; set; }
         public DateTime CreatedAt { get; set; }
         public int ProposalCount { get; set; }
-        public int? CaseId { get; set; }
-        public string? CaseName { get; set; }
         public bool HasProposed { get; set; }
     }
 

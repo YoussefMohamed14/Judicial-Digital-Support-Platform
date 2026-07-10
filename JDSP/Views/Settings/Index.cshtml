@@ -1,4 +1,4 @@
-﻿@using System.Globalization
+@using System.Globalization
 @model JDSP.ViewModels.Settings.SettingsViewModel
 @{
     Layout = User.IsInRole("Admin") || User.IsInRole("CourtEmployee") ? "_CourtLayout" : (User.IsInRole("Lawyer") ? "_LawyerLayout" : "_ClientLayout");
@@ -47,8 +47,11 @@
                 </div>
 
                 <div class="col-md-5">
-                    <label asp-for="SwitchPassword" class="form-label fw-semibold">@(ar ? "كلمة مرور الحساب الآخر" : "Other account password")</label>
-                    <input asp-for="SwitchPassword" class="form-control" autocomplete="current-password" />
+                    <div class="d-flex justify-content-between align-items-center gap-3">
+                        <label asp-for="SwitchPassword" class="form-label fw-semibold mb-0">@(ar ? "كلمة مرور الحساب الآخر" : "Other account password")</label>
+                        <a asp-controller="Account" asp-action="ForgotPassword" class="small text-decoration-none">@(ar ? "نسيت كلمة المرور؟" : "Forgot password?")</a>
+                    </div>
+                    <input asp-for="SwitchPassword" class="form-control mt-2" autocomplete="current-password" />
                     <span asp-validation-for="SwitchPassword" class="text-danger small"></span>
                 </div>
 

@@ -3,14 +3,12 @@
     Layout = User.IsInRole("Client") ? "_ClientLayout" : User.IsInRole("Lawyer") ? "_LawyerLayout" : "_Layout";
     var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
     ViewData["Title"] = ar ? "البحث عن محامين" : "Find lawyers";
-    int? selectedCaseId = ViewBag.CaseId as int?;
 }
 
 <div class="page-head"><span class="eyebrow">@(ar ? "دليل المحامين" : "Lawyer directory")</span><h1>@(ar ? "ابحث عن محامٍ" : "Find a lawyer")</h1><p>@(ar ? "تصفح الملفات المهنية، تابع المحامين، أو أرسل طلباً مباشراً مع النبذة وملف القضية." : "Browse professional profiles, follow lawyers, or send a direct request with your brief and case file.")</p></div>
 
 <section class="card-panel mb-4">
     <form method="get" asp-action="Index">
-        @if (selectedCaseId.HasValue) { <input type="hidden" name="caseId" value="@selectedCaseId.Value" /> }
         <div class="row g-3">
             <div class="col-md-5"><label class="form-label fw-semibold">@(ar ? "الاسم أو الكلمة المفتاحية" : "Name or keyword")</label><input name="searchTerm" value="@Model.SearchTerm" class="form-control" placeholder="@(ar ? "ابحث بالاسم أو التخصص" : "Search by name or specialization")" /></div>
             <div class="col-md-5"><label class="form-label fw-semibold">@(ar ? "التخصص" : "Specialization")</label><select name="specialization" class="form-select"><option value="">@(ar ? "كل التخصصات" : "All specializations")</option>@foreach (var item in UiText.SpecializationOptions) {<option value="@item" selected="@(Model.Specialization == item)">@UiText.Specialization(item, ar)</option>}</select></div>
@@ -35,7 +33,7 @@ else {
                     </div>
                     <div class="detail-grid compact-grid mt-3"><div><span>@(ar ? "الخبرة" : "Experience")</span><strong>@UiText.YearsShort(lawyer.YearsOfExperience, ar)</strong></div><div><span>@(ar ? "السعر" : "Price")</span><strong>@UiText.Price(lawyer.ConsultationPrice, lawyer.ConsultationPriceUnit, ar)</strong></div></div>
                     <div class="d-flex justify-content-between align-items-center mt-3"><span class="status @(lawyer.IsAvailable ? "open" : "closed")">@UiText.Availability(lawyer.IsAvailable, ar)</span>@if (lawyer.IsFollowed) { <span class="small text-secondary">★ @(ar ? "متابَع" : "Followed")</span> }</div>
-                    <a asp-action="Details" asp-route-id="@lawyer.LawyerProfileId" asp-route-caseId="@selectedCaseId" class="btn btn-outline-primary mt-3">@(ar ? "عرض الملف" : "View profile")</a>
+                    <a asp-action="Details" asp-route-id="@lawyer.LawyerProfileId" class="btn btn-outline-primary mt-3">@(ar ? "عرض الملف" : "View profile")</a>
                 </article>
             </div>
         }
