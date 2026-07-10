@@ -1,202 +1,208 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using JDSP.Data;
+using JDSP.Helpers;
+using JDSP.Models;
+using JDSP.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using JDSP.Models;
-using JDSP.Data;
-using JDSP.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace JDSP.Controllers
-{
+namespace JDSP.Controllers {
     [Authorize]
-    public class LawyerRequestController : Controller
-    {
+    public class LawyerRequestController : Controller {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public LawyerRequestController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
-        {
+        public LawyerRequestController(ApplicationDbContext context, UserManager<ApplicationUser> userManager) {
             _context = context;
             _userManager = userManager;
         }
-        
-        public async Task<IActionResult> Confirm(int caseId, string lawyerId)
-        {
-            var Case = await _context.Cases.FindAsync(caseId);
+
+        [Authorize(Roles = Roles.Client), HttpGet]
+        public async Task<IActionResult> Confirm(int caseId, string lawyerId) {
+            var clientId = _userManager.GetUserId(User);
+            if (clientId == null) return Challenge();
+
+            var item = await _context.Cases.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CaseID == caseId && x.CreatedBy_Id == clientId);
             var lawyer = await _userManager.FindByIdAsync(lawyerId);
 
-            if (Case == null || lawyer == null)
-            {
+            if (item == null || lawyer == null || !await _userManager.IsInRoleAsync(lawyer, Roles.Lawyer))
                 return NotFound();
-            }
 
-            var vm = new SendRequestViewModel
-            {
+            return View(new SendRequestViewModel {
                 CaseId = caseId,
-                CaseName = Case.CaseName,
+                CaseName = item.CaseName,
                 LawyerId = lawyerId,
                 LawyerName = $"{lawyer.FirstName} {lawyer.MiddleName} {lawyer.LastName}"
-            };
-
-            return View(vm);
+            });
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Confirm(SendRequestViewModel vm)
-        {
-            bool alreadyExists = _context.CaseLawyers.Any(cl =>
-                        cl.CaseLawyerId == vm.CaseId &&
-                        cl.LawyerId == vm.LawyerId &&
-                        cl.Status != "Rejected");
-            if (alreadyExists)
-            {
+
+        [Authorize(Roles = Roles.Client), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Confirm(SendRequestViewModel vm) {
+            var clientId = _userManager.GetUserId(User);
+            if (clientId == null) return Challenge();
+
+            var ownsCase = await _context.Cases.AnyAsync(x => x.CaseID == vm.CaseId && x.CreatedBy_Id == clientId);
+            var lawyer = await _userManager.FindByIdAsync(vm.LawyerId);
+            if (!ownsCase || lawyer == null || !await _userManager.IsInRoleAsync(lawyer, Roles.Lawyer))
+                return NotFound();
+
+            var alreadyExists = await _context.CaseLawyers.AnyAsync(cl =>
+                cl.CaseId == vm.CaseId &&
+                cl.LawyerId == vm.LawyerId &&
+                cl.Status != "Rejected");
+
+            if (alreadyExists) {
                 TempData["ErrorMessage"] = "You have already sent a request to this lawyer for this case.";
-                return RedirectToAction("Index", "Lawyers", new { caseId = vm.CaseId, lawyerId = vm.LawyerId });
+                return RedirectToAction("Index", "Lawyers");
             }
 
-            var request = new CaseLawyer
-            {
+            _context.CaseLawyers.Add(new CaseLawyer {
                 CaseId = vm.CaseId,
                 LawyerId = vm.LawyerId,
                 Status = "Pending",
                 AssignedAt = DateTime.Now
-            };
+            });
 
-            _context.CaseLawyers.Add(request);
             await _context.SaveChangesAsync();
-
             TempData["SuccessMessage"] = "Request sent successfully.";
             return RedirectToAction("MyCases", "Cases");
         }
 
-        public async Task<IActionResult> IncomingRequests()
-        {
-            var lawyer = await _userManager.GetUserAsync(User);
+        [Authorize(Roles = Roles.Lawyer), HttpGet]
+        public async Task<IActionResult> IncomingRequests() {
+            var lawyerId = _userManager.GetUserId(User);
+            if (lawyerId == null) return Challenge();
 
-            var requests = _context.CaseLawyers
-                .Where(cl => cl.LawyerId == lawyer!.Id && cl.Status == "Pending")
-                .Select(cl => new RespondToRequestViewModel
-                {
+            var requests = await _context.CaseLawyers.AsNoTracking()
+                .Where(cl => cl.LawyerId == lawyerId && cl.Status == "Pending")
+                .Select(cl => new RespondToRequestViewModel {
                     CaseLawyerID = cl.CaseLawyerId,
                     CaseName = cl.Case!.CaseName,
                     ClientName = cl.Case.Creator!.FirstName + " " + cl.Case.Creator.MiddleName + " " + cl.Case.Creator.LastName
-                }).ToList();
+                })
+                .ToListAsync();
+
             return View(requests);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Respond(RespondToRequestViewModel requests)
-        {
-            var request = await _context.CaseLawyers.FindAsync(requests.CaseLawyerID);
-            if (request == null)
-            {
-                return NotFound();
+        [Authorize(Roles = Roles.Lawyer), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Respond(RespondToRequestViewModel requests) {
+            var lawyerId = _userManager.GetUserId(User);
+            if (lawyerId == null) return Challenge();
+            if (requests.Decision != "Accepted" && requests.Decision != "Rejected") return BadRequest();
+
+            var request = await _context.CaseLawyers
+                .FirstOrDefaultAsync(x => x.CaseLawyerId == requests.CaseLawyerID && x.LawyerId == lawyerId);
+            if (request == null) return NotFound();
+
+            if (requests.Decision == "Accepted" && await HasHearingConflictAsync(lawyerId, request.CaseId)) {
+                TempData["ErrorMessage"] = "This case has a hearing that conflicts with another active client's case.";
+                return RedirectToAction(nameof(IncomingRequests));
             }
 
-            if (requests.Decision != "Accepted" && requests.Decision != "Rejected")
-            {
-                return BadRequest();
-            }
             request.Status = requests.Decision;
             await _context.SaveChangesAsync();
-            
+
             TempData["SuccessMessage"] = $"Response {requests.Decision} sent successfully.";
-            return RedirectToAction("IncomingRequests");
+            return RedirectToAction(nameof(IncomingRequests));
         }
 
-        public async Task<IActionResult> MyRequests()
-        {
-            var user = await _userManager.GetUserAsync(User);
+        [Authorize(Roles = Roles.Client), HttpGet]
+        public async Task<IActionResult> MyRequests() {
+            var clientId = _userManager.GetUserId(User);
+            if (clientId == null) return Challenge();
 
-            var requests = _context.CaseLawyers
-                .Where(cl => cl.Case!.CreatedBy_Id == user!.Id)
-                .Select(cl => new MyRequestStatusViewModel
-                {
+            var requests = await _context.CaseLawyers.AsNoTracking()
+                .Where(cl => cl.Case!.CreatedBy_Id == clientId)
+                .Select(cl => new MyRequestStatusViewModel {
                     CaseLawyerId = cl.CaseLawyerId,
                     CaseName = cl.Case!.CaseName,
                     LawyerName = cl.Lawyer!.FirstName + " " + cl.Lawyer.MiddleName + " " + cl.Lawyer.LastName,
                     Status = cl.Status,
                     ProposedPrice = cl.ProposedPrice
-                }).ToList();
+                })
+                .ToListAsync();
+
             return View(requests);
         }
 
-        public async Task<IActionResult> ProposePrice(int caseLawyerId)
-        {
-            var request = _context.CaseLawyers
-                .Where(cl => cl.CaseLawyerId == caseLawyerId && cl.Status == "Accepted")
-                .Select(cl => new ProposePriceViewModel
-                {
+        [Authorize(Roles = Roles.Lawyer), HttpGet]
+        public async Task<IActionResult> ProposePrice(int caseLawyerId) {
+            var lawyerId = _userManager.GetUserId(User);
+            if (lawyerId == null) return Challenge();
+
+            var request = await _context.CaseLawyers.AsNoTracking()
+                .Where(cl => cl.CaseLawyerId == caseLawyerId && cl.LawyerId == lawyerId && cl.Status == "Accepted")
+                .Select(cl => new ProposePriceViewModel {
                     CaseLawyerId = cl.CaseLawyerId,
                     CaseName = cl.Case!.CaseName,
                     ClientName = cl.Case.Creator!.FirstName + " " + cl.Case.Creator.MiddleName + " " + cl.Case.Creator.LastName
-                }).FirstOrDefault();
-            if (request == null)
-            {
-                return NotFound();
-            }
-            return View(request);
+                })
+                .FirstOrDefaultAsync();
+
+            return request == null ? NotFound() : View(request);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ProposePrice(ProposePriceViewModel vm)
-        {
-            if (!ModelState.IsValid)
-            {
+        [Authorize(Roles = Roles.Lawyer), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProposePrice(ProposePriceViewModel vm) {
+            var lawyerId = _userManager.GetUserId(User);
+            if (lawyerId == null) return Challenge();
+
+            var request = await _context.CaseLawyers
+                .Include(x => x.Case).ThenInclude(x => x!.Creator)
+                .FirstOrDefaultAsync(x => x.CaseLawyerId == vm.CaseLawyerId && x.LawyerId == lawyerId && x.Status == "Accepted");
+            if (request == null) return NotFound();
+
+            if (!ModelState.IsValid) {
+                vm.CaseName = request.Case?.CaseName ?? string.Empty;
+                vm.ClientName = request.Case?.Creator == null
+                    ? string.Empty
+                    : $"{request.Case.Creator.FirstName} {request.Case.Creator.MiddleName} {request.Case.Creator.LastName}";
                 return View(vm);
             }
-            var request = await _context.CaseLawyers.FindAsync(vm.CaseLawyerId);
-            
-            if (request == null)
-            {
-                return NotFound();
-            }
-            
+
             request.ProposedPrice = vm.ProposedPrice;
             request.Status = "Price Proposed";
-
             await _context.SaveChangesAsync();
-            
+
             TempData["SuccessMessage"] = "Price proposed, waiting for the client to accept.";
-            return RedirectToAction("IncomingRequests");
+            return RedirectToAction(nameof(IncomingRequests));
         }
 
-        public IActionResult OfferDetails(int caseLawyerId)
-        {
-            var offer = _context.CaseLawyers
-                .Where(cl => cl.CaseLawyerId == caseLawyerId && cl.Status == "Price Proposed")
-                .Select(cl => new AcceptOfferViewModel
-                {
+        [Authorize(Roles = Roles.Client), HttpGet]
+        public async Task<IActionResult> OfferDetails(int caseLawyerId) {
+            var clientId = _userManager.GetUserId(User);
+            if (clientId == null) return Challenge();
+
+            var offer = await _context.CaseLawyers.AsNoTracking()
+                .Where(cl => cl.CaseLawyerId == caseLawyerId && cl.Case!.CreatedBy_Id == clientId && cl.Status == "Price Proposed" && cl.ProposedPrice != null)
+                .Select(cl => new AcceptOfferViewModel {
                     CaseLawyerId = cl.CaseLawyerId,
                     CaseName = cl.Case!.CaseName,
                     LawyerName = cl.Lawyer!.FirstName + " " + cl.Lawyer.MiddleName + " " + cl.Lawyer.LastName,
                     ProposedPrice = cl.ProposedPrice!.Value
-                }).FirstOrDefault();
-            if (offer == null)
-            {
-                return NotFound();
-            }
-            return View(offer);
+                })
+                .FirstOrDefaultAsync();
+
+            return offer == null ? NotFound() : View(offer);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AcceptOffer(AcceptOfferViewModel vm)
-        {
-            var request = await _context.CaseLawyers.FindAsync(vm.CaseLawyerId);
+        [Authorize(Roles = Roles.Client), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AcceptOffer(AcceptOfferViewModel vm) {
+            var clientId = _userManager.GetUserId(User);
+            if (clientId == null) return Challenge();
 
-            if (request == null)
-            {
-                return NotFound();
-            }
+            var request = await _context.CaseLawyers
+                .Include(x => x.Case)
+                .FirstOrDefaultAsync(x => x.CaseLawyerId == vm.CaseLawyerId && x.Case!.CreatedBy_Id == clientId && x.Status == "Price Proposed" && x.ProposedPrice != null);
+            if (request == null) return NotFound();
 
             request.Status = "OfferAccepted";
-
-            var subscription = new CaseLawyerSubscription
-            {
-                CaseLawyerId = vm.CaseLawyerId,
-                Price = vm.ProposedPrice,
+            var subscription = new CaseLawyerSubscription {
+                CaseLawyerId = request.CaseLawyerId,
+                Price = request.ProposedPrice!.Value,
                 Status = "Active",
                 BillingCycle = "Monthly",
                 StartDate = DateTime.Now,
@@ -207,8 +213,28 @@ namespace JDSP.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Offer accepted! Your subscription is now active.";
-            return RedirectToAction("Confirmation", "Subscriptions",
-                                    new { subscriptionId = subscription.CaseLawyerSubscriptionId });
+            return RedirectToAction("Confirmation", "Subscriptions", new { subscriptionId = subscription.CaseLawyerSubscriptionId });
+        }
+
+        private async Task<bool> HasHearingConflictAsync(string lawyerId, int requestedCaseId) {
+            var requestedHearings = await _context.Hearings.AsNoTracking()
+                .Where(h => h.CaseId == requestedCaseId && h.Status == "Scheduled" && h.EndDate >= DateTime.Now)
+                .Select(h => new { h.HearingDate, h.EndDate })
+                .ToListAsync();
+
+            if (requestedHearings.Count == 0) return false;
+
+            var activeCaseIds = _context.CaseLawyers.AsNoTracking()
+                .Where(x => x.LawyerId == lawyerId && x.CaseId != requestedCaseId &&
+                    (x.Status == "Accepted" || x.Status == "Price Proposed" || x.Status == "OfferAccepted"))
+                .Select(x => x.CaseId);
+
+            var otherHearings = await _context.Hearings.AsNoTracking()
+                .Where(h => activeCaseIds.Contains(h.CaseId) && h.Status == "Scheduled" && h.EndDate >= DateTime.Now)
+                .Select(h => new { h.HearingDate, h.EndDate })
+                .ToListAsync();
+
+            return requestedHearings.Any(a => otherHearings.Any(b => a.HearingDate < b.EndDate && b.HearingDate < a.EndDate));
         }
     }
 }

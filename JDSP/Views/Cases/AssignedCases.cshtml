@@ -1,0 +1,56 @@
+@model JDSP.ViewModels.Cases.LawyerAssignedCasesViewModel
+@{
+    Layout = "_LawyerLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "القضايا المسندة" : "Assigned cases";
+}
+
+<div class="page-head"><span class="eyebrow">@(ar ? "القضايا" : "Cases")</span><h1>@(ar ? "القضايا المسندة" : "Assigned cases")</h1><p>@(ar ? "اعرض معلومات القضايا المسندة إلى حسابك كمحامٍ فقط." : "View-only case information assigned to your lawyer account.")</p></div>
+
+<div class="filters">
+    <a asp-action="AssignedCases" class="@(string.IsNullOrWhiteSpace(Model.StatusFilter) ? "active" : "")">@(ar ? "الكل" : "All")</a>
+    @foreach (var status in new[] { "Open", "Pending", "In Progress", "Waiting for next hearing date", "Closed" }) {
+        <a asp-action="AssignedCases" asp-route-status="@status" class="@(Model.StatusFilter == status ? "active" : "")">@UiText.Status(status, ar)</a>
+    }
+</div>
+
+@if (Model.Cases.Count == 0) {
+    <section class="card-panel empty"><b>▣</b><h3>@(ar ? "لا توجد قضايا مسندة" : "No assigned cases")</h3><p>@(ar ? "ستظهر هنا القضايا التي تسندها المحكمة أو التي تُقبل عبر المنصة." : "Cases assigned by the court or accepted through the platform will appear here.")</p></section>
+}
+else {
+    <div class="row g-4">
+        @foreach (var item in Model.Cases) {
+            var officialRequestClass = item.OfficialCaseRequestStatus == "Pending" ? "disabled" : "";
+            <div class="col-md-6 col-xl-4">
+                <article class="case-card">
+                    <div class="d-flex justify-content-between align-items-start gap-2"><span class="case-icon">▣</span><span class="status @item.Status.ToLower().Replace(" ", "-")">@UiText.Status(item.Status, ar)</span></div>
+                    <h2>@item.CaseName</h2>
+                    <div class="case-type">@UiText.CaseType(item.CaseType, ar)</div>
+                    <p class="case-desc">@item.Description</p>
+                    <div class="case-meta">
+                        <div><span>@(ar ? "العميل" : "Client")</span><strong>@item.ClientName</strong></div>
+                        <div><span>@(ar ? "تاريخ الإسناد" : "Assigned")</span><strong>@item.AssignedAt.ToString("dd MMM yyyy")</strong></div>
+                        <div><span>@(ar ? "الجلسة القادمة" : "Next hearing")</span><strong>@(item.NextHearingDate?.ToString("dd MMM yyyy, h:mm tt") ?? (ar ? "غير مجدولة" : "Not scheduled"))</strong></div>
+                    </div>
+                    @if (item.NextHearingDate.HasValue) {
+                        <div class="hearing-countdown small mt-3" data-hearing-start="@item.NextHearingDate.Value.ToString("o")" data-hearing-end="@(item.NextHearingEndDate?.ToString("o") ?? item.NextHearingDate.Value.ToString("o"))"><span>@(ar ? "المتبقي" : "Countdown")</span><strong>--</strong></div>
+                    }
+                    <div class="lawyer-case-actions mt-3">
+                        <a asp-action="LawyerDetails" asp-route-id="@item.CaseId" class="btn btn-outline-primary">@(ar ? "عرض التفاصيل" : "View details")</a>
+                        @if (item.HasSuccessfulPayment) {
+                            <a asp-controller="LawyerBalance" asp-action="Index" class="status open text-decoration-none">@(ar ? "تم الدفع - الرصيد" : "Paid - Balance")</a>
+                        }
+                        else {
+                            <a asp-action="CreatePaymentRequest" asp-route-caseId="@item.CaseId" class="btn btn-primary">@(item.HasPendingPayment ? (ar ? "تعديل طلب الدفع" : "Edit payment") : (ar ? "طلب دفع" : "Payment"))</a>
+                        }
+                    </div>
+                    <a asp-controller="OfficialCaseRequests" asp-action="Create" asp-route-caseId="@item.CaseId" class="btn btn-outline-secondary mt-2 w-100 @officialRequestClass">@(ar ? "طلب مراجعة رسمية وجدولة جلسة" : "Request court review / hearing")</a>
+                </article>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/hearing-countdown.js" asp-append-version="true"></script>
+}

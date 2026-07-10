@@ -1,144 +1,279 @@
-﻿using JDSP.Helpers;
+﻿using JDSP.Data;
+using JDSP.Helpers;
 using JDSP.Models;
 using JDSP.ViewModels.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace JDSP.Controllers {
     public class AccountController : Controller {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _users;
+        private readonly SignInManager<ApplicationUser> _signIn;
+        private readonly IWebHostEnvironment _env;
+        private readonly ApplicationDbContext _db;
+        public AccountController(UserManager<ApplicationUser> users, SignInManager<ApplicationUser> signIn, IWebHostEnvironment env, ApplicationDbContext db) { _users = users; _signIn = signIn; _env = env; _db = db; }
 
-        public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager) {
-            _userManager = userManager;
-            _signInManager = signInManager;
+        [AllowAnonymous, HttpGet]
+        public async Task<IActionResult> Register() {
+            if (User.Identity?.IsAuthenticated == true) {
+                var user = await _users.GetUserAsync(User);
+                if (user != null) {
+                    if (user.MustChangePassword)
+                        return RedirectToAction(nameof(ChangeTemporaryPassword));
+                    if (await IsLawyerAwaitingApprovalAsync(user))
+                        return RedirectToAction(nameof(LawyerPendingApproval));
+                    if (!user.IsProfileCompleted && await NeedsProfileAsync(user))
+                        return RedirectToAction(nameof(CompleteProfile));
+                    return await DashboardAsync(user);
+                }
+            }
+            LoadRoles(); return View();
         }
 
-        [HttpGet]
-        public IActionResult Register() {
-            LoadRoles();
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model) {
             LoadRoles();
+            if (model.Role != Roles.Client && model.Role != Roles.Lawyer)
+                ModelState.AddModelError(nameof(model.Role), "You can only register as Client or Lawyer.");
 
-            if (!ModelState.IsValid)
-                return View(model);
-
-            if (model.Role != Roles.Client && model.Role != Roles.Lawyer) {
-                ModelState.AddModelError("Role", "You can only register as Client or Lawyer.");
-                return View(model);
+            if (model.Role == Roles.Lawyer) {
+                if (model.NationalIdFile == null || model.NationalIdFile.Length == 0)
+                    ModelState.AddModelError(nameof(model.NationalIdFile), "Upload your national/legal ID.");
+                if (model.LawyerIdFile == null || model.LawyerIdFile.Length == 0)
+                    ModelState.AddModelError(nameof(model.LawyerIdFile), "Upload your lawyer ID or proof.");
             }
 
+            if (!ModelState.IsValid) return View(model);
+
+            var national = model.NationalNumber.Trim();
+            if (await _users.Users.AnyAsync(x => x.NationalNumber == national)) { ModelState.AddModelError(nameof(model.NationalNumber), "This national number is already registered."); return View(model); }
+            var selectedLanguage = ResolveRequestedLanguage();
             var user = new ApplicationUser {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                MiddleName = model.MiddleName,
-                LastName = model.LastName,
-                PhoneNumber = model.PhoneNumber,
-                NationalNumber = model.NationalNumber,
-                AccountStatus = "Active",
+                UserName = model.Email.Trim(), Email = model.Email.Trim(), FirstName = model.FirstName.Trim(),
+                MiddleName = string.IsNullOrWhiteSpace(model.MiddleName) ? null : model.MiddleName.Trim(), LastName = model.LastName.Trim(),
+                PhoneNumber = model.PhoneNumber.Trim(), NationalNumber = national, AccountStatus = "Active", PreferredLanguage = selectedLanguage, IsProfileCompleted = false,
+                LawyerApprovalStatus = model.Role == Roles.Lawyer ? VerificationStatus.Pending : VerificationStatus.NotRequired,
                 CreatedAt = DateTime.Now
             };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded) {
-                await _userManager.AddToRoleAsync(user, model.Role);
-
-                TempData["Success"] = "Account created successfully. Please login.";
-                return RedirectToAction("Login");
+            var result = await _users.CreateAsync(user, model.Password);
+            if (!result.Succeeded) {
+                foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
+                return View(model);
             }
 
-            foreach (var error in result.Errors) {
-                ModelState.AddModelError("", error.Description);
+            await _users.AddToRoleAsync(user, model.Role);
+
+            if (model.Role == Roles.Lawyer) {
+                var nationalUpload = await VerificationFileHelper.SaveAsync(model.NationalIdFile, _env);
+                if (!nationalUpload.Success) {
+                    await _users.DeleteAsync(user);
+                    ModelState.AddModelError(nameof(model.NationalIdFile), nationalUpload.Error ?? "Upload failed.");
+                    return View(model);
+                }
+
+                var lawyerUpload = await VerificationFileHelper.SaveAsync(model.LawyerIdFile, _env);
+                if (!lawyerUpload.Success) {
+                    await _users.DeleteAsync(user);
+                    ModelState.AddModelError(nameof(model.LawyerIdFile), lawyerUpload.Error ?? "Upload failed.");
+                    return View(model);
+                }
+
+                _db.LawyerVerificationRequests.Add(new LawyerVerificationRequest {
+                    LawyerId = user.Id,
+                    NationalIdFileName = nationalUpload.OriginalName ?? "National ID",
+                    NationalIdFilePath = nationalUpload.StoredName ?? string.Empty,
+                    LawyerIdFileName = lawyerUpload.OriginalName ?? "Lawyer ID",
+                    LawyerIdFilePath = lawyerUpload.StoredName ?? string.Empty,
+                    Status = VerificationStatus.Pending,
+                    RequestedAt = DateTime.Now
+                });
+                await _db.SaveChangesAsync();
+
+                await _signIn.SignInAsync(user, false);
+                return RedirectToAction(nameof(LawyerPendingApproval));
             }
 
-            return View(model);
+            await _signIn.SignInAsync(user, false);
+            return RedirectToAction(nameof(CompleteProfile));
         }
 
-        [HttpGet]
-        public IActionResult Login() {
+        [Authorize, HttpGet]
+        public async Task<IActionResult> CompleteProfile() {
+            var user = await _users.GetUserAsync(User); if (user == null) return RedirectToAction(nameof(Login));
+            if (await IsLawyerAwaitingApprovalAsync(user)) return RedirectToAction(nameof(LawyerPendingApproval));
+            if (user.IsProfileCompleted) return await DashboardAsync(user);
+            return View(new CompleteProfileViewModel { Bio = user.Bio ?? string.Empty });
+        }
+
+        [Authorize, HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteProfile(CompleteProfileViewModel model) {
+            var user = await _users.GetUserAsync(User); if (user == null) return RedirectToAction(nameof(Login));
+            if (await IsLawyerAwaitingApprovalAsync(user)) return RedirectToAction(nameof(LawyerPendingApproval));
+            if (!ModelState.IsValid) return View(model);
+            var upload = await ProfileImageHelper.SaveAsync(model.Photo, _env, user.PhotoPath);
+            if (!upload.Success) { ModelState.AddModelError(nameof(model.Photo), upload.Error ?? "Upload failed."); return View(model); }
+            user.PhotoPath = upload.Path; user.Bio = model.Bio.Trim(); user.IsProfileCompleted = true;
+            var result = await _users.UpdateAsync(user);
+            if (!result.Succeeded) { foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description); return View(model); }
+            await EnsureLawyerProfileExistsAsync(user);
+            await _signIn.RefreshSignInAsync(user); TempData["Success"] = "Your profile is ready."; return await DashboardAsync(user);
+        }
+
+        [AllowAnonymous, HttpGet]
+        public async Task<IActionResult> Login() {
+            if (User.Identity?.IsAuthenticated == true) {
+                var user = await _users.GetUserAsync(User);
+                if (user != null) {
+                    if (user.MustChangePassword)
+                        return RedirectToAction(nameof(ChangeTemporaryPassword));
+                    if (await IsLawyerAwaitingApprovalAsync(user))
+                        return RedirectToAction(nameof(LawyerPendingApproval));
+                    if (!user.IsProfileCompleted && await NeedsProfileAsync(user))
+                        return RedirectToAction(nameof(CompleteProfile));
+                    return await DashboardAsync(user);
+                }
+            }
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model) {
-            if (!ModelState.IsValid)
-                return View(model);
+            if (!ModelState.IsValid) return View(model);
+            var user = await _users.FindByEmailAsync(model.Email.Trim());
+            if (user == null || user.AccountStatus != "Active") return InvalidLogin(model);
+            var result = await _signIn.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+            if (!result.Succeeded) return InvalidLogin(model);
+            if (Request.Cookies.ContainsKey(CookieRequestCultureProvider.DefaultCookieName)) {
+                var selectedLanguage = ResolveRequestedLanguage();
+                if (user.PreferredLanguage != selectedLanguage) { user.PreferredLanguage = selectedLanguage; await _users.UpdateAsync(user); }
+            }
+            if (user.MustChangePassword) return RedirectToAction(nameof(ChangeTemporaryPassword));
+            if (await IsLawyerAwaitingApprovalAsync(user)) return RedirectToAction(nameof(LawyerPendingApproval));
+            if (!user.IsProfileCompleted && await NeedsProfileAsync(user)) return RedirectToAction(nameof(CompleteProfile));
+            return await DashboardAsync(user);
+        }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+        [Authorize, HttpGet]
+        public async Task<IActionResult> LawyerPendingApproval() {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return RedirectToAction(nameof(Login));
+            if (!await _users.IsInRoleAsync(user, Roles.Lawyer)) return await DashboardAsync(user);
+            if (user.LawyerApprovalStatus == VerificationStatus.Approved) return await DashboardAsync(user);
 
-            if (user == null) {
-                ModelState.AddModelError("", "Invalid email or password.");
+            var request = await _db.LawyerVerificationRequests.AsNoTracking()
+                .Where(x => x.LawyerId == user.Id)
+                .OrderByDescending(x => x.RequestedAt)
+                .FirstOrDefaultAsync();
+
+            ViewBag.Status = user.LawyerApprovalStatus;
+            ViewBag.RejectionReason = user.LawyerApprovalRejectionReason;
+            ViewBag.RequestedAt = request?.RequestedAt;
+            return View();
+        }
+
+        [Authorize, HttpGet]
+        public async Task<IActionResult> ChangeTemporaryPassword() {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return RedirectToAction(nameof(Login));
+            if (!user.MustChangePassword) return await DashboardAsync(user);
+            return View(new ChangeTemporaryPasswordViewModel());
+        }
+
+        [Authorize, HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeTemporaryPassword(ChangeTemporaryPasswordViewModel model) {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return RedirectToAction(nameof(Login));
+            if (!ModelState.IsValid) return View(model);
+
+            var result = await _users.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (!result.Succeeded) {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
                 return View(model);
             }
 
-            if (user.AccountStatus != "Active") {
-                ModelState.AddModelError("", "Your account is not active.");
-                return View(model);
-            }
+            user.MustChangePassword = false;
+            await _users.UpdateAsync(user);
+            await _signIn.RefreshSignInAsync(user);
+            TempData["Success"] = "Password changed successfully.";
+            return await DashboardAsync(user);
+        }
 
-            var result = await _signInManager.PasswordSignInAsync(
-                user,
-                model.Password,
-                model.RememberMe,
-                lockoutOnFailure: false
-            );
+        [Authorize, HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout() { await _signIn.SignOutAsync(); return RedirectToAction("Index", "Home"); }
 
-            if (result.Succeeded) {
-                return await RedirectToDashboard(user);
-            }
+        [Authorize, HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeAccount() {
+            await _signIn.SignOutAsync();
+            TempData["Success"] = ResolveRequestedLanguage() == "ar" ? "اختر الحساب الذي تريد الدخول به." : "Choose the account you want to open.";
+            return RedirectToAction(nameof(Login));
+        }
 
-            ModelState.AddModelError("", "Invalid email or password.");
+        [AllowAnonymous] public IActionResult AccessDenied() => View();
+        [AllowAnonymous] public IActionResult Error() => RedirectToAction("Index", "Error", new { code = 500 });
+
+        private IActionResult InvalidLogin(LoginViewModel model) {
+            var ar = ResolveRequestedLanguage() == "ar";
+            var message = ar
+                ? "البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى التحقق والمحاولة مرة أخرى."
+                : "Invalid email or password. Please check your details and try again.";
+
+            ModelState.AddModelError(string.Empty, message);
+            ViewData["LoginError"] = message;
             return View(model);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout() {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+        private string ResolveRequestedLanguage() {
+            var feature = HttpContext.Features.Get<IRequestCultureFeature>();
+            var language = feature?.RequestCulture.UICulture.TwoLetterISOLanguageName;
+            return language == "ar" ? "ar" : "en";
         }
+        private void LoadRoles() => ViewBag.Roles = new SelectList(new[] { Roles.Client, Roles.Lawyer });
+        private async Task<bool> NeedsProfileAsync(ApplicationUser user) => await _users.IsInRoleAsync(user, Roles.Client) || await _users.IsInRoleAsync(user, Roles.Lawyer);
+        private async Task<bool> IsLawyerAwaitingApprovalAsync(ApplicationUser user) =>
+            await _users.IsInRoleAsync(user, Roles.Lawyer) && user.LawyerApprovalStatus != VerificationStatus.Approved;
 
-        [HttpGet]
-        public IActionResult AccessDenied() {
-            return View();
-        }
+        private async Task EnsureLawyerProfileExistsAsync(ApplicationUser user) {
+            if (!await _users.IsInRoleAsync(user, Roles.Lawyer))
+                return;
 
-        private void LoadRoles() {
-            ViewBag.Roles = new SelectList(new[]
-            {
-                Roles.Client,
-                Roles.Lawyer
+            var exists = await _db.LawyerProfiles.AnyAsync(x => x.UserId == user.Id);
+            if (exists)
+                return;
+
+            _db.LawyerProfiles.Add(new LawyerProfile {
+                UserId = user.Id,
+                Bio = LawyerProfileRules.DefaultIncompleteBio,
+                Specialization = LawyerProfileRules.DefaultSpecialization,
+                YearsOfExperience = 0,
+                ConsultationPrice = 0,
+                ConsultationPriceUnit = UiText.PriceUnitHour,
+                IsAvailable = true,
+                CreatedAt = DateTime.Now
             });
+
+            await _db.SaveChangesAsync();
         }
 
-        private async Task<IActionResult> RedirectToDashboard(ApplicationUser user) {
-            if (await _userManager.IsInRoleAsync(user, Roles.Admin))
-                return RedirectToAction("AdminDashboard", "Dashboard");
+        private async Task<IActionResult> DashboardAsync(ApplicationUser user) {
+            if (await _users.IsInRoleAsync(user, Roles.Admin)) return RedirectToAction("AdminDashboard", "Dashboard");
+            if (await _users.IsInRoleAsync(user, Roles.CourtEmployee)) return RedirectToAction("CourtEmployeeDashboard", "Dashboard");
+            if (await _users.IsInRoleAsync(user, Roles.Lawyer)) {
+                if (user.LawyerApprovalStatus != VerificationStatus.Approved)
+                    return RedirectToAction(nameof(LawyerPendingApproval));
 
-            if (await _userManager.IsInRoleAsync(user, Roles.CourtEmployee))
-                return RedirectToAction("CourtEmployeeDashboard", "Dashboard");
+                var profile = await _db.LawyerProfiles.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == user.Id);
+                if (!LawyerProfileRules.IsProfessionalProfileComplete(profile))
+                    return RedirectToAction("Index", "Profile", new { professionalRequired = true });
 
-            if (await _userManager.IsInRoleAsync(user, Roles.Lawyer))
                 return RedirectToAction("LawyerDashboard", "Dashboard");
-
-            if (await _userManager.IsInRoleAsync(user, Roles.Client))
-                return RedirectToAction("ClientDashboard", "Dashboard");
-
-            return RedirectToAction("Index", "Home");
-        }
-        public IActionResult Error() {
-            return View();
+            }
+            if (await _users.IsInRoleAsync(user, Roles.Client)) return RedirectToAction("ClientDashboard", "Dashboard");
+            await _signIn.SignOutAsync(); return RedirectToAction(nameof(Login));
         }
     }
 }

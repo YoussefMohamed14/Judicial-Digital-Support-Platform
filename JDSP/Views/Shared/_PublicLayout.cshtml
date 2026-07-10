@@ -1,0 +1,55 @@
+@using System.Globalization
+@{
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var isHomePage = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "") == "Home"
+        && (ViewContext.RouteData.Values["action"]?.ToString() ?? "") == "Index";
+}
+<!DOCTYPE html>
+<html lang="@(ar ? "ar" : "en")" dir="@(ar ? "rtl" : "ltr")">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - JDSP</title>
+    <link rel="icon" href="~/favicon.ico" asp-append-version="true" />
+    <script>document.documentElement.setAttribute('data-bs-theme', localStorage.getItem('jdsp-theme') || 'light');</script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/public.css" asp-append-version="true" />
+</head>
+<body class="public-body">
+<header class="public-header">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container py-2">
+            <a class="navbar-brand brand" asp-controller="Home" asp-action="Index"><img src="~/images/jdsp-logo.png" class="brand-logo" alt="JDSP" asp-append-version="true" /> JDSP</a>
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">@(ar ? "الرئيسية" : "Home")</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#features">@(ar ? "الخدمات" : "Services")</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#steps">@(ar ? "كيف تعمل" : "How it works")</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    @if (User.Identity?.IsAuthenticated != true && isHomePage) {
+                        <form asp-controller="Home" asp-action="ChangeLanguage" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="language" value="@(ar ? "en" : "ar")" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                            <button type="submit" class="btn btn-outline-primary public-language-toggle" aria-label="@(ar ? "Switch to English" : "Switch to Arabic")">@(ar ? "EN" : "AR")</button>
+                        </form>
+                    }
+                    <button type="button" class="btn public-theme-toggle" data-theme-toggle aria-label="@(ar ? "تبديل المظهر" : "Toggle theme")">☾</button>
+                    <a class="btn btn-link public-login-link text-decoration-none" asp-controller="Account" asp-action="Login">@(ar ? "دخول" : "Login")</a>
+                    <a class="btn btn-primary px-4" asp-controller="Account" asp-action="Register">@(ar ? "إنشاء حساب" : "Create account")</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<main>@RenderBody()</main>
+<footer class="public-footer"><div class="container py-4 d-flex justify-content-between flex-wrap gap-2"><span>© @DateTime.Now.Year JDSP</span><span>@(ar ? "منصة الدعم القضائي الرقمي" : "Judicial Digital Support Platform")</span></div></footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/theme.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

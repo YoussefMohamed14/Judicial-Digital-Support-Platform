@@ -1,5 +1,82 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@using System.Globalization
+@model JDSP.ViewModels.CourtEmployee.CourtEmployeeDashboardViewModel
 @{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "لوحة موظف المحكمة" : "Court Employee Dashboard";
 }
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <span class="eyebrow">@(ar ? "مساحة موظف المحكمة" : "Court employee workspace")</span>
+        <h1>@(ar ? "لوحة المراجعة والاعتماد" : "Review and approval dashboard")</h1>
+        <p>@(ar ? "راجع المحامين الجدد، طلبات تعديل الهوية، القضايا التي انتهت جلستها، وأنشئ القضايا الرسمية للعملاء." : "Review new lawyers, identity changes, hearing follow-ups, and create official cases for clients.")</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-controller="IdentityChangeRequests" asp-action="Index" class="btn btn-outline-primary">@(ar ? "طلبات الهوية" : "Identity requests")</a>
+        <a asp-controller="LawyerApprovals" asp-action="Index" class="btn btn-outline-primary">@(ar ? "مراجعة المحامين" : "Review lawyers")</a>
+        <a asp-controller="OfficialCaseRequests" asp-action="Index" class="btn btn-outline-primary">@(ar ? "طلبات الجلسات" : "Hearing requests")</a>
+        <a asp-controller="Cases" asp-action="Create" class="btn btn-primary px-4">@(ar ? "+ إنشاء قضية رسمية" : "+ Create official case")</a>
+    </div>
+</div>
+
+<div class="row g-3 stats-row mb-4">
+    <div class="col"><div class="stat"><span>⚖</span><div><small>@(ar ? "بانتظار اعتماد المحامين" : "Pending lawyer approvals")</small><strong>@Model.PendingLawyerApprovals</strong></div></div></div>
+    <div class="col"><div class="stat"><span>☑</span><div><small>@(ar ? "طلبات هوية معلقة" : "Pending identity requests")</small><strong>@Model.PendingIdentityChangeRequests</strong></div></div></div>
+    <div class="col"><div class="stat"><span>✓</span><div><small>@(ar ? "محامون معتمدون" : "Approved lawyers")</small><strong>@Model.ApprovedLawyers</strong></div></div></div>
+    <div class="col"><div class="stat"><span>👥</span><div><small>@(ar ? "العملاء" : "Clients")</small><strong>@Model.TotalClients</strong></div></div></div>
+    <div class="col"><div class="stat"><span>▣</span><div><small>@(ar ? "القضايا" : "Cases")</small><strong>@Model.TotalCases</strong></div></div></div>
+    <div class="col"><div class="stat"><span>◷</span><div><small>@(ar ? "طلبات جلسات معلقة" : "Pending hearing requests")</small><strong>@Model.PendingOfficialCaseRequests</strong></div></div></div>
+    <div class="col"><div class="stat"><span>⏱</span><div><small>@(ar ? "بانتظار جلسة جديدة" : "Need next hearing")</small><strong>@Model.WaitingForHearingFollowUp</strong></div></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <section class="card-panel h-100">
+            <div class="panel-head"><div><h2>@(ar ? "طلبات اعتماد المحامين" : "Lawyer verification requests")</h2><p>@(ar ? "طلبات المحامين الجديدة بانتظار المراجعة." : "New lawyer requests waiting for review.")</p></div><a asp-controller="LawyerApprovals" asp-action="Index" class="btn btn-sm btn-outline-primary">@(ar ? "عرض الكل" : "View all")</a></div>
+            @if (!Model.PendingLawyers.Any()) {
+                <div class="empty compact"><b>✓</b><p>@(ar ? "لا توجد طلبات اعتماد جديدة الآن." : "There are no new lawyer verification requests now.")</p></div>
+            }
+            else {
+                <div class="table-responsive"><table class="table clean-table align-middle"><thead><tr><th>@(ar ? "المحامي" : "Lawyer")</th><th>@(ar ? "البريد" : "Email")</th><th>@(ar ? "تاريخ الطلب" : "Requested")</th><th></th></tr></thead><tbody>
+                @foreach (var item in Model.PendingLawyers) {
+                    <tr><td class="fw-semibold">@item.LawyerName</td><td>@item.Email</td><td>@item.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td><td class="text-end"><a asp-controller="LawyerApprovals" asp-action="Details" asp-route-id="@item.RequestId" class="btn btn-sm btn-outline-primary">@(ar ? "مراجعة" : "Review")</a></td></tr>
+                }
+                </tbody></table></div>
+            }
+        </section>
+    </div>
+    <div class="col-lg-6">
+        <section class="card-panel h-100">
+            <div class="panel-head"><div><h2>@(ar ? "طلبات تعديل الهوية" : "Identity change requests")</h2><p>@(ar ? "طلبات تعديل الاسم أو الهاتف أو الرقم القومي." : "Requests to update name, phone, or national number.")</p></div><a asp-controller="IdentityChangeRequests" asp-action="Index" class="btn btn-sm btn-outline-primary">@(ar ? "عرض الكل" : "View all")</a></div>
+            @if (!Model.PendingIdentityChanges.Any()) {
+                <div class="empty compact"><b>✓</b><p>@(ar ? "لا توجد طلبات تعديل هوية جديدة الآن." : "There are no new identity change requests now.")</p></div>
+            }
+            else {
+                <div class="table-responsive"><table class="table clean-table align-middle"><thead><tr><th>@(ar ? "المستخدم" : "User")</th><th>@(ar ? "الاسم المطلوب" : "Requested name")</th><th>@(ar ? "تاريخ الطلب" : "Requested")</th><th></th></tr></thead><tbody>
+                @foreach (var item in Model.PendingIdentityChanges) {
+                    <tr><td class="fw-semibold">@item.RequestedByName<br /><small class="text-secondary">@item.Email</small></td><td>@item.RequestedFullName</td><td>@item.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td><td class="text-end"><a asp-controller="IdentityChangeRequests" asp-action="Details" asp-route-id="@item.RequestId" class="btn btn-sm btn-outline-primary">@(ar ? "مراجعة" : "Review")</a></td></tr>
+                }
+                </tbody></table></div>
+            }
+        </section>
+    </div>
+
+    <div class="col-lg-12">
+        <section class="card-panel h-100">
+            <div class="panel-head"><div><h2>@(ar ? "طلبات القضايا الرسمية والجلسات" : "Official case and hearing requests")</h2><p>@(ar ? "طلبات المحامين لتحويل قضية إلى مسار رسمي مع جلسة." : "Lawyer requests to make a case official and schedule a hearing.")</p></div><a asp-controller="OfficialCaseRequests" asp-action="Index" class="btn btn-sm btn-outline-primary">@(ar ? "عرض الكل" : "View all")</a></div>
+            @if (!Model.PendingOfficialCaseRequestsList.Any()) {
+                <div class="empty compact"><b>✓</b><p>@(ar ? "لا توجد طلبات جلسات جديدة الآن." : "There are no new hearing requests now.")</p></div>
+            }
+            else {
+                <div class="table-responsive"><table class="table clean-table align-middle"><thead><tr><th>@(ar ? "القضية" : "Case")</th><th>@(ar ? "المحامي" : "Lawyer")</th><th>@(ar ? "العميل" : "Client")</th><th>@(ar ? "تاريخ الطلب" : "Requested")</th><th></th></tr></thead><tbody>
+                @foreach (var item in Model.PendingOfficialCaseRequestsList) {
+                    <tr><td class="fw-semibold">@item.CaseName</td><td>@item.LawyerName</td><td>@item.ClientName</td><td>@item.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td><td class="text-end"><a asp-controller="OfficialCaseRequests" asp-action="Details" asp-route-id="@item.RequestId" class="btn btn-sm btn-outline-primary">@(ar ? "مراجعة" : "Review")</a></td></tr>
+                }
+                </tbody></table></div>
+            }
+        </section>
+    </div>
+</div>
+
+<div class="rule-banner mt-4"><strong>ⓘ</strong><span>@(ar ? "لا يمكن للعملاء إنشاء قضايا رسمية. إجراء إنشاء القضايا محمي بدور موظف المحكمة." : "Clients cannot create official cases. Case creation is protected by the CourtEmployee role.")</span></div>

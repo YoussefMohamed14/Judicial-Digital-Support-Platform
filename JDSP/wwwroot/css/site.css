@@ -29,3 +29,22 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* Payment and hearing workflow refinements */
+.hearing-countdown.phase-before-start {
+    border-color: rgba(34, 197, 94, .55) !important;
+    background: rgba(34, 197, 94, .10) !important;
+}
+.hearing-countdown.phase-before-start strong { color: #64d98a !important; }
+.hearing-countdown.phase-in-session {
+    border-color: rgba(59, 130, 246, .60) !important;
+    background: rgba(59, 130, 246, .12) !important;
+}
+.hearing-countdown.phase-in-session strong { color: #73a8ff !important; }
+.hearing-countdown.phase-ended {
+    border-color: rgba(148, 163, 184, .35) !important;
+    background: rgba(148, 163, 184, .08) !important;
+}
+.payment-card.payment-paid { background: rgba(22, 101, 52, .24) !important; border-color: rgba(34, 197, 94, .65) !important; }
+.payment-card.payment-declined { background: rgba(127, 29, 29, .18) !important; border-color: rgba(248, 113, 113, .60) !important; }
+.payment-card.payment-pending { background: rgba(120, 53, 15, .12); border-color: rgba(250, 204, 21, .45); }
+.balance-payment-item.partially-withdrawn { border-color: rgba(250, 204, 21, .45); }

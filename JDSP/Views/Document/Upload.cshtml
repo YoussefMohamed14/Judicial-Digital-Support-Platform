@@ -1,26 +1,24 @@
-﻿@model JDSP.ViewModel.Document.UploadDocumentViewModel
+@model JDSP.ViewModel.Document.UploadDocumentViewModel
+@{
+    Layout = User.IsInRole("Client") ? "_ClientLayout" : "_Layout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "رفع مستند" : "Upload Document";
+}
 
-<h2>Upload Document</h2>
+<h2>@(ar ? "رفع مستند" : "Upload Document")</h2>
 
-<form asp-action="Upload"
-      asp-controller="Document"
-      method="post"
-      enctype="multipart/form-data">
-
+<form asp-action="Upload" asp-controller="Document" method="post" enctype="multipart/form-data">
     <div class="mb-3">
-        <label asp-for="CaseId"></label>
+        <label asp-for="CaseId">@(ar ? "رقم القضية" : "Case ID")</label>
         <input asp-for="CaseId" class="form-control" />
         <span asp-validation-for="CaseId" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="File"></label>
+        <label asp-for="File">@(ar ? "الملف" : "File")</label>
         <input asp-for="File" class="form-control" type="file" />
         <span asp-validation-for="File" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">
-        Upload
-    </button>
-
+    <button type="submit" class="btn btn-primary">@(ar ? "رفع" : "Upload")</button>
 </form>

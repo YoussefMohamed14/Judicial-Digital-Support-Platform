@@ -1,0 +1,25 @@
+@model JDSP.ViewModels.Cases.MyCasesViewModel
+@{
+    Layout = "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "قضاياي" : "My cases";
+    string Active(string? s) => (string.IsNullOrWhiteSpace(s) && string.IsNullOrWhiteSpace(Model.StatusFilter)) || string.Equals(s, Model.StatusFilter, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+
+<div class="page-head"><span class="eyebrow">@(ar ? "حالة القضايا" : "Case status")</span><h1>@(ar ? "قضاياي" : "My cases")</h1><p>@(ar ? "القضايا الرسمية التي أنشأها موظف المحكمة وأسندها إليك. هذه المساحة للعرض فقط للعميل." : "Official cases created and assigned to you by a Court Employee. This area is view-only for clients.")</p></div>
+@if (TempData["SuccessMessage"] != null) { <div class="alert alert-success">@TempData["SuccessMessage"]</div> }
+<div class="filters"><a class="@Active(null)" asp-action="MyCases">@(ar ? "الكل" : "All")</a><a class="@Active("Open")" asp-action="MyCases" asp-route-status="Open">@UiText.Status("Open", ar)</a><a class="@Active("Pending")" asp-action="MyCases" asp-route-status="Pending">@UiText.Status("Pending", ar)</a><a class="@Active("In Progress")" asp-action="MyCases" asp-route-status="In Progress">@UiText.Status("In Progress", ar)</a><a class="@Active("Waiting for next hearing date")" asp-action="MyCases" asp-route-status="Waiting for next hearing date">@UiText.Status("Waiting for next hearing date", ar)</a><a class="@Active("Closed")" asp-action="MyCases" asp-route-status="Closed">@UiText.Status("Closed", ar)</a></div>
+@if (Model.Cases.Count == 0) {
+    <div class="card-panel empty"><b>▣</b><h3>@(ar ? "لا توجد قضايا رسمية" : "No official cases found")</h3><p>@(ar ? "يمكن لموظف المحكمة فقط إنشاء القضية وإسنادها إلى حسابك. يمكنك التواصل مع محامٍ أو نشر طلب عام أثناء الانتظار." : "Only a Court Employee can create a case and assign it to your account. You can contact a lawyer or post a public request while waiting.")</p><div class="d-flex justify-content-center flex-wrap gap-2"><a asp-controller="Lawyers" asp-action="Index" class="btn btn-primary">@(ar ? "ابحث عن محامٍ" : "Find lawyer")</a><a asp-controller="ServiceRequests" asp-action="CreatePublic" class="btn btn-outline-primary">@(ar ? "طلب عام" : "Public request")</a></div></div>
+}
+else {
+    <div class="row g-4">
+    @foreach (var item in Model.Cases) {
+        <div class="col-md-6 col-xl-4"><article class="case-card"><div class="d-flex justify-content-between"><b class="case-icon">▣</b><span class="status @item.Status.ToLower().Replace(" ", "-")">@UiText.Status(item.Status, ar)</span></div><h2>@item.CaseName</h2><small class="case-type">@UiText.CaseType(item.CaseType, ar)</small><p class="case-desc">@item.Description</p><div class="case-meta"><div><span>@(ar ? "المحامي المسند" : "Assigned lawyer")</span><strong>@(item.AssignedLawyerName ?? (ar ? "غير مسند" : "Not assigned"))</strong></div><div><span>@(ar ? "الجلسة القادمة" : "Next hearing")</span><strong>@(item.NextHearingDate?.ToString("dd MMM yyyy, h:mm tt") ?? (ar ? "غير مجدولة" : "Not scheduled"))</strong></div><div><span>@(ar ? "تاريخ الإنشاء" : "Created")</span><strong>@item.CreatedAt.ToString("dd MMM yyyy")</strong></div></div>@if (item.NextHearingDate.HasValue) { <div class="hearing-countdown small mt-3" data-hearing-start="@item.NextHearingDate.Value.ToString("o")" data-hearing-end="@(item.NextHearingEndDate?.ToString("o") ?? item.NextHearingDate.Value.ToString("o"))"><span>@(ar ? "المتبقي" : "Countdown")</span><strong>--</strong></div> }<div class="d-flex gap-2 mt-3"><a asp-action="Details" asp-route-id="@item.CaseId" class="btn btn-primary flex-fill">@(ar ? "التفاصيل" : "Details")</a><a asp-controller="Document" asp-action="Index" asp-route-caseId="@item.CaseId" class="btn btn-outline-secondary flex-fill">@(ar ? "المستندات" : "Documents")</a></div></article></div>
+    }
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/hearing-countdown.js" asp-append-version="true"></script>
+}

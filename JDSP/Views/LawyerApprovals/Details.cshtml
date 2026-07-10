@@ -1,0 +1,58 @@
+@using System.Globalization
+@using JDSP.Helpers
+@model JDSP.ViewModels.CourtEmployee.LawyerApprovalDetailsViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تفاصيل اعتماد المحامي" : "Lawyer approval details";
+    var pending = Model.Status == VerificationStatus.Pending;
+}
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <span class="eyebrow">@(ar ? "مراجعة المستندات" : "Document review")</span>
+        <h1>@Model.LawyerName</h1>
+        <p>@(ar ? "تحقق من بيانات الحساب والمستندات قبل الاعتماد." : "Check account information and documents before approval.")</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">@(ar ? "رجوع للطلبات" : "Back to requests")</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="card-panel h-100">
+            <div class="panel-head"><div><h2>@(ar ? "بيانات المحامي" : "Lawyer information")</h2><p>@(ar ? "البيانات المسجلة في الحساب." : "Information registered on the account.")</p></div><span class="status @(Model.Status.ToLowerInvariant())">@UiText.Status(Model.Status, ar)</span></div>
+            <div class="detail-grid">
+                <div><span>@(ar ? "الاسم" : "Name")</span><strong>@Model.LawyerName</strong></div>
+                <div><span>@(ar ? "البريد" : "Email")</span><strong>@Model.Email</strong></div>
+                <div><span>@(ar ? "الهاتف" : "Phone")</span><strong>@Model.PhoneNumber</strong></div>
+                <div><span>@(ar ? "الرقم القومي" : "National number")</span><strong>@Model.NationalNumber</strong></div>
+                <div><span>@(ar ? "تاريخ الطلب" : "Requested")</span><strong>@Model.RequestedAt.ToString("yyyy-MM-dd HH:mm")</strong></div>
+                <div><span>@(ar ? "تاريخ المراجعة" : "Reviewed")</span><strong>@(Model.ReviewedAt?.ToString("yyyy-MM-dd HH:mm") ?? (ar ? "لم تتم" : "Not reviewed"))</strong></div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.RejectionReason)) {
+                <div class="alert alert-danger mt-4"><strong>@(ar ? "سبب الرفض:" : "Rejection reason:")</strong> @Model.RejectionReason</div>
+            }
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="card-panel mb-4">
+            <div class="panel-head"><div><h2>@(ar ? "المستندات" : "Documents")</h2><p>@(ar ? "تحميل الملفات المرفقة للمراجعة." : "Download attached files for review.")</p></div></div>
+            <div class="d-grid gap-2">
+                <a asp-action="Download" asp-route-id="@Model.RequestId" asp-route-file="national" class="btn btn-outline-primary">@(ar ? "تحميل بطاقة الهوية" : "Download national/legal ID")</a>
+                <a asp-action="Download" asp-route-id="@Model.RequestId" asp-route-file="lawyer" class="btn btn-outline-primary">@(ar ? "تحميل إثبات المحاماة" : "Download lawyer ID/proof")</a>
+            </div>
+            <small class="text-secondary d-block mt-3">@Model.NationalIdFileName<br />@Model.LawyerIdFileName</small>
+        </section>
+
+        @if (pending) {
+            <section class="card-panel">
+                <h2 class="h5 fw-bold mb-3">@(ar ? "قرار المراجعة" : "Review decision")</h2>
+                <form asp-action="Approve" asp-route-id="@Model.RequestId" method="post" class="d-grid gap-2 mb-2">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-success">@(ar ? "اعتماد حساب المحامي" : "Approve lawyer account")</button>
+                </form>
+                <a asp-action="Reject" asp-route-id="@Model.RequestId" class="btn btn-outline-danger w-100">@(ar ? "رفض مع سبب" : "Reject with reason")</a>
+            </section>
+        }
+    </div>
+</div>

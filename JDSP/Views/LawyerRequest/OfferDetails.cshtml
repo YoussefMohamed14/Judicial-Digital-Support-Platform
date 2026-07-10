@@ -1,35 +1,29 @@
-﻿@*
-    this will be changed in the future
-*@
-
-
-
 @model JDSP.ViewModel.AcceptOfferViewModel
 @{
-    ViewData["Title"] = "Offer Details";
+    Layout = User.IsInRole("Client") ? "_ClientLayout" : "_Layout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تفاصيل العرض" : "Offer Details";
 }
 
 <div class="container mt-4" style="max-width:520px">
-    <h2 class="mb-1">Lawyer's Offer</h2>
-    <p class="text-muted mb-4">Review the price before accepting.</p>
+    <h2 class="mb-1">@(ar ? "عرض المحامي" : "Lawyer's Offer")</h2>
+    <p class="text-muted mb-4">@(ar ? "راجع السعر قبل القبول." : "Review the price before accepting.")</p>
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="mb-3">
-                <span class="text-muted small">Case</span>
+                <span class="text-muted small">@(ar ? "القضية" : "Case")</span>
                 <p class="fw-semibold mb-0">@Model.CaseName</p>
             </div>
             <hr />
             <div class="mb-3">
-                <span class="text-muted small">Lawyer</span>
+                <span class="text-muted small">@(ar ? "المحامي" : "Lawyer")</span>
                 <p class="fw-semibold mb-0">@Model.LawyerName</p>
             </div>
             <hr />
             <div>
-                <span class="text-muted small">Proposed Price</span>
-                <p class="fw-bold fs-4 text-primary mb-0">
-                    EGP @Model.ProposedPrice.ToString("N2")
-                </p>
+                <span class="text-muted small">@(ar ? "السعر المقترح" : "Proposed Price")</span>
+                <p class="fw-bold fs-4 text-primary mb-0">EGP @Model.ProposedPrice.ToString("N2")</p>
             </div>
         </div>
     </div>
@@ -42,8 +36,8 @@
         <input type="hidden" asp-for="ProposedPrice" />
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success px-4">✓ Accept Offer</button>
-            <a asp-action="MyRequests" class="btn btn-outline-secondary">← Back</a>
+            <button type="submit" class="btn btn-success px-4">✓ @(ar ? "قبول العرض" : "Accept Offer")</button>
+            <a asp-action="MyRequests" class="btn btn-outline-secondary">@(ar ? "→ رجوع" : "← Back")</a>
         </div>
     </form>
 </div>

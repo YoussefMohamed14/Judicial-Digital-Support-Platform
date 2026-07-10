@@ -1,0 +1,27 @@
+@model JDSP.ViewModels.ServiceRequests.CreateServiceRequestViewModel
+@{
+    Layout = "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "طلب عام" : "Public request";
+}
+
+<div class="page-head"><span class="eyebrow">@(ar ? "الطلبات العامة" : "Public requests")</span><h1>@(ar ? "نشر طلب قانوني عام" : "Post a public legal request")</h1><p>@(ar ? "ستظهر النبذة والملف للمحامين حتى يتمكنوا من إرسال عروض. تبقى القضية الرسمية من صلاحيات موظف المحكمة فقط." : "Your brief and file will be visible to lawyers who can send proposals. The official case remains Court Employee-only.")</p></div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <section class="card-panel request-form-card">
+            <form asp-action="CreatePublic" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+                <div class="mb-3"><label asp-for="Subject" class="form-label fw-semibold">@(ar ? "موضوع الطلب" : "Request subject")</label><input asp-for="Subject" class="form-control" placeholder="@(ar ? "مثال: أحتاج محامي أحوال شخصية" : "e.g. Need a family-law lawyer")" /><span asp-validation-for="Subject" class="text-danger small"></span></div>
+                <div class="mb-3"><label asp-for="Brief" class="form-label fw-semibold">@(ar ? "نبذة القضية" : "Case brief")</label><textarea asp-for="Brief" class="form-control" rows="8" placeholder="@(ar ? "اشرح المشكلة القانونية دون نشر تفاصيل حساسة غير ضرورية..." : "Describe the legal issue without publishing unnecessary sensitive details...")"></textarea><span asp-validation-for="Brief" class="text-danger small"></span></div>
+                <div class="mb-4"><label asp-for="CaseFile" class="form-label fw-semibold">@(ar ? "ملف القضية" : "Case file")</label><input asp-for="CaseFile" class="form-control" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" /><small class="text-secondary">@(ar ? "PDF أو DOC أو DOCX أو TXT أو JPG أو PNG. الحد الأقصى 10 ميجابايت." : "PDF, DOC, DOCX, TXT, JPG or PNG. Maximum 10 MB.")</small><span asp-validation-for="CaseFile" class="text-danger small d-block"></span></div>
+                <div class="d-flex flex-wrap gap-2"><button class="btn btn-primary px-4">@(ar ? "نشر الطلب" : "Publish request")</button><a asp-action="MyRequests" class="btn btn-outline-secondary">@(ar ? "عرض طلباتي" : "View my requests")</a></div>
+            </form>
+        </section>
+    </div>
+    <div class="col-xl-4">
+        <section class="card-panel"><div class="panel-head"><div><h2>@(ar ? "قبل النشر" : "Before publishing")</h2><p>@(ar ? "اجعل طلبك مفيداً وآمناً." : "Keep your request useful and safe.")</p></div></div><div class="guideline-list"><div><b>1</b><span>@(ar ? "اشرح المشكلة ونوع المحامي الذي تحتاجه." : "Explain the problem and what kind of lawyer you need.")</span></div><div><b>2</b><span>@(ar ? "اذكر التواريخ المهمة، وتجنب نشر كلمات المرور أو بيانات الحسابات البنكية." : "Include important dates, but avoid posting passwords or bank details.")</span></div><div><b>3</b><span>@(ar ? "راجع عروض المحامين قبل اختيار من ستتواصل معه." : "Review proposals from lawyers before choosing who to contact.")</span></div></div></section>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

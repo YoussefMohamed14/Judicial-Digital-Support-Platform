@@ -1,0 +1,250 @@
+@model JDSP.ViewModels.Messages.MessagesIndexViewModel
+@{
+    Layout = User.IsInRole("Lawyer") ? "_LawyerLayout" : "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var isClient = User.IsInRole("Client");
+    ViewData["Title"] = ar ? "الرسائل" : "Messages";
+
+    string BillingText(string? type) => type switch {
+        "Monthly" => ar ? "شهري" : "per month",
+        "Hourly" => ar ? "بالساعة" : "per hour",
+        _ => ar ? "مرة واحدة / لكل قضية" : "one time / per case"
+    };
+    string PaymentStatusText(string? status) => status switch {
+        "Paid" => ar ? "مدفوع" : "Paid",
+        "Declined" => ar ? "مرفوض" : "Declined",
+        _ => ar ? "بانتظار الدفع" : "Pending payment"
+    };
+}
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "التواصل" : "Communication")</span>
+    <h1>@(ar ? "الرسائل" : "Messages")</h1>
+    <p>@(ar ? "تواصل مع العملاء أو المحامين المرتبطين بطلبات وقضايا مقبولة. رسائل النظام قراءة فقط." : "Chat with clients or lawyers connected to accepted requests and cases. System messages are read-only.")</p>
+</div>
+
+<div class="row g-4 messages-live" data-selected-contact="@Model.SelectedContactId" data-is-client="@(isClient ? "true" : "false")">
+    <div class="col-lg-4">
+        <section class="card-panel h-100">
+            <div class="panel-head">
+                <div>
+                    <h2>@(ar ? "جهات الاتصال" : "Contacts")</h2>
+                    <p>@(ar ? "رسائل النظام والمحادثات الحالية." : "System messages and current conversations.")</p>
+                </div>
+                <span class="role-pill">@(Model.Contacts.Count + (Model.SystemMessages.Any() ? 1 : 0))</span>
+            </div>
+
+            <div class="message-contact-list">
+                @if (Model.SystemMessages.Any()) {
+                    <a asp-controller="Messages" asp-action="Index" asp-route-system="true" class="message-contact system-contact @(Model.SelectedContact == null ? "active" : "")">
+                        <img src="@Model.SystemAvatarPath" class="avatar" alt="JDSP" />
+                        <span>
+                            <strong>@(ar ? "رسائل النظام" : "JDSP System")</strong>
+                            <small>@(ar ? "إشعارات المحكمة وقرارات المراجعة" : "Court notifications and review decisions")</small>
+                        </span>
+                        @if (Model.UnreadSystemMessages > 0) {
+                            <em class="message-badge">@Model.UnreadSystemMessages</em>
+                        }
+                    </a>
+                }
+
+                @foreach (var contact in Model.Contacts) {
+                    var initials = string.Join("", contact.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+                    <a asp-controller="Messages" asp-action="Index" asp-route-contactId="@contact.UserId" class="message-contact @(Model.SelectedContactId == contact.UserId ? "active" : "")">
+                        @if (!string.IsNullOrWhiteSpace(contact.PhotoPath)) { <img src="@contact.PhotoPath" class="avatar" alt="@contact.FullName" /> }
+                        else { <span class="avatar avatar-fallback">@initials</span> }
+                        <span><strong>@(contact.FullName == "Client" || contact.FullName == "Lawyer" ? UiText.Role(contact.FullName, ar) : contact.FullName)</strong><small>@UiText.Relationship(contact.Relationship, ar)</small></span>
+                        @if (contact.UnreadCount > 0) { <em class="message-badge">@contact.UnreadCount</em> }
+                    </a>
+                }
+            </div>
+
+            @if (!Model.SystemMessages.Any() && !Model.Contacts.Any()) {
+                <div class="empty compact"><b>◉</b><p>@(ar ? "لا توجد رسائل أو جهات اتصال حالية بعد." : "No messages or current contacts yet.")</p></div>
+            }
+        </section>
+    </div>
+
+    <div class="col-lg-8">
+        <section class="card-panel h-100 chat-card">
+            @if (Model.SelectedContact != null) {
+                <div class="panel-head chat-head">
+                    <div>
+                        <h2>@Model.SelectedContact.FullName</h2>
+                        <p>@UiText.Relationship(Model.SelectedContact.Relationship, ar)</p>
+                    </div>
+                    <span class="status open">@(ar ? "محادثة مباشرة" : "Live chat")</span>
+                </div>
+                <div class="chat-window" id="chatWindow">
+                    @foreach (var message in Model.ChatMessages) {
+                        var paymentClass = message.Payment?.Status?.ToLowerInvariant() switch { "paid" => "payment-paid", "declined" => "payment-declined", _ => "payment-pending" };
+                        <article class="chat-message @(message.IsMine ? "mine" : "theirs") @((message.MessageType == "PaymentRequest" || message.Payment != null) ? "payment-message" : "")" data-message-id="@message.Id">
+                            <div class="chat-bubble">
+                                @if (message.Payment != null) {
+                                    <div class="payment-card @paymentClass">
+                                        <div class="payment-card-head">
+                                            <strong>@(ar ? "طلب دفع" : "Payment request")</strong>
+                                            <span>@PaymentStatusText(message.Payment.Status)</span>
+                                        </div>
+                                        <div class="payment-card-grid">
+                                            <div><small>@(ar ? "القضية" : "Case")</small><b>@message.Payment.CaseName</b></div>
+                                            <div><small>@(ar ? "المبلغ" : "Amount")</small><b>@message.Payment.Amount.ToString("0.00")</b></div>
+                                            <div><small>@(ar ? "نوع الدفع" : "Payment type")</small><b>@BillingText(message.Payment.BillingType)</b></div>
+                                            <div><small>@(ar ? "المرجع" : "Reference")</small><b>@message.Payment.TransactionRef</b></div>
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(message.Payment.Note)) { <p class="payment-note"><strong>@(ar ? "ملاحظة:" : "Note:")</strong> @message.Payment.Note</p> }
+                                        @if (!string.IsNullOrWhiteSpace(message.Payment.DeclineReason)) { <p class="payment-note declined"><strong>@(ar ? "سبب الرفض:" : "Decline reason:")</strong> @message.Payment.DeclineReason</p> }
+                                        @if (isClient && !message.IsMine && message.Payment.Status == "Requested") {
+                                            <div class="payment-actions">
+                                                <a asp-controller="Payments" asp-action="Pay" asp-route-id="@message.Payment.PaymentId" class="btn btn-success btn-sm">@(ar ? "دفع" : "Pay")</a>
+                                                <form asp-controller="Payments" asp-action="Decline" method="post" class="decline-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="paymentId" value="@message.Payment.PaymentId" />
+                                                    <input name="reason" class="form-control form-control-sm" maxlength="1000" required placeholder="@(ar ? "سبب الرفض" : "Decline reason")" />
+                                                    <button class="btn btn-outline-danger btn-sm" type="submit">@(ar ? "رفض" : "Decline")</button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else {
+                                    <p>@message.Body</p>
+                                }
+                                <time>@message.CreatedAt.ToString("yyyy-MM-dd HH:mm")</time>
+                            </div>
+                        </article>
+                    }
+                </div>
+                <form id="chatForm" class="chat-composer" asp-controller="Messages" asp-action="Send" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="contactId" value="@Model.SelectedContact.UserId" />
+                    <textarea name="body" id="messageBody" class="form-control" rows="2" maxlength="2000" placeholder="@(ar ? "اكتب رسالتك..." : "Write your message...")"></textarea>
+                    <button class="btn btn-primary" type="submit">@(ar ? "إرسال" : "Send")</button>
+                </form>
+                <small class="text-secondary d-block mt-2">@(ar ? "المحادثة تعمل بتحديث مباشر تلقائي أثناء فتح الصفحة." : "The conversation updates automatically while this page is open.")</small>
+            }
+            else if (Model.SystemMessages.Any()) {
+                <div class="panel-head">
+                    <div class="d-flex gap-3 align-items-center">
+                        <img src="@Model.SystemAvatarPath" class="avatar" alt="JDSP" />
+                        <div>
+                            <h2>@(ar ? "رسائل النظام" : "JDSP System")</h2>
+                            <p>@(ar ? "هذه رسائل تلقائية من المنصة ولا يمكن الرد عليها." : "These are automatic platform messages and cannot be replied to.")</p>
+                        </div>
+                    </div>
+                    <span class="locked">@(ar ? "قراءة فقط" : "Read only")</span>
+                </div>
+                <div class="system-message-list">
+                    @foreach (var message in Model.SystemMessages) {
+                        <article class="system-message @(message.IsRead ? "" : "unread")">
+                            <div>
+                                <h3>@message.Title</h3>
+                                <time>@message.CreatedAt.ToString("yyyy-MM-dd HH:mm")</time>
+                            </div>
+                            <p>@message.Body</p>
+                        </article>
+                    }
+                </div>
+            }
+            else {
+                <div class="message-shell-preview mb-4">
+                    <aside><div class="fake-search"></div><div class="fake-contact active"></div><div class="fake-contact"></div><div class="fake-contact"></div></aside>
+                    <main><div class="fake-message left"></div><div class="fake-message right"></div><div class="fake-message left short"></div><div class="fake-composer"></div></main>
+                </div>
+                <div class="empty compact"><b>✉</b><h3>@(ar ? "لا توجد رسائل بعد" : "No messages yet")</h3><p>@(ar ? "بعد قبول طلب أو إسناد قضية، ستظهر جهة الاتصال هنا." : "After a request is accepted or a case is assigned, the contact will appear here.")</p></div>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function(){
+    const root = document.querySelector('.messages-live');
+    if (!root) return;
+    const contactId = root.dataset.selectedContact;
+    const isClient = root.dataset.isClient === 'true';
+    const chatWindow = document.getElementById('chatWindow');
+    const form = document.getElementById('chatForm');
+    const textarea = document.getElementById('messageBody');
+    const isAr = document.documentElement.dir === 'rtl';
+    const antiForgery = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+    if (!contactId || !chatWindow || !form) return;
+
+    function lastId(){
+        const items = chatWindow.querySelectorAll('[data-message-id]');
+        if (!items.length) return 0;
+        return parseInt(items[items.length - 1].dataset.messageId || '0', 10) || 0;
+    }
+    function escapeHtml(value){
+        return (value || '').toString().replace(/[&<>'"]/g, function(ch){ return ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[ch]; });
+    }
+    function billingText(type){
+        if (type === 'Monthly') return isAr ? 'شهري' : 'per month';
+        if (type === 'Hourly') return isAr ? 'بالساعة' : 'per hour';
+        return isAr ? 'مرة واحدة / لكل قضية' : 'one time / per case';
+    }
+    function statusText(status){
+        if (status === 'Paid') return isAr ? 'مدفوع' : 'Paid';
+        if (status === 'Declined') return isAr ? 'مرفوض' : 'Declined';
+        return isAr ? 'بانتظار الدفع' : 'Pending payment';
+    }
+    function paymentHtml(payment, message){
+        const statusClass = payment.status === 'Paid' ? 'payment-paid' : (payment.status === 'Declined' ? 'payment-declined' : 'payment-pending');
+        let actions = '';
+        if (isClient && !message.isMine && payment.status === 'Requested') {
+            actions = '<div class="payment-actions"><a class="btn btn-success btn-sm" href="/Payments/Pay/' + encodeURIComponent(payment.paymentId) + '">' + (isAr ? 'دفع' : 'Pay') + '</a>' +
+                '<form method="post" action="/Payments/Decline" class="decline-form"><input name="__RequestVerificationToken" type="hidden" value="' + escapeHtml(antiForgery) + '" /><input name="paymentId" type="hidden" value="' + escapeHtml(payment.paymentId) + '" /><input name="reason" class="form-control form-control-sm" maxlength="1000" required placeholder="' + (isAr ? 'سبب الرفض' : 'Decline reason') + '" /><button class="btn btn-outline-danger btn-sm" type="submit">' + (isAr ? 'رفض' : 'Decline') + '</button></form></div>';
+        }
+        const note = payment.note ? '<p class="payment-note"><strong>' + (isAr ? 'ملاحظة:' : 'Note:') + '</strong> ' + escapeHtml(payment.note) + '</p>' : '';
+        const decline = payment.declineReason ? '<p class="payment-note declined"><strong>' + (isAr ? 'سبب الرفض:' : 'Decline reason:') + '</strong> ' + escapeHtml(payment.declineReason) + '</p>' : '';
+        return '<div class="payment-card ' + statusClass + '"><div class="payment-card-head"><strong>' + (isAr ? 'طلب دفع' : 'Payment request') + '</strong><span>' + statusText(payment.status) + '</span></div><div class="payment-card-grid">' +
+            '<div><small>' + (isAr ? 'القضية' : 'Case') + '</small><b>' + escapeHtml(payment.caseName) + '</b></div>' +
+            '<div><small>' + (isAr ? 'المبلغ' : 'Amount') + '</small><b>' + Number(payment.amount || 0).toFixed(2) + '</b></div>' +
+            '<div><small>' + (isAr ? 'نوع الدفع' : 'Payment type') + '</small><b>' + billingText(payment.billingType) + '</b></div>' +
+            '<div><small>' + (isAr ? 'المرجع' : 'Reference') + '</small><b>' + escapeHtml(payment.transactionRef) + '</b></div></div>' + note + decline + actions + '</div>';
+    }
+    function appendMessage(message){
+        const content = message.payment ? paymentHtml(message.payment, message) : '<p>' + escapeHtml(message.body) + '</p>';
+        const bubbleHtml = '<div class="chat-bubble">' + content + '<time>' + escapeHtml(message.createdAtText || '') + '</time></div>';
+        const existing = chatWindow.querySelector('[data-message-id="' + message.id + '"]');
+        if (existing) {
+            existing.className = 'chat-message ' + (message.isMine ? 'mine' : 'theirs') + (message.payment ? ' payment-message' : '');
+            existing.innerHTML = bubbleHtml;
+            return;
+        }
+        const article = document.createElement('article');
+        article.className = 'chat-message ' + (message.isMine ? 'mine' : 'theirs') + (message.payment ? ' payment-message' : '');
+        article.dataset.messageId = message.id;
+        article.innerHTML = bubbleHtml;
+        chatWindow.appendChild(article);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+    async function poll(){
+        try{
+            const response = await fetch('/Messages/Conversation?contactId=' + encodeURIComponent(contactId) + '&afterId=0', { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+            if (!response.ok) return;
+            const messages = await response.json();
+            messages.forEach(appendMessage);
+        }catch(e){}
+    }
+    form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        const body = (textarea.value || '').trim();
+        if (!body) return;
+        const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+        const data = new URLSearchParams();
+        data.append('__RequestVerificationToken', token);
+        data.append('contactId', contactId);
+        data.append('body', body);
+        const response = await fetch('/Messages/Send', { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+        if (!response.ok) return;
+        const message = await response.json();
+        appendMessage(message);
+        textarea.value = '';
+    });
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    setInterval(poll, 2000);
+})();
+</script>
+}

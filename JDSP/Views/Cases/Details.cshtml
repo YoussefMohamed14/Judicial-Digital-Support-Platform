@@ -1,0 +1,50 @@
+@model JDSP.ViewModels.Cases.ClientCaseDetailsViewModel
+@{
+    Layout = "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تفاصيل القضية" : "Case details";
+}
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <a asp-action="MyCases" class="back-link">@(ar ? "→ الرجوع إلى القضايا" : "← Back to cases")</a>
+        <h1 class="mt-2">@Model.CaseName</h1>
+        <p>@(ar ? "قضية" : "Case") #@Model.CaseId · @(ar ? "تم الإنشاء" : "Created") @Model.CreatedAt.ToString("dd MMM yyyy")</p>
+    </div>
+    <span class="status large @Model.Status.ToLower().Replace(" ", "-")">@UiText.Status(Model.Status, ar)</span>
+</div>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="card-panel mb-4">
+            <div class="panel-head"><div><h2>@(ar ? "معلومات القضية" : "Case information")</h2><p>@(ar ? "تفاصيل القضية المقدمة." : "The submitted case details.")</p></div></div>
+            <div class="detail-grid">
+                <div><span>@(ar ? "نوع القضية" : "Case type")</span><strong>@UiText.CaseType(Model.CaseType, ar)</strong></div>
+                <div><span>@(ar ? "تاريخ الإنشاء" : "Created date")</span><strong>@Model.CreatedAt.ToString("dd MMM yyyy, h:mm tt")</strong></div>
+            </div>
+            <div class="description mt-3"><span>@(ar ? "الوصف" : "Description")</span><p>@Model.Description</p></div>
+        </section>
+        <section class="card-panel">
+            <div class="panel-head"><div><h2>@(ar ? "المستندات" : "Documents")</h2><p>@(ar ? "راجع الملفات المرتبطة بهذه القضية الرسمية." : "Review files connected to this official case.")</p></div><a asp-controller="Document" asp-action="Index" class="btn btn-outline-secondary">@(ar ? "فتح المستندات" : "Open documents")</a></div>
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <section class="card-panel mb-4">
+            <div class="panel-head"><div><h2>@(ar ? "إسناد المحامي" : "Lawyer assignment")</h2><p>@(ar ? "أحدث حالة للطلب." : "Latest request status.")</p></div></div>
+            <div class="info-row"><span>@(ar ? "المحامي" : "Lawyer")</span><strong>@(Model.AssignedLawyerName ?? (ar ? "غير مسند" : "Not assigned"))</strong></div>
+            <div class="info-row"><span>@(ar ? "الحالة" : "Status")</span><strong>@(Model.LawyerRequestStatus == null ? (ar ? "لا يوجد طلب" : "No request") : UiText.Status(Model.LawyerRequestStatus, ar))</strong></div>
+            @if(Model.AssignedLawyerName == null){<a asp-controller="Lawyers" asp-action="Index" class="btn btn-primary w-100 mt-3">@(ar ? "ابحث عن محامٍ" : "Find a lawyer")</a>}
+        </section>
+        <section class="card-panel">
+            <div class="panel-head"><div><h2>@(ar ? "الجلسة القادمة" : "Next hearing")</h2><p>@(ar ? "أقرب جلسة مجدولة من موظف المحكمة." : "Nearest hearing scheduled by the Court Employee.")</p></div></div>
+            @if(Model.NextHearingDate.HasValue){
+                <div class="hearing"><b>@Model.NextHearingDate.Value.Day</b><div><strong>@Model.NextHearingDate.Value.ToString("MMMM yyyy")</strong><small>@Model.NextHearingDate.Value.ToString("dddd, h:mm tt")</small></div></div>
+                <div class="hearing-countdown mt-3" data-hearing-start="@Model.NextHearingDate.Value.ToString("o")" data-hearing-end="@(Model.NextHearingEndDate?.ToString("o") ?? Model.NextHearingDate.Value.ToString("o"))"><span>@(ar ? "الوقت المتبقي للجلسة" : "Time until hearing")</span><strong>--</strong></div>
+                <div class="info-row"><span>@(ar ? "النوع" : "Type")</span><strong>@Model.NextHearingType</strong></div>
+                <div class="info-row"><span>@(ar ? "المكان" : "Location")</span><strong>@(Model.NextHearingLocation ?? (ar ? "لم يتم التأكيد بعد" : "To be confirmed"))</strong></div>
+            }else{<div class="empty compact"><b>◷</b><p>@(ar ? "لا توجد جلسات قادمة." : "No upcoming hearing.")</p></div>}
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/hearing-countdown.js" asp-append-version="true"></script>
+}

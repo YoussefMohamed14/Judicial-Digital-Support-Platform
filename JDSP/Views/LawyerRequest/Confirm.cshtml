@@ -1,25 +1,23 @@
-﻿@*
-   this is only for test and it will be changed in the future
-*@
-
 @model JDSP.ViewModel.SendRequestViewModel
 @{
-    ViewData["Title"] = "Confirm Request";
+    Layout = User.IsInRole("Client") ? "_ClientLayout" : "_Layout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تأكيد الطلب" : "Confirm Request";
 }
 
 <div class="container mt-4" style="max-width:520px">
-    <h2 class="mb-1">Confirm Your Request</h2>
-    <p class="text-muted mb-4">Review the details before sending.</p>
+    <h2 class="mb-1">@(ar ? "تأكيد طلبك" : "Confirm Your Request")</h2>
+    <p class="text-muted mb-4">@(ar ? "راجع التفاصيل قبل الإرسال." : "Review the details before sending.")</p>
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="mb-3">
-                <span class="text-muted small">Case</span>
+                <span class="text-muted small">@(ar ? "القضية" : "Case")</span>
                 <p class="fw-semibold mb-0">@Model.CaseName</p>
             </div>
             <hr />
             <div>
-                <span class="text-muted small">Lawyer</span>
+                <span class="text-muted small">@(ar ? "المحامي" : "Lawyer")</span>
                 <p class="fw-semibold mb-0">@Model.LawyerName</p>
             </div>
         </div>
@@ -33,11 +31,8 @@
         <input type="hidden" asp-for="LawyerName" />
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary px-4">Send Request ✓</button>
-            <a asp-controller="Lawyers"
-               asp-action="Index"
-               asp-route-caseId="@Model.CaseId"
-               class="btn btn-outline-secondary">← Back to Lawyers</a>
+            <button type="submit" class="btn btn-primary px-4">@(ar ? "إرسال الطلب ✓" : "Send Request ✓")</button>
+            <a asp-controller="Lawyers" asp-action="Index" asp-route-caseId="@Model.CaseId" class="btn btn-outline-secondary">@(ar ? "→ الرجوع إلى المحامين" : "← Back to Lawyers")</a>
         </div>
     </form>
 </div>

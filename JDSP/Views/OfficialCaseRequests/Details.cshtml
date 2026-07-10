@@ -1,0 +1,54 @@
+@model JDSP.ViewModels.OfficialCaseRequests.OfficialCaseRequestDetailsViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تفاصيل طلب رسمي" : "Official request details";
+}
+
+<a asp-action="Index" class="back-link">@(ar ? "→ الرجوع إلى الطلبات" : "← Back to requests")</a>
+<div class="page-head mt-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div><span class="eyebrow">@(ar ? "طلب رسمي" : "Official request")</span><h1>@Model.CaseName</h1><p>@(ar ? "طلب من المحامي" : "Request from lawyer") @Model.LawyerName</p></div>
+    <span class="status large @Model.Status.ToLower()">@UiText.Status(Model.Status, ar)</span>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="card-panel mb-4">
+            <div class="panel-head"><div><h2>@(ar ? "تفاصيل الطلب" : "Request details")</h2><p>@(ar ? "راجع سبب الطلب قبل اتخاذ القرار." : "Review the request reason before deciding.")</p></div></div>
+            <div class="detail-grid">
+                <div><span>@(ar ? "القضية" : "Case")</span><strong>@Model.CaseName</strong></div>
+                <div><span>@(ar ? "العميل" : "Client")</span><strong>@Model.ClientName</strong></div>
+                <div><span>@(ar ? "المحامي" : "Lawyer")</span><strong>@Model.LawyerName</strong></div>
+                <div><span>@(ar ? "تاريخ الطلب" : "Requested")</span><strong>@Model.RequestedAt.ToString("yyyy-MM-dd HH:mm")</strong></div>
+            </div>
+            <div class="description mt-3"><span>@(ar ? "السبب" : "Reason")</span><p>@Model.Reason</p></div>
+        </section>
+
+        @if (Model.Status == "Approved") {
+            <section class="card-panel mb-4">
+                <div class="panel-head"><div><h2>@(ar ? "الجلسة المحددة" : "Scheduled hearing")</h2><p>@(ar ? "هذه الجلسة تظهر للعميل والمحامي." : "This hearing appears for both client and lawyer.")</p></div></div>
+                <div class="detail-grid">
+                    <div><span>@(ar ? "البداية" : "Start")</span><strong>@Model.HearingDate?.ToString("yyyy-MM-dd HH:mm")</strong></div>
+                    <div><span>@(ar ? "النهاية" : "End")</span><strong>@Model.HearingEndDate?.ToString("yyyy-MM-dd HH:mm")</strong></div>
+                    <div><span>@(ar ? "النوع" : "Type")</span><strong>@Model.HearingType</strong></div>
+                    <div><span>@(ar ? "المكان" : "Location")</span><strong>@(Model.Location ?? (ar ? "سيتم التأكيد" : "To be confirmed"))</strong></div>
+                    <div><span>@(ar ? "ملاحظات" : "Notes")</span><strong>@(Model.CourtNotes ?? "-")</strong></div>
+                </div>
+            </section>
+        }
+        @if (Model.Status == "Rejected") {
+            <section class="card-panel"><div class="description"><span>@(ar ? "سبب الرفض" : "Rejection reason")</span><p>@Model.RejectionReason</p></div></section>
+        }
+    </div>
+    <div class="col-lg-4">
+        @if (Model.Status == "Pending") {
+            <section class="card-panel">
+                <div class="setting-title"><b>☑</b><div><h2>@(ar ? "قرار الموظف" : "Employee decision")</h2><p>@(ar ? "حدد موعد الجلسة عند الموافقة." : "Set the hearing schedule when approving.")</p></div></div>
+                <div class="d-grid gap-2">
+                    <a asp-action="Approve" asp-route-id="@Model.RequestId" class="btn btn-success">@(ar ? "موافقة وجدولة جلسة" : "Approve and schedule")</a>
+                    <a asp-action="Reject" asp-route-id="@Model.RequestId" class="btn btn-outline-danger">@(ar ? "رفض بسبب" : "Reject with reason")</a>
+                </div>
+            </section>
+        }
+    </div>
+</div>

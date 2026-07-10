@@ -1,0 +1,21 @@
+@model JDSP.ViewModels.OfficialCaseRequests.OfficialCaseRequestRejectViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "رفض الطلب" : "Reject request";
+}
+
+<a asp-action="Details" asp-route-id="@Model.RequestId" class="back-link">@(ar ? "→ الرجوع" : "← Back")</a>
+<div class="page-head mt-3"><span class="eyebrow">@(ar ? "رفض" : "Reject")</span><h1>@(ar ? "رفض طلب القضية الرسمية" : "Reject official case request")</h1><p>@Model.CaseName · @Model.LawyerName</p></div>
+
+<section class="card-panel request-form-card">
+    <form asp-action="Reject" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="RequestId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="mb-3"><label asp-for="RejectionReason" class="form-label fw-semibold">@(ar ? "سبب الرفض" : "Rejection reason")</label><textarea asp-for="RejectionReason" class="form-control" rows="5" maxlength="1000" required></textarea><span asp-validation-for="RejectionReason" class="text-danger small"></span></div>
+        <button class="btn btn-outline-danger px-4" type="submit">@(ar ? "رفض وإبلاغ المحامي" : "Reject and notify lawyer")</button>
+    </form>
+</section>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

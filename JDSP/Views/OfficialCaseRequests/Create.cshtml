@@ -1,0 +1,43 @@
+@model JDSP.ViewModels.OfficialCaseRequests.OfficialCaseRequestCreateViewModel
+@{
+    Layout = "_LawyerLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "طلب قضية رسمية" : "Official case request";
+}
+
+<a asp-controller="Cases" asp-action="LawyerDetails" asp-route-id="@Model.CaseId" class="back-link">@(ar ? "→ الرجوع إلى القضية" : "← Back to case")</a>
+<div class="page-head mt-3">
+    <span class="eyebrow">@(ar ? "طلب رسمي" : "Official request")</span>
+    <h1>@(ar ? "طلب جعل القضية رسمية وجدولة جلسة" : "Request official case and hearing schedule")</h1>
+    <p>@(ar ? "يراجع موظف المحكمة الطلب وهو فقط من يحدد موعد الجلسة." : "The Court Employee reviews this request and is the only role that can schedule hearings.")</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="card-panel request-form-card">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="CaseId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="detail-grid mb-4">
+                    <div><span>@(ar ? "القضية" : "Case")</span><strong>@Model.CaseName</strong></div>
+                    <div><span>@(ar ? "العميل" : "Client")</span><strong>@Model.ClientName</strong></div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Reason" class="form-label fw-semibold">@(ar ? "سبب الطلب" : "Request reason")</label>
+                    <textarea asp-for="Reason" class="form-control" rows="5" maxlength="1000" placeholder="@(ar ? "اشرح سبب طلب جعل القضية رسمية وتحديد جلسة" : "Explain why this case needs official handling and a hearing")"></textarea>
+                    <span asp-validation-for="Reason" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn btn-primary px-4">@(ar ? "إرسال الطلب" : "Submit request")</button>
+            </form>
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <section class="card-panel">
+            <div class="setting-title"><b>⚖</b><div><h2>@(ar ? "مهم" : "Important")</h2><p>@(ar ? "لا يمكنك تحديد موعد الجلسة بنفسك." : "You cannot choose the hearing schedule yourself.")</p></div></div>
+            <p class="text-secondary mb-0">@(ar ? "بعد الموافقة، ينشئ موظف المحكمة جلسة رسمية تظهر لك وللعميل مع عداد تنازلي." : "After approval, the Court Employee creates an official hearing that appears for both lawyer and client with a countdown.")</p>
+        </section>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

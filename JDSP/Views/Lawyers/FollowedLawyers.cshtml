@@ -1,0 +1,64 @@
+﻿@model List<JDSP.ViewModels.Lawyers.LawyerListItemViewModel>
+@{
+    Layout = "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "المحامون المتابعون" : "Followed lawyers";
+}
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <span class="eyebrow">@(ar ? "المتابعة" : "Following")</span>
+        <h1>@(ar ? "المحامون المتابعون" : "Followed lawyers")</h1>
+        <p>@(ar ? "ارجع بسرعة إلى المحامين الذين تتابعهم وأرسل طلباً عندما تكون مستعداً." : "Quickly return to lawyers you follow and send a request when you are ready.")</p>
+    </div>
+    <a asp-action="Index" class="btn btn-primary px-4">@(ar ? "ابحث عن محامين أكثر" : "Find more lawyers")</a>
+</div>
+
+@if (!Model.Any()) {
+    <section class="card-panel empty">
+        <b>☆</b>
+        <h3>@(ar ? "أنت لا تتابع أي محامين بعد" : "You are not following any lawyers yet")</h3>
+        <p>@(ar ? "افتح دليل المحامين وتابع الملفات التي تريد الاحتفاظ بها." : "Open the lawyer directory and follow the profiles you want to keep.")</p>
+        <a asp-action="Index" class="btn btn-primary">@(ar ? "ابحث عن محامين" : "Find lawyers")</a>
+    </section>
+}
+else {
+    <div class="row g-4">
+        @foreach (var lawyer in Model) {
+            var initials = string.Join("", lawyer.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+            <div class="col-md-6 col-xl-4">
+                <article class="followed-lawyer-card">
+                    <div class="followed-lawyer-head">
+                        @if (!string.IsNullOrWhiteSpace(lawyer.PhotoPath)) {
+                            <img src="@lawyer.PhotoPath" class="lawyer-avatar" alt="@lawyer.FullName" />
+                        }
+                        else {
+                            <div class="lawyer-avatar avatar-fallback">@initials</div>
+                        }
+                        <div>
+                            <h2>@lawyer.FullName</h2>
+                            <span class="case-type">@UiText.Specialization(lawyer.Specialization, ar)</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-grid compact-grid">
+                        <div><span>@(ar ? "الخبرة" : "Experience")</span><strong>@UiText.YearsShort(lawyer.YearsOfExperience, ar)</strong></div>
+                        <div><span>@(ar ? "السعر" : "Price")</span><strong>@UiText.Price(lawyer.ConsultationPrice, lawyer.ConsultationPriceUnit, ar)</strong></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="status @(lawyer.IsAvailable ? "open" : "closed")">@UiText.Availability(lawyer.IsAvailable, ar)</span>
+                        <span class="small text-secondary">★ @(ar ? "متابَع" : "Followed")</span>
+                    </div>
+
+                    <div class="lawyer-card-actions">
+                        <a asp-action="Details" asp-route-id="@lawyer.LawyerProfileId" class="btn btn-outline-primary">@(ar ? "التفاصيل" : "Details")</a>
+                        @if (lawyer.IsAvailable) {
+                            <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@lawyer.LawyerProfileId" class="btn btn-primary">@(ar ? "إرسال طلب" : "Send request")</a>
+                        }
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}

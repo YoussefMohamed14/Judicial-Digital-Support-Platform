@@ -1,5 +1,87 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@using System.Globalization
+@model JDSP.ViewModels.CourtEmployee.CourtEmployeeDashboardViewModel
 @{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "لوحة المدير العام" : "Super Admin Dashboard";
 }
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "إدارة النظام" : "System administration")</span>
+    <h1>@(ar ? "لوحة المدير العام" : "Super Admin dashboard")</h1>
+    <p>@(ar ? "أنشئ حسابات موظفي المحكمة وراجع الطلبات المهمة من مكان واحد." : "Create court employee accounts and review important requests from one place.")</p>
+</div>
+
+<div class="row g-3 stats-row mb-4">
+    <div class="col"><div class="stat"><span>⚖</span><div><small>@(ar ? "طلبات اعتماد المحامين" : "Pending lawyer approvals")</small><strong>@Model.PendingLawyerApprovals</strong></div></div></div>
+    <div class="col"><div class="stat"><span>☑</span><div><small>@(ar ? "طلبات تعديل الهوية" : "Pending identity requests")</small><strong>@Model.PendingIdentityChangeRequests</strong></div></div></div>
+    <div class="col"><div class="stat"><span>👥</span><div><small>@(ar ? "العملاء" : "Clients")</small><strong>@Model.TotalClients</strong></div></div></div>
+    <div class="col"><div class="stat"><span>▣</span><div><small>@(ar ? "القضايا" : "Cases")</small><strong>@Model.TotalCases</strong></div></div></div>
+    <div class="col"><div class="stat"><span>◷</span><div><small>@(ar ? "طلبات جلسات معلقة" : "Pending hearing requests")</small><strong>@Model.PendingOfficialCaseRequests</strong></div></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <section class="card-panel h-100">
+            <div class="setting-title"><b>▣</b><div><h2>@(ar ? "موظفو المحكمة" : "Court employees")</h2><p>@(ar ? "إنشاء ومراجعة حسابات الموظفين الداخليين." : "Create and review internal employee accounts.")</p></div></div>
+            <a asp-controller="Admin" asp-action="CourtEmployees" class="btn btn-primary">@(ar ? "إدارة الموظفين" : "Manage employees")</a>
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section class="card-panel h-100">
+            <div class="setting-title"><b>⚖</b><div><h2>@(ar ? "اعتماد المحامين" : "Lawyer approvals")</h2><p>@(ar ? "راجع مستندات المحامين الجدد وقم بالموافقة أو الرفض." : "Review new lawyer documents and approve or reject.")</p></div></div>
+            <a asp-controller="LawyerApprovals" asp-action="Index" class="btn btn-outline-primary position-relative">
+                @(ar ? "عرض الطلبات" : "View requests")
+                @if (Model.PendingLawyerApprovals > 0) { <span class="message-badge ms-2">@Model.PendingLawyerApprovals</span> }
+            </a>
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section class="card-panel h-100">
+            <div class="setting-title"><b>☑</b><div><h2>@(ar ? "طلبات تعديل الهوية" : "Identity changes")</h2><p>@(ar ? "راجع طلبات تغيير الاسم أو الهاتف أو الرقم القومي." : "Review requests to change name, phone, or national number.")</p></div></div>
+            <a asp-controller="IdentityChangeRequests" asp-action="Index" class="btn btn-outline-primary position-relative">
+                @(ar ? "مراجعة الطلبات" : "Review requests")
+                @if (Model.PendingIdentityChangeRequests > 0) { <span class="message-badge ms-2">@Model.PendingIdentityChangeRequests</span> }
+            </a>
+        </section>
+    </div>
+
+    <div class="col-md-4">
+        <section class="card-panel h-100">
+            <div class="setting-title"><b>◷</b><div><h2>@(ar ? "طلبات الجلسات" : "Hearing requests")</h2><p>@(ar ? "راجع طلبات المحامين لجعل القضايا رسمية وجدولة الجلسات." : "Review lawyer official-case and hearing requests.")</p></div></div>
+            <a asp-controller="OfficialCaseRequests" asp-action="Index" class="btn btn-outline-primary position-relative">
+                @(ar ? "مراجعة الطلبات" : "Review requests")
+                @if (Model.PendingOfficialCaseRequests > 0) { <span class="message-badge ms-2">@Model.PendingOfficialCaseRequests</span> }
+            </a>
+        </section>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-6">
+        <section class="card-panel h-100">
+            <div class="panel-head"><div><h2>@(ar ? "محامون بانتظار المراجعة" : "Lawyers waiting for review")</h2><p>@(ar ? "أحدث طلبات اعتماد المحامين." : "Latest lawyer approval requests.")</p></div></div>
+            @if (!Model.PendingLawyers.Any()) { <div class="empty compact"><b>✓</b><p>@(ar ? "لا توجد طلبات حالياً." : "No requests now.")</p></div> }
+            else {
+                <div class="quick">
+                    @foreach (var item in Model.PendingLawyers) {
+                        <a asp-controller="LawyerApprovals" asp-action="Details" asp-route-id="@item.RequestId"><span><strong>@item.LawyerName</strong><small>@item.Email</small></span><em class="message-badge">!</em></a>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-lg-6">
+        <section class="card-panel h-100">
+            <div class="panel-head"><div><h2>@(ar ? "طلبات هوية بانتظار المراجعة" : "Identity requests waiting for review")</h2><p>@(ar ? "أحدث طلبات تعديل البيانات القانونية." : "Latest legal identity update requests.")</p></div></div>
+            @if (!Model.PendingIdentityChanges.Any()) { <div class="empty compact"><b>✓</b><p>@(ar ? "لا توجد طلبات حالياً." : "No requests now.")</p></div> }
+            else {
+                <div class="quick">
+                    @foreach (var item in Model.PendingIdentityChanges) {
+                        <a asp-controller="IdentityChangeRequests" asp-action="Details" asp-route-id="@item.RequestId"><span><strong>@item.RequestedByName</strong><small>@item.RequestedFullName</small></span><em class="message-badge">!</em></a>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>

@@ -1,0 +1,130 @@
+@model JDSP.ViewModel.LawyerBalance.LawyerBalanceViewModel
+@{
+    Layout = "_LawyerLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "الرصيد" : "Balance";
+    string BillingText(string? type) => type switch {
+        "Monthly" => ar ? "شهري" : "per month",
+        "Hourly" => ar ? "بالساعة" : "per hour",
+        _ => ar ? "مرة واحدة / لكل قضية" : "one time / per case"
+    };
+    string PayoutText(string? status) => status switch { "Withdrawn" => ar ? "تم السحب" : "Withdrawn", "PartiallyWithdrawn" => ar ? "سحب جزئي" : "Partially withdrawn", _ => ar ? "متاح" : "Available" };
+}
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "المدفوعات" : "Payments")</span>
+    <h1>@(ar ? "رصيد المحامي" : "Lawyer balance")</h1>
+    <p>@(ar ? "المدفوعات الناجحة تنتقل إلى رصيدك ويمكنك سحبها إلى بطاقتك." : "Successful client payments move to your balance, and you can withdraw them to your card.")</p>
+</div>
+
+<div class="balance-summary-grid mb-4">
+    <section class="stat balance-stat primary">
+        <span>💳</span>
+        <div><small>@(ar ? "الرصيد المتاح" : "Available balance")</small><strong>@Model.AvailableBalance.ToString("0.00")</strong></div>
+    </section>
+    <section class="stat balance-stat">
+        <span>✓</span>
+        <div><small>@(ar ? "إجمالي المدفوع" : "Total paid")</small><strong>@Model.TotalPaid.ToString("0.00")</strong></div>
+    </section>
+    <section class="stat balance-stat">
+        <span>↗</span>
+        <div><small>@(ar ? "تم سحبه" : "Withdrawn")</small><strong>@Model.WithdrawnBalance.ToString("0.00")</strong></div>
+    </section>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <section class="card-panel">
+            <div class="panel-head">
+                <div>
+                    <h2>@(ar ? "سحب الرصيد" : "Withdraw balance")</h2>
+                    <p>@(ar ? "هذا سحب تجريبي لمرحلة المشروع. سيتم تعليم الدفعات كمسحوبة." : "This is a mock withdrawal for the project phase. It marks available payments as withdrawn.")</p>
+                </div>
+                <span class="status open">@Model.AvailablePaymentCount</span>
+            </div>
+
+            @if (Model.AvailableBalance <= 0) {
+                <div class="empty compact"><b>💳</b><h3>@(ar ? "لا يوجد رصيد متاح" : "No available balance")</h3><p>@(ar ? "بعد نجاح دفع العميل ستظهر الأموال هنا." : "After a client payment succeeds, funds will appear here.")</p></div>
+            }
+            else {
+                <form asp-action="Withdraw" method="post" class="form-grid">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div>
+                        <label class="form-label">@(ar ? "مبلغ السحب" : "Withdrawal amount")</label>
+                        <input asp-for="Withdraw.Amount" class="form-control" type="number" min="1" max="@Model.AvailableBalance" step="0.01" placeholder="@Model.AvailableBalance.ToString("0.00")" />
+                        <span asp-validation-for="Withdraw.Amount" class="text-danger small"></span>
+                        <small class="text-secondary">@(ar ? "يمكنك سحب جزء من الرصيد أو كله." : "You can withdraw part of the balance or all of it.")</small>
+                    </div>
+                    <div>
+                        <label class="form-label">@(ar ? "اسم صاحب البطاقة" : "Card holder name")</label>
+                        <input asp-for="Withdraw.CardHolderName" class="form-control" />
+                        <span asp-validation-for="Withdraw.CardHolderName" class="text-danger small"></span>
+                    </div>
+                    <div>
+                        <label class="form-label">@(ar ? "رقم البطاقة" : "Card number")</label>
+                        <input asp-for="Withdraw.CardNumber" class="form-control js-card-number" autocomplete="cc-number" inputmode="numeric" placeholder="1234 - 5678 - 9012 - 3456" />
+                        <span asp-validation-for="Withdraw.CardNumber" class="text-danger small"></span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label">@(ar ? "تاريخ الانتهاء" : "Expiry")</label>
+                            <input asp-for="Withdraw.Expiry" class="form-control js-card-expiry" placeholder="MM/YY" inputmode="numeric" />
+                            <span asp-validation-for="Withdraw.Expiry" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">CVV</label>
+                            <input asp-for="Withdraw.Cvv" class="form-control" autocomplete="cc-csc" inputmode="numeric" maxlength="4" />
+                            <span asp-validation-for="Withdraw.Cvv" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg" type="submit">@(ar ? "سحب المبلغ" : "Withdraw amount")</button>
+                </form>
+            }
+        </section>
+    </div>
+
+    <div class="col-lg-7">
+        <section class="card-panel">
+            <div class="panel-head">
+                <div>
+                    <h2>@(ar ? "سجل المدفوعات" : "Payment history")</h2>
+                    <p>@(ar ? "كل دفعة ناجحة مرتبطة بقضية." : "Every successful payment connected to a case.")</p>
+                </div>
+            </div>
+
+            @if (!Model.Payments.Any()) {
+                <div class="empty compact"><b>◎</b><p>@(ar ? "لا توجد مدفوعات ناجحة بعد." : "No successful payments yet.")</p></div>
+            }
+            else {
+                <div class="balance-payment-list">
+                    @foreach (var payment in Model.Payments) {
+                        var withdrawn = payment.LawyerPayoutStatus == "Withdrawn";
+                        var partial = payment.LawyerPayoutStatus == "PartiallyWithdrawn";
+                        <article class="balance-payment-item @(withdrawn ? "withdrawn" : (partial ? "partially-withdrawn" : "available"))">
+                            <div>
+                                <h3>@payment.CaseName</h3>
+                                <p>@payment.ClientName · @BillingText(payment.BillingType)</p>
+                                <small>@(ar ? "تم الدفع" : "Paid") @payment.PaidAt.ToString("yyyy-MM-dd HH:mm")</small>
+                                @if (payment.WithdrawnAmount > 0) {
+                                    <small>@(ar ? "رقم السحب" : "Withdrawal ref"): @payment.LawyerPayoutReference · ****@payment.LawyerPayoutCardLast4</small>
+                                }
+                            </div>
+                            <div class="text-end">
+                                <strong>@payment.Amount.ToString("0.00")</strong>
+                                <small class="d-block text-secondary">@(ar ? "المتاح" : "Available"): @payment.AvailableAmount.ToString("0.00")</small>
+                                <small class="d-block text-secondary">@(ar ? "المسحوب" : "Withdrawn"): @payment.WithdrawnAmount.ToString("0.00")</small>
+                                <span class="status @(withdrawn ? "closed" : "open")">@PayoutText(payment.LawyerPayoutStatus)</span>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/payment-format.js" asp-append-version="true"></script>
+}

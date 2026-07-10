@@ -1,0 +1,72 @@
+@model JDSP.ViewModels.Cases.LawyerAssignedCaseListItemViewModel
+@using JDSP.ViewModels.Cases
+@{
+    Layout = "_LawyerLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تفاصيل القضية" : "Case details";
+    var paymentHistory = ViewBag.PaymentHistory as IReadOnlyList<CasePaymentListItemViewModel> ?? Array.Empty<CasePaymentListItemViewModel>();
+    string BillingText(string? type) => type switch { "Monthly" => ar ? "شهري" : "per month", "Hourly" => ar ? "بالساعة" : "per hour", _ => ar ? "مرة واحدة / لكل قضية" : "one time / per case" };
+    var officialRequestDisabled = Model.OfficialCaseRequestStatus == "Pending" ? "disabled" : "";
+}
+
+<a asp-action="AssignedCases" class="back-link">@(ar ? "→ الرجوع إلى القضايا المسندة" : "← Back to assigned cases")</a>
+<div class="page-head mt-3"><span class="eyebrow">@(ar ? "قضية مسندة" : "Assigned case")</span><h1>@Model.CaseName</h1><p>@(ar ? "تابع بيانات القضية وأرسل طلبات الدفع أو اطلب اعتماد القضية رسمياً." : "Review case information, send payment requests, or request official hearing scheduling.")</p></div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="card-panel mb-4">
+            <div class="panel-head"><div><h2>@(ar ? "نظرة عامة على القضية" : "Case overview")</h2><p>@(ar ? "معلومات الإسناد والحالة." : "Assignment and status information.")</p></div><span class="status large @Model.Status.ToLower().Replace(" ", "-")">@UiText.Status(Model.Status, ar)</span></div>
+            <div class="detail-grid">
+                <div><span>@(ar ? "نوع القضية" : "Case type")</span><strong>@UiText.CaseType(Model.CaseType, ar)</strong></div>
+                <div><span>@(ar ? "العميل" : "Client")</span><strong>@Model.ClientName</strong></div>
+                <div><span>@(ar ? "تاريخ الإسناد" : "Assigned on")</span><strong>@Model.AssignedAt.ToString("dd MMMM yyyy")</strong></div>
+                <div><span>@(ar ? "الجلسة القادمة" : "Next hearing")</span><strong>@(Model.NextHearingDate?.ToString("dd MMMM yyyy, h:mm tt") ?? (ar ? "غير مجدولة" : "Not scheduled"))</strong></div>
+                <div><span>@(ar ? "نوع الجلسة" : "Hearing type")</span><strong>@(Model.NextHearingType ?? (ar ? "لم يتم التأكيد" : "To be confirmed"))</strong></div>
+                <div><span>@(ar ? "مكان الجلسة" : "Hearing location")</span><strong>@(Model.NextHearingLocation ?? (ar ? "لم يتم التأكيد بعد" : "To be confirmed"))</strong></div>
+            </div>
+            @if (Model.NextHearingDate.HasValue) {
+                <div class="hearing-countdown mt-3" data-hearing-start="@Model.NextHearingDate.Value.ToString("o")" data-hearing-end="@(Model.NextHearingEndDate?.ToString("o") ?? Model.NextHearingDate.Value.ToString("o"))">
+                    <span>@(ar ? "الوقت المتبقي للجلسة" : "Time until hearing")</span>
+                    <strong>--</strong>
+                </div>
+            }
+        </section>
+        <section class="card-panel"><div class="description"><span>@(ar ? "وصف القضية" : "Case description")</span><p>@Model.Description</p></div></section>
+    </div>
+
+    <div class="col-lg-4">
+        <section class="card-panel mb-4">
+            <div class="panel-head"><div><h2>@(ar ? "إجراءات القضية" : "Case actions")</h2><p>@(ar ? "الدفع والطلبات الرسمية المرتبطة بهذه القضية." : "Payment and official actions for this case.")</p></div></div>
+            <div class="d-grid gap-2">
+                @if (Model.HasSuccessfulPayment) {
+                    <div class="alert alert-success mb-0">@(ar ? "تم الدفع بنجاح، وانتقل المبلغ إلى صفحة الرصيد." : "Payment completed, and the amount moved to your balance page.") <a asp-controller="LawyerBalance" asp-action="Index" class="alert-link">@(ar ? "فتح الرصيد" : "Open balance")</a></div>
+                }
+                else {
+                    <a asp-controller="Cases" asp-action="CreatePaymentRequest" asp-route-caseId="@Model.CaseId" class="btn btn-primary">@(Model.HasPendingPayment ? (ar ? "تعديل طلب الدفع" : "Edit payment request") : (ar ? "إرسال طلب دفع" : "Payment request"))</a>
+                }
+                <a asp-controller="OfficialCaseRequests" asp-action="Create" asp-route-caseId="@Model.CaseId" class="btn btn-outline-primary @officialRequestDisabled">@(ar ? "طلب مراجعة رسمية وجدولة جلسة" : "Request court review / hearing")</a>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.OfficialCaseRequestStatus)) {
+                <div class="info-row mt-3"><span>@(ar ? "حالة الطلب الرسمي" : "Official request")</span><strong>@UiText.Status(Model.OfficialCaseRequestStatus, ar)</strong></div>
+            }
+        </section>
+
+        <section class="card-panel">
+            <div class="panel-head"><div><h2>@(ar ? "آخر طلبات الدفع" : "Recent payment requests")</h2><p>@(ar ? "سجل مرتبط بهذه القضية." : "Records connected to this case.")</p></div></div>
+            @if (!paymentHistory.Any()) {
+                <div class="empty compact"><b>◎</b><p>@(ar ? "لا توجد طلبات دفع بعد." : "No payment requests yet.")</p></div>
+            }
+            else {
+                <div class="quick payment-history-list">
+                    @foreach (var item in paymentHistory) {
+                        <div class="info-row"><span>@item.TransactionRef<br /><small>@BillingText(item.BillingType) · @item.RequestedAt.ToString("yyyy-MM-dd HH:mm")</small></span><strong>@item.Amount.ToString("0.00")<br /><small>@UiText.Status(item.Status, ar)</small></strong></div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/hearing-countdown.js" asp-append-version="true"></script>
+}

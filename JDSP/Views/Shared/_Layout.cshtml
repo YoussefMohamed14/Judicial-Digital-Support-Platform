@@ -1,56 +1,72 @@
-﻿<!DOCTYPE html>
-<html>
+@using System.Globalization
+@{
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+}
+<!DOCTYPE html>
+<html lang="@(ar ? "ar" : "en")" dir="@(ar ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"] - JDSP</title>
+    <link rel="icon" href="~/favicon.ico" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/public.css" asp-append-version="true" />
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom mb-3">
         <div class="container">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">JDSP</a>
+            <a class="navbar-brand brand" asp-controller="Home" asp-action="Index"><img src="~/images/jdsp-logo.png" class="brand-logo" alt="JDSP" asp-append-version="true" /> JDSP</a>
 
             <ul class="navbar-nav ms-auto">
                 @if (User.Identity != null && User.Identity.IsAuthenticated) {
                     @if (User.IsInRole("Admin")) {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="AdminDashboard">Admin Dashboard</a>
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="AdminDashboard">@(ar ? "لوحة المدير العام" : "Super Admin")</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Admin" asp-action="CourtEmployees">@(ar ? "موظفو المحكمة" : "Court Employees")</a>
                         </li>
                     }
 
                     @if (User.IsInRole("CourtEmployee")) {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="CourtEmployeeDashboard">Court Dashboard</a>
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="CourtEmployeeDashboard">@(ar ? "لوحة المحكمة" : "Court Dashboard")</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="LawyerApprovals" asp-action="Index">@(ar ? "اعتماد المحامين" : "Lawyer Approvals")</a>
                         </li>
                     }
 
                     @if (User.IsInRole("Lawyer")) {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="LawyerDashboard">Lawyer Dashboard</a>
+                            <a class="nav-link" asp-controller="Profile" asp-action="Index">@(ar ? "تعديل الملف" : "Edit Profile")</a>
                         </li>
                     }
 
                     @if (User.IsInRole("Client")) {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Dashboard" asp-action="ClientDashboard">Client Dashboard</a>
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="Index">@(ar ? "تصفح المحامين" : "Browse Lawyers")</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Lawyers" asp-action="FollowedLawyers">@(ar ? "المحامون المتابعون" : "Followed Lawyers")</a>
                         </li>
                     }
 
                     <li class="nav-item">
                         <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            <button type="submit" class="btn btn-link nav-link">@(ar ? "تسجيل الخروج" : "Logout")</button>
                         </form>
                     </li>
                 }
                 else {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">@(ar ? "تسجيل الدخول" : "Login")</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                        <a class="nav-link" asp-controller="Account" asp-action="Register">@(ar ? "إنشاء حساب" : "Register")</a>
                     </li>
                 }
             </ul>
@@ -58,6 +74,10 @@
     </nav>
 
     <main class="container">
+        @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+        @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success">@TempData["SuccessMessage"]</div> }
+        @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+        @if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger">@TempData["ErrorMessage"]</div> }
         @RenderBody()
     </main>
 

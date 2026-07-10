@@ -1,0 +1,210 @@
+@model JDSP.ViewModels.Profile.ClientProfileViewModel
+@{
+    Layout = User.IsInRole("Lawyer") ? "_LawyerLayout" : "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تعديل الملف الشخصي" : "Edit profile";
+    var initials = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+}
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "الحساب" : "Account")</span>
+    <h1>@(ar ? "تعديل الملف الشخصي" : "Edit profile")</h1>
+    <p>@(ar ? "راجع معلومات الهوية المؤكدة وحدّث معلوماتك العامة والمهنية." : "Review verified identity information and update your public and professional details.")</p>
+</div>
+
+@if (Model.IsLawyer && Model.ProfessionalProfileRequired) {
+    <div class="alert alert-warning">
+        @(ar
+            ? "يجب إكمال التخصص والنبذة المهنية والخبرة والسعر قبل استخدام مساحة المحامي."
+            : "You must complete specialization, professional bio, experience, and price before using the lawyer workspace.")
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <section class="card-panel profile-summary text-center">
+            @if(!string.IsNullOrWhiteSpace(Model.PhotoPath)){
+                <img src="@Model.PhotoPath" class="profile-avatar" alt="@Model.FullName" />
+            }
+            else{
+                <div class="profile-avatar avatar-fallback">@initials</div>
+            }
+            <h2>@Model.FullName</h2>
+            <span class="role-pill">@UiText.Role(Model.Role, ar)</span>
+            <p class="text-secondary mt-3 mb-0">@(ar ? "عضو منذ" : "Member since") @Model.CreatedAt.ToString("MMMM yyyy")</p>
+        </section>
+    </div>
+
+    <div class="col-lg-8">
+        <section class="card-panel mb-4">
+            <div class="panel-head">
+                <div>
+                    <h2>@(ar ? "الهوية المؤكدة" : "Verified identity")</h2>
+                    <p>@(ar ? "البيانات القانونية لا تتغير مباشرة. عند تعديلها يتم إرسال طلب لموظف المحكمة للموافقة أو الرفض." : "Legal details are not changed directly. When you edit them, a request is sent to the court employee for approval or rejection.")</p>
+                </div>
+                <span class="locked">🔒 @(ar ? "تحتاج موافقة" : "Approval required")</span>
+            </div>
+            <div class="detail-grid mb-4">
+                <div><span>@(ar ? "الاسم الحالي" : "Current full name")</span><strong>@Model.FullName</strong></div>
+                <div><span>@(ar ? "البريد الإلكتروني" : "Email")</span><strong>@Model.Email</strong></div>
+                <div><span>@(ar ? "الهاتف الحالي" : "Current phone number")</span><strong>@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? (ar ? "غير متوفر" : "Not provided") : Model.PhoneNumber)</strong></div>
+                <div><span>@(ar ? "الرقم القومي الحالي" : "Current national number")</span><strong>@Model.NationalNumber</strong></div>
+            </div>
+
+            @if (Model.HasPendingIdentityChangeRequest) {
+                <div class="alert alert-warning mb-0">
+                    <strong>@(ar ? "طلب قيد المراجعة" : "Request pending")</strong><br />
+                    @(ar
+                        ? "لديك طلب تعديل هوية مرسل بالفعل إلى موظف المحكمة. لا يمكنك إرسال طلب جديد حتى تتم مراجعته."
+                        : "You already have an identity change request sent to the court employee. You cannot send a new request until it is reviewed.")
+                    @if (Model.PendingIdentityChangeRequestedAt.HasValue) {
+                        <span class="d-block mt-1 text-muted">@(ar ? "تاريخ الطلب:" : "Requested:") @Model.PendingIdentityChangeRequestedAt.Value.ToString("yyyy-MM-dd HH:mm")</span>
+                    }
+                </div>
+            }
+            else {
+                <form asp-action="RequestIdentityChange" method="post" enctype="multipart/form-data" class="identity-request-form">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="RequestedFullName" class="form-label fw-semibold">@(ar ? "الاسم المطلوب" : "Requested full name")</label>
+                            <input asp-for="RequestedFullName" class="form-control" />
+                            <span asp-validation-for="RequestedFullName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="RequestedPhoneNumber" class="form-label fw-semibold">@(ar ? "الهاتف المطلوب" : "Requested phone number")</label>
+                            <input asp-for="RequestedPhoneNumber" class="form-control" />
+                            <span asp-validation-for="RequestedPhoneNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="RequestedNationalNumber" class="form-label fw-semibold">@(ar ? "الرقم القومي المطلوب" : "Requested national number")</label>
+                            <input asp-for="RequestedNationalNumber" class="form-control" />
+                            <span asp-validation-for="RequestedNationalNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LegalIdFile" class="form-label fw-semibold">@(ar ? "إرفاق بطاقة الهوية القانونية" : "Attach legal ID")</label>
+                            <input asp-for="LegalIdFile" class="form-control" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" />
+                            <small class="text-secondary">@(ar ? "PDF أو JPG أو PNG أو WEBP. الحد الأقصى 10 ميجابايت." : "PDF, JPG, PNG, or WEBP. Max 10 MB.")</small>
+                            <span asp-validation-for="LegalIdFile" class="text-danger small d-block"></span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 align-items-center mt-3">
+                        <button class="btn btn-outline-primary">@(ar ? "إرسال طلب تعديل الهوية" : "Send identity change request")</button>
+                        <small class="text-secondary">@(ar ? "سيتم تطبيق التعديل تلقائياً فقط إذا وافق موظف المحكمة." : "Changes are applied automatically only after court employee approval.")</small>
+                    </div>
+                </form>
+            }
+        </section>
+
+        <section class="card-panel">
+            <div class="panel-head">
+                <div>
+                    <h2>@(ar ? "المعلومات القابلة للتعديل" : "Editable information")</h2>
+                    <p>@(ar ? "حدّث صورتك ونبذتك، وأكمل بياناتك المهنية إذا كنت محامياً." : "Update your photo and bio, and complete your professional data if you are a lawyer.")</p>
+                </div>
+            </div>
+
+            <form asp-action="Update" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+
+                <div class="mb-4">
+                    <label asp-for="NewPhoto" class="form-label fw-semibold">@(ar ? "صورة شخصية جديدة" : "New profile photo")</label>
+                    <input asp-for="NewPhoto" class="form-control" accept="image/jpeg,image/png,image/webp" />
+                    <small class="text-secondary">@(ar ? "اتركها فارغة للاحتفاظ بالصورة الحالية. الحد الأقصى 5 ميجابايت." : "Leave empty to keep the current photo. Max 5 MB.")</small>
+                    <span asp-validation-for="NewPhoto" class="text-danger small d-block"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Bio" class="form-label fw-semibold">@(ar ? "نبذة الحساب العامة" : "General account bio")</label>
+                    <textarea asp-for="Bio" class="form-control" rows="5" placeholder="@(ar ? "اكتب نبذة قصيرة تظهر في ملفك العام..." : "Write a short bio for your public account profile...")"></textarea>
+                    <span asp-validation-for="Bio" class="text-danger small"></span>
+                </div>
+
+                @if (Model.IsLawyer) {
+                    <hr class="my-4" />
+                    <div class="panel-head align-items-start">
+                        <div>
+                            <h2>@(ar ? "البيانات المهنية المطلوبة" : "Required professional details")</h2>
+                            <p>@(ar ? "هذه البيانات تظهر للعملاء في دليل المحامين، لذلك يجب إكمالها قبل استخدام المنصة كمحامٍ." : "These details appear to clients in the lawyer directory, so they must be completed before using the platform as a lawyer.")</p>
+                        </div>
+                    </div>
+
+                    <input type="hidden" asp-for="LawyerProfileId" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Specialization" class="form-label fw-semibold">@(ar ? "التخصص" : "Specialization")</label>
+                            <select asp-for="Specialization" class="form-select" id="specializationSelect">
+                                <option value="">@(ar ? "اختر التخصص" : "Choose specialization")</option>
+                                @foreach (var specialization in UiText.SpecializationOptions) {
+                                    <option value="@specialization">@UiText.Specialization(specialization, ar)</option>
+                                }
+                                <option value="@UiText.OtherSpecialization">@(ar ? "أخرى" : "Other")</option>
+                            </select>
+                            <span asp-validation-for="Specialization" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6" id="customSpecializationBox">
+                            <label asp-for="CustomSpecialization" class="form-label fw-semibold">@(ar ? "اكتب التخصص" : "Type specialization")</label>
+                            <input asp-for="CustomSpecialization" class="form-control" placeholder="@(ar ? "مثال: قضايا التأمين" : "e.g. Insurance cases")" />
+                            <span asp-validation-for="CustomSpecialization" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 mt-3">
+                        <label asp-for="ProfessionalBio" class="form-label fw-semibold">@(ar ? "النبذة المهنية" : "Professional bio")</label>
+                        <textarea asp-for="ProfessionalBio" class="form-control" rows="6" placeholder="@(ar ? "اكتب خبرتك القانونية، أنواع القضايا التي تتعامل معها، وطريقة العمل مع العملاء..." : "Describe your legal experience, case types you handle, and how you work with clients...")"></textarea>
+                        <span asp-validation-for="ProfessionalBio" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="YearsOfExperience" class="form-label fw-semibold">@(ar ? "سنوات الخبرة" : "Years of experience")</label>
+                            <input asp-for="YearsOfExperience" class="form-control" type="number" min="0" max="60" />
+                            <span asp-validation-for="YearsOfExperience" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ConsultationPrice" class="form-label fw-semibold">@(ar ? "السعر" : "Price")</label>
+                            <input asp-for="ConsultationPrice" class="form-control" type="number" min="1" step="0.01" />
+                            <span asp-validation-for="ConsultationPrice" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ConsultationPriceUnit" class="form-label fw-semibold">@(ar ? "نوع السعر" : "Price type")</label>
+                            <select asp-for="ConsultationPriceUnit" class="form-select">
+                                <option value="@UiText.PriceUnitHour">@(ar ? "بالساعة" : "Per hour")</option>
+                                <option value="@UiText.PriceUnitMonth">@(ar ? "شهري" : "Per month")</option>
+                            </select>
+                            <span asp-validation-for="ConsultationPriceUnit" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch my-4">
+                        <input asp-for="IsAvailable" class="form-check-input" />
+                        <label asp-for="IsAvailable" class="form-check-label fw-semibold">@(ar ? "متاح لاستقبال طلبات جديدة" : "Available to receive new requests")</label>
+                    </div>
+                }
+
+                <button class="btn btn-primary px-4">@(ar ? "حفظ التغييرات" : "Save changes")</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const select = document.getElementById('specializationSelect');
+            const box = document.getElementById('customSpecializationBox');
+            if (!select || !box) return;
+
+            function toggleCustomSpecialization() {
+                box.style.display = select.value === '@UiText.OtherSpecialization' ? '' : 'none';
+            }
+
+            select.addEventListener('change', toggleCustomSpecialization);
+            toggleCustomSpecialization();
+        })();
+    </script>
+}

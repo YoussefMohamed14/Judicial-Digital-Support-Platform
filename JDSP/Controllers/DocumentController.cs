@@ -50,7 +50,7 @@ namespace JDSP.Controllers
                 Directory.CreateDirectory(uploadsFolder);
 
             }
-            string currentUserId = "6228bed9-2eed-40e1-9e2f-3b96e5a544cc";//GetCurrentUserId();
+            string currentUserId = GetCurrentUserId();
 
             string uniqueFileName = Guid.NewGuid().ToString() +
                         Path.GetExtension(model.File.FileName);

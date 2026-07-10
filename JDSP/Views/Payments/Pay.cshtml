@@ -1,0 +1,72 @@
+@model JDSP.ViewModels.Cases.ClientPaymentViewModel
+@{
+    Layout = "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "دفع الطلب" : "Pay request";
+    string billing = Model.BillingType switch {
+        "Monthly" => ar ? "شهري" : "per month",
+        "Hourly" => ar ? "بالساعة" : "per hour",
+        _ => ar ? "مرة واحدة / لكل قضية" : "one time / per case"
+    };
+}
+
+<a asp-controller="Messages" asp-action="Index" class="back-link">@(ar ? "→ الرجوع إلى الرسائل" : "← Back to messages")</a>
+<div class="page-head mt-3">
+    <span class="eyebrow">@(ar ? "دفع تجريبي" : "Mock payment")</span>
+    <h1>@(ar ? "إتمام الدفع" : "Complete payment")</h1>
+    <p>@(ar ? "راجع بيانات القضية وطلب الدفع، ثم أدخل بيانات البطاقة التجريبية." : "Review the case and payment information, then enter mock card details.")</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="card-panel request-form-card">
+            <form asp-action="Pay" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="PaymentId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="CardHolderName" class="form-label fw-semibold">@(ar ? "اسم صاحب البطاقة" : "Card holder name")</label>
+                    <input asp-for="CardHolderName" class="form-control" placeholder="@(ar ? "الاسم كما يظهر على البطاقة" : "Name on card")" />
+                    <span asp-validation-for="CardHolderName" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="CardNumber" class="form-label fw-semibold">@(ar ? "رقم البطاقة" : "Card number")</label>
+                    <input asp-for="CardNumber" class="form-control js-card-number" inputmode="numeric" autocomplete="off" placeholder="4111 - 1111 - 1111 - 1111" />
+                    <span asp-validation-for="CardNumber" class="text-danger small"></span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Expiry" class="form-label fw-semibold">@(ar ? "تاريخ الانتهاء" : "Expiry")</label>
+                        <input asp-for="Expiry" class="form-control js-card-expiry" inputmode="numeric" placeholder="MM/YY" />
+                        <span asp-validation-for="Expiry" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Cvv" class="form-label fw-semibold">CVV</label>
+                        <input asp-for="Cvv" class="form-control" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="123" />
+                        <span asp-validation-for="Cvv" class="text-danger small"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success w-100 mt-4">@(ar ? "دفع" : "Pay") @Model.Amount.ToString("0.00")</button>
+            </form>
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="card-panel payment-summary-card">
+            <div class="panel-head"><div><h2>@(ar ? "بيانات الدفع" : "Payment information")</h2><p>@(ar ? "تفاصيل الطلب المرتبط بالقضية." : "Request details connected to the case.")</p></div><span class="status pending">@(ar ? "بانتظار الدفع" : "Pending")</span></div>
+            <div class="detail-grid one-column">
+                <div><span>@(ar ? "القضية" : "Case")</span><strong>@Model.CaseName</strong></div>
+                <div><span>@(ar ? "المحامي" : "Lawyer")</span><strong>@Model.LawyerName</strong></div>
+                <div><span>@(ar ? "المبلغ" : "Amount")</span><strong>@Model.Amount.ToString("0.00")</strong></div>
+                <div><span>@(ar ? "نوع الدفع" : "Payment type")</span><strong>@billing</strong></div>
+                <div><span>@(ar ? "رقم الطلب" : "Reference")</span><strong>@Model.TransactionRef</strong></div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.Note)) {
+                <div class="description mt-3"><span>@(ar ? "ملاحظة المحامي" : "Lawyer note")</span><p>@Model.Note</p></div>
+            }
+            <p class="text-secondary small mt-3 mb-0">@(ar ? "هذه صفحة دفع تجريبية داخل المشروع فقط ولا يتم تنفيذ عملية دفع حقيقية." : "This is a mock payment page for the project only. No real payment is processed.")</p>
+        </section>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> <script src="~/js/payment-format.js" asp-append-version="true"></script> }

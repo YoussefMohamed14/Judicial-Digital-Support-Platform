@@ -1,0 +1,52 @@
+@using System.Globalization
+@model JDSP.ViewModels.Admin.CourtEmployeeAccountDetailsViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تفاصيل موظف المحكمة" : "Court employee details";
+}
+
+<a asp-action="CourtEmployees" class="back-link">@(ar ? "→ الرجوع إلى موظفي المحكمة" : "← Back to court employees")</a>
+
+<div class="page-head mt-3">
+    <span class="eyebrow">@(ar ? "حساب داخلي" : "Internal account")</span>
+    <h1>@Model.FullName</h1>
+    <p>@(ar ? "تفاصيل حساب موظف المحكمة وصلاحية الدخول." : "Court employee account details and access status.")</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="card-panel">
+            <div class="panel-head">
+                <div>
+                    <h2>@(ar ? "بيانات الحساب" : "Account information")</h2>
+                    <p>@(ar ? "هذه البيانات للعرض والمراجعة من المدير العام." : "These details are for super-admin review.")</p>
+                </div>
+                <span class="status large @(Model.AccountStatus == "Active" ? "open" : "closed")">@UiText.Status(Model.AccountStatus, ar)</span>
+            </div>
+            <div class="detail-grid">
+                <div><span>@(ar ? "الاسم" : "Full name")</span><strong>@Model.FullName</strong></div>
+                <div><span>@(ar ? "البريد الإلكتروني" : "Email")</span><strong>@Model.Email</strong></div>
+                <div><span>@(ar ? "رقم الهاتف" : "Phone number")</span><strong>@Model.PhoneNumber</strong></div>
+                <div><span>@(ar ? "الرقم القومي" : "National number")</span><strong>@Model.NationalNumber</strong></div>
+                <div><span>@(ar ? "تاريخ الإنشاء" : "Created")</span><strong>@Model.CreatedAt.ToString("yyyy-MM-dd")</strong></div>
+                <div><span>@(ar ? "كلمة مرور مؤقتة" : "Temporary password")</span><strong>@(Model.MustChangePassword ? (ar ? "يجب تغييرها" : "Must be changed") : (ar ? "تم تغييرها" : "Changed"))</strong></div>
+                <div><span>@(ar ? "اللغة المفضلة" : "Preferred language")</span><strong>@Model.PreferredLanguage.ToUpperInvariant()</strong></div>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <section class="card-panel">
+            <div class="setting-title"><b>!</b><div><h2>@(ar ? "إجراءات" : "Actions")</h2><p>@(ar ? "الإزالة تعطل الدخول ولا تحذف السجل من قاعدة البيانات." : "Remove disables access and keeps the database record for audit history.")</p></div></div>
+            @if (Model.AccountStatus == "Active") {
+                <form asp-action="RemoveCourtEmployee" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('@(ar ? "إزالة صلاحية دخول هذا الموظف؟" : "Remove this employee access?")');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger w-100">@(ar ? "إزالة الموظف" : "Remove employee")</button>
+                </form>
+            }
+            else {
+                <div class="alert alert-info mb-0">@(ar ? "هذا الحساب غير نشط حالياً." : "This account is currently inactive.")</div>
+            }
+        </section>
+    </div>
+</div>

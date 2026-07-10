@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace JDSP.ViewModels.Account {
     public class RegisterViewModel {
@@ -17,8 +18,9 @@ namespace JDSP.ViewModels.Account {
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
+        [Required]
         [Phone]
-        public string? PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(20)]
@@ -26,6 +28,10 @@ namespace JDSP.ViewModels.Account {
 
         [Required]
         public string Role { get; set; } = string.Empty;
+
+        public IFormFile? NationalIdFile { get; set; }
+
+        public IFormFile? LawyerIdFile { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

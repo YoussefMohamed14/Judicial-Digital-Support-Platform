@@ -1,54 +1,59 @@
-﻿@*
-    //دا تست فقط
-*@
 @model JDSP.ViewModel.CreateCaseViewModel
 @{
-    ViewData["Title"] = "Create New Case";
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "إنشاء قضية" : "Create case";
 }
 
-<div class="container mt-4" style="max-width:680px">
-    <h2 class="mb-1">Submit a New Case</h2>
-    <p class="text-muted mb-4">Fill in your case details. You will choose a lawyer in the next step.</p>
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "لموظف المحكمة فقط" : "Court employee only")</span>
+    <h1>@(ar ? "إنشاء قضية رسمية" : "Create an official case")</h1>
+    <p>@(ar ? "اختر حساب العميل صاحب القضية. لا يمكن للعملاء إنشاء قضايا رسمية بأنفسهم." : "Select the client account that owns the case. Clients cannot create official cases themselves.")</p>
+</div>
 
+<section class="card-panel" style="max-width:780px">
     <form asp-action="Create" method="post">
         @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
         <div class="mb-3">
-            <label asp-for="CaseName" class="form-label fw-semibold"></label>
-            <input asp-for="CaseName" class="form-control"
-                   placeholder="e.g. Property dispute with neighbor" />
+            <label asp-for="ClientId" class="form-label fw-semibold">@(ar ? "العميل" : "Client")</label>
+            <select asp-for="ClientId" asp-items="ViewBag.Clients" class="form-select">
+                <option value="">@(ar ? "-- اختر العميل --" : "-- Select client --")</option>
+            </select>
+            <span asp-validation-for="ClientId" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CaseName" class="form-label fw-semibold">@(ar ? "اسم القضية" : "Case name")</label>
+            <input asp-for="CaseName" class="form-control" placeholder="@(ar ? "مثال: نزاع عقاري" : "e.g. Property dispute")" />
             <span asp-validation-for="CaseName" class="text-danger small"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="CaseType" class="form-label fw-semibold"></label>
+            <label asp-for="CaseType" class="form-label fw-semibold">@(ar ? "نوع القضية" : "Case type")</label>
             <select asp-for="CaseType" class="form-select">
-                <option value="">-- Select type --</option>
-                <option value="Civil">Civil</option>
-                <option value="Criminal">Criminal</option>
-                <option value="Family">Family</option>
-                <option value="Commercial">Commercial</option>
-                <option value="Administrative">Administrative</option>
+                <option value="">@(ar ? "-- اختر النوع --" : "-- Select type --")</option>
+                <option value="Civil">@(ar ? "مدنية" : "Civil")</option>
+                <option value="Criminal">@(ar ? "جنائية" : "Criminal")</option>
+                <option value="Family">@(ar ? "أحوال شخصية" : "Family")</option>
+                <option value="Commercial">@(ar ? "تجارية" : "Commercial")</option>
+                <option value="Administrative">@(ar ? "إدارية" : "Administrative")</option>
             </select>
             <span asp-validation-for="CaseType" class="text-danger small"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Description" class="form-label fw-semibold"></label>
-            <textarea asp-for="Description" class="form-control" rows="6"
-                      placeholder="Describe your case in detail..."></textarea>
+        <div class="mb-4">
+            <label asp-for="Description" class="form-label fw-semibold">@(ar ? "الوصف" : "Description")</label>
+            <textarea asp-for="Description" class="form-control" rows="6" placeholder="@(ar ? "أدخل الوصف الرسمي للقضية..." : "Enter the official case description...")"></textarea>
             <span asp-validation-for="Description" class="text-danger small"></span>
         </div>
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary px-4">Next: Choose a Lawyer →</button>
-            <a asp-action="MyCases" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4">@(ar ? "إنشاء القضية" : "Create case")</button>
+            <a asp-controller="Dashboard" asp-action="CourtEmployeeDashboard" class="btn btn-outline-secondary">@(ar ? "إلغاء" : "Cancel")</a>
         </div>
     </form>
-</div>
+</section>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,123 @@
+﻿@using System.Globalization
+@model JDSP.ViewModels.Settings.SettingsViewModel
+@{
+    Layout = User.IsInRole("Admin") || User.IsInRole("CourtEmployee") ? "_CourtLayout" : (User.IsInRole("Lawyer") ? "_LawyerLayout" : "_ClientLayout");
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "الإعدادات" : "Settings";
+}
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "الحساب" : "Account")</span>
+    <h1>@(ar ? "الإعدادات" : "Settings")</h1>
+    <p>@(ar ? "بدّل بين حساباتك، واختر اللغة والمظهر." : "Switch between your accounts, language, and appearance.")</p>
+</div>
+
+<div class="settings-stack">
+
+    <section class="card-panel">
+        <div class="setting-title">
+            <b>☰</b>
+            <div>
+                <h2>@(ar ? "تعديل الملف" : "Edit profile")</h2>
+                <p>@(User.IsInRole("Lawyer")
+                    ? (ar ? "حدّث صورتك ونبذتك وبياناتك المهنية المطلوبة من صفحة واحدة." : "Update your photo, bio, and required professional lawyer details from one page.")
+                    : (ar ? "حدّث صورتك ونبذتك العامة." : "Update your photo and public bio."))</p>
+            </div>
+        </div>
+        <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-primary">@(ar ? "فتح تعديل الملف" : "Open edit profile")</a>
+    </section>
+    <section class="card-panel">
+        <div class="setting-title">
+            <b>@@</b>
+            <div>
+                <h2>@(ar ? "تبديل الحساب" : "Switch account")</h2>
+                <p>@(ar ? "الحساب الحالي" : "Current account"): <strong>@Model.CurrentEmail</strong></p>
+            </div>
+        </div>
+
+        <form asp-action="SwitchAccount" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label asp-for="SwitchEmail" class="form-label fw-semibold">@(ar ? "بريد الحساب الآخر" : "Other account email")</label>
+                    <input asp-for="SwitchEmail" class="form-control" placeholder="@(ar ? "مثال: lawyer@example.com" : "example: lawyer@example.com")" />
+                    <span asp-validation-for="SwitchEmail" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-5">
+                    <label asp-for="SwitchPassword" class="form-label fw-semibold">@(ar ? "كلمة مرور الحساب الآخر" : "Other account password")</label>
+                    <input asp-for="SwitchPassword" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="SwitchPassword" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-primary">@(ar ? "تبديل" : "Switch")</button>
+                </div>
+            </div>
+
+            <p class="text-muted small mt-3 mb-0">
+                @(ar ? "هذا لا يغيّر البريد الإلكتروني للحساب الحالي؛ فقط يفتح حسابًا آخر تملكه." : "This does not change the current account email; it only opens another account you own.")
+            </p>
+        </form>
+    </section>
+
+    <section class="card-panel">
+        <div class="setting-title">
+            <b>文</b>
+            <div>
+                <h2>@(ar ? "اللغة" : "Language")</h2>
+                <p>@(ar ? "اختر لغة واجهة المنصة." : "Choose the interface language.")</p>
+            </div>
+        </div>
+
+        <form asp-action="ChangeLanguage" method="post" class="language-grid">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+            <label class="language-option @(Model.PreferredLanguage == "en" ? "selected" : "")">
+                <input type="radio" name="language" value="en" checked="@(Model.PreferredLanguage == "en")" />
+                <b>EN</b>
+                <span>
+                    <strong>@(ar ? "الإنجليزية" : "English")</strong>
+                    <small>@(ar ? "من اليسار إلى اليمين" : "Left-to-right")</small>
+                </span>
+            </label>
+
+            <label class="language-option @(Model.PreferredLanguage == "ar" ? "selected" : "")">
+                <input type="radio" name="language" value="ar" checked="@(Model.PreferredLanguage == "ar")" />
+                <b>AR</b>
+                <span>
+                    <strong>العربية</strong>
+                    <small>من اليمين إلى اليسار</small>
+                </span>
+            </label>
+
+            <button class="btn btn-outline-primary">@(ar ? "حفظ اللغة" : "Save language")</button>
+        </form>
+    </section>
+
+    <section class="card-panel">
+        <div class="setting-title">
+            <b>◐</b>
+            <div>
+                <h2>@(ar ? "المظهر" : "Appearance")</h2>
+                <p>@(ar ? "اختر الوضع الفاتح أو الداكن." : "Choose light or dark mode.")</p>
+            </div>
+        </div>
+
+        <div class="theme-grid">
+            <button type="button" class="theme-option" data-theme-choice="light">
+                <span class="theme-preview light"></span>
+                <strong>@(ar ? "فاتح" : "Light mode")</strong>
+            </button>
+            <button type="button" class="theme-option" data-theme-choice="dark">
+                <span class="theme-preview dark"></span>
+                <strong>@(ar ? "داكن" : "Dark mode")</strong>
+            </button>
+        </div>
+    </section>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
