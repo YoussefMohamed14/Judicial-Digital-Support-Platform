@@ -34,6 +34,11 @@ namespace JDSP.Models {
         [ForeignKey(nameof(LawyerId))]
         public ApplicationUser? Lawyer { get; set; }
 
+        public int? CaseId { get; set; }
+
+        [ForeignKey(nameof(CaseId))]
+        public Case? Case { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? RespondedAt { get; set; }
 

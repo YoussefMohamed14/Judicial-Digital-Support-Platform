@@ -5,10 +5,11 @@
     ViewData["Title"] = Model.FullName;
     var initials = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
     var isLawyer = User.IsInRole("Lawyer");
+    int? selectedCaseId = ViewBag.CaseId as int?;
 }
 
 @if (User.IsInRole("Client")) {
-    <a asp-action="Index" class="back-link">@(ar ? "→ الرجوع إلى المحامين" : "← Back to lawyers")</a>
+    <a asp-action="Index" asp-route-caseId="@selectedCaseId" class="back-link">@(ar ? "→ الرجوع إلى المحامين" : "← Back to lawyers")</a>
 }
 else if (isLawyer) {
     <a asp-controller="Profile" asp-action="Index" class="back-link">@(ar ? "→ الرجوع إلى تعديل الملف" : "← Back to edit profile")</a>
@@ -47,7 +48,7 @@ else if (isLawyer) {
             <section class="card-panel">
                 <div class="panel-head"><div><h2>@(ar ? "العمل مع هذا المحامي" : "Work with this lawyer")</h2><p>@(ar ? "ارفع ملف القضية وأرسل نبذة مباشرة إلى المحامي." : "Upload the case file and send a brief directly to the lawyer.")</p></div></div>
                 <div class="d-flex flex-wrap gap-2">
-                    @if (Model.IsAvailable) { <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@Model.LawyerProfileId" class="btn btn-primary">@(ar ? "إرسال طلب قضية" : "Send case request")</a> }
+                    @if (Model.IsAvailable) { <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@Model.LawyerProfileId" asp-route-caseId="@selectedCaseId" class="btn btn-primary">@(selectedCaseId.HasValue ? (ar ? "إرسال هذه القضية" : "Send this case") : (ar ? "إرسال طلب قضية" : "Send case request"))</a> }
                     else { <button class="btn btn-secondary" disabled>@(ar ? "غير متاح حالياً" : "Currently unavailable")</button> }
                     @if (Model.IsFollowed) {
                         <form asp-action="Unfollow" method="post">@Html.AntiForgeryToken()<input type="hidden" name="lawyerProfileId" value="@Model.LawyerProfileId" /><button type="submit" class="btn btn-outline-warning">@(ar ? "إلغاء المتابعة" : "Unfollow")</button></form>

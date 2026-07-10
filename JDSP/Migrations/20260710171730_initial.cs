@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace JDSP.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -346,40 +346,6 @@ namespace JDSP.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LegalServiceRequests",
-                columns: table => new
-                {
-                    LegalServiceRequestId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Subject = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: false),
-                    Brief = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: false),
-                    RequestType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    OriginalFileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    FilePath = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LawyerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RespondedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LegalServiceRequests", x => x.LegalServiceRequestId);
-                    table.ForeignKey(
-                        name: "FK_LegalServiceRequests_AspNetUsers_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_LegalServiceRequests_AspNetUsers_LawyerId",
-                        column: x => x.LawyerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SystemNotifications",
                 columns: table => new
                 {
@@ -495,6 +461,47 @@ namespace JDSP.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LegalServiceRequests",
+                columns: table => new
+                {
+                    LegalServiceRequestId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Subject = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: false),
+                    Brief = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: false),
+                    RequestType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    OriginalFileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    FilePath = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LawyerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CaseId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RespondedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LegalServiceRequests", x => x.LegalServiceRequestId);
+                    table.ForeignKey(
+                        name: "FK_LegalServiceRequests_AspNetUsers_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LegalServiceRequests_AspNetUsers_LawyerId",
+                        column: x => x.LawyerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LegalServiceRequests_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalTable: "Cases",
+                        principalColumn: "CaseID",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OfficialCaseRequests",
                 columns: table => new
                 {
@@ -586,6 +593,30 @@ namespace JDSP.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CaseLawyerSubscriptions",
+                columns: table => new
+                {
+                    CaseLawyerSubscriptionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CaseLawyerId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BillingCycle = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseLawyerSubscriptions", x => x.CaseLawyerSubscriptionId);
+                    table.ForeignKey(
+                        name: "FK_CaseLawyerSubscriptions_CaseLawyers_CaseLawyerId",
+                        column: x => x.CaseLawyerId,
+                        principalTable: "CaseLawyers",
+                        principalColumn: "CaseLawyerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PublicRequestProposals",
                 columns: table => new
                 {
@@ -612,30 +643,6 @@ namespace JDSP.Migrations
                         column: x => x.LegalServiceRequestId,
                         principalTable: "LegalServiceRequests",
                         principalColumn: "LegalServiceRequestId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CaseLawyerSubscriptions",
-                columns: table => new
-                {
-                    CaseLawyerSubscriptionId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CaseLawyerId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    BillingCycle = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CaseLawyerSubscriptions", x => x.CaseLawyerSubscriptionId);
-                    table.ForeignKey(
-                        name: "FK_CaseLawyerSubscriptions_CaseLawyers_CaseLawyerId",
-                        column: x => x.CaseLawyerId,
-                        principalTable: "CaseLawyers",
-                        principalColumn: "CaseLawyerId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -839,6 +846,11 @@ namespace JDSP.Migrations
                 name: "IX_LawyerVerificationRequests_Status_RequestedAt",
                 table: "LawyerVerificationRequests",
                 columns: new[] { "Status", "RequestedAt" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LegalServiceRequests_CaseId",
+                table: "LegalServiceRequests",
+                column: "CaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LegalServiceRequests_ClientId",

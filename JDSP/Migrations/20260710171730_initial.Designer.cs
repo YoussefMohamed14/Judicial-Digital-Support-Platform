@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JDSP.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260710005935_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260710171730_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -677,6 +677,9 @@ namespace JDSP.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)");
 
+                    b.Property<int?>("CaseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ClientId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -714,6 +717,8 @@ namespace JDSP.Migrations
                         .HasColumnType("nvarchar(180)");
 
                     b.HasKey("LegalServiceRequestId");
+
+                    b.HasIndex("CaseId");
 
                     b.HasIndex("ClientId");
 
@@ -1286,6 +1291,11 @@ namespace JDSP.Migrations
 
             modelBuilder.Entity("JDSP.Models.LegalServiceRequest", b =>
                 {
+                    b.HasOne("JDSP.Models.Case", "Case")
+                        .WithMany()
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("JDSP.Models.ApplicationUser", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")
@@ -1296,6 +1306,8 @@ namespace JDSP.Migrations
                         .WithMany()
                         .HasForeignKey("LawyerId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Case");
 
                     b.Navigation("Client");
 

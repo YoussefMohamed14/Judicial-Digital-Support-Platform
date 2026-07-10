@@ -23,7 +23,7 @@
             <div class="description mt-3"><span>@(ar ? "الوصف" : "Description")</span><p>@Model.Description</p></div>
         </section>
         <section class="card-panel">
-            <div class="panel-head"><div><h2>@(ar ? "المستندات" : "Documents")</h2><p>@(ar ? "راجع الملفات المرتبطة بهذه القضية الرسمية." : "Review files connected to this official case.")</p></div><a asp-controller="Document" asp-action="Index" class="btn btn-outline-secondary">@(ar ? "فتح المستندات" : "Open documents")</a></div>
+            <div class="panel-head"><div><h2>@(ar ? "المستندات" : "Documents")</h2><p>@(ar ? "راجع الملفات المرتبطة بهذه القضية الرسمية." : "Review files connected to this official case.")</p></div><a asp-controller="Document" asp-action="Index" asp-route-caseId="@Model.CaseId" class="btn btn-outline-secondary">@(ar ? "فتح المستندات" : "Open documents")</a></div>
         </section>
     </div>
     <div class="col-lg-4">
@@ -31,7 +31,7 @@
             <div class="panel-head"><div><h2>@(ar ? "إسناد المحامي" : "Lawyer assignment")</h2><p>@(ar ? "أحدث حالة للطلب." : "Latest request status.")</p></div></div>
             <div class="info-row"><span>@(ar ? "المحامي" : "Lawyer")</span><strong>@(Model.AssignedLawyerName ?? (ar ? "غير مسند" : "Not assigned"))</strong></div>
             <div class="info-row"><span>@(ar ? "الحالة" : "Status")</span><strong>@(Model.LawyerRequestStatus == null ? (ar ? "لا يوجد طلب" : "No request") : UiText.Status(Model.LawyerRequestStatus, ar))</strong></div>
-            @if(Model.AssignedLawyerName == null){<a asp-controller="Lawyers" asp-action="Index" class="btn btn-primary w-100 mt-3">@(ar ? "ابحث عن محامٍ" : "Find a lawyer")</a>}
+            @if(Model.AssignedLawyerName == null){<a asp-controller="Lawyers" asp-action="Index" asp-route-caseId="@Model.CaseId" class="btn btn-primary w-100 mt-3">@(ar ? "ابحث عن محامٍ" : "Find a lawyer")</a>}
         </section>
         <section class="card-panel">
             <div class="panel-head"><div><h2>@(ar ? "الجلسة القادمة" : "Next hearing")</h2><p>@(ar ? "أقرب جلسة مجدولة من موظف المحكمة." : "Nearest hearing scheduled by the Court Employee.")</p></div></div>

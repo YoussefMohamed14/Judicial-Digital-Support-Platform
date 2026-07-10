@@ -47,7 +47,10 @@ namespace JDSP.Controllers {
         }
 
         [Authorize(Roles = Roles.Client), HttpGet]
-        public async Task<IActionResult> SendToLawyer(int lawyerProfileId) {
+        public async Task<IActionResult> SendToLawyer(int lawyerProfileId, int? caseId) {
+            var clientId = _users.GetUserId(User);
+            if (clientId == null) return Challenge();
+
             var lawyer = await _db.LawyerProfiles
                 .AsNoTracking()
                 .Include(x => x.User)
@@ -55,10 +58,33 @@ namespace JDSP.Controllers {
 
             if (lawyer == null) return NotFound();
 
+            Case? existingCase = null;
+            if (caseId.HasValue) {
+                existingCase = await _db.Cases
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.CaseID == caseId.Value && x.CreatedBy_Id == clientId);
+
+                if (existingCase == null) return NotFound();
+
+                var alreadyAssigned = await _db.CaseLawyers.AsNoTracking().AnyAsync(x =>
+                    x.CaseId == existingCase.CaseID &&
+                    x.LawyerId == lawyer.UserId &&
+                    x.Status != "Rejected");
+
+                if (alreadyAssigned) {
+                    TempData["Error"] = "You already sent this case to that lawyer.";
+                    return RedirectToAction("Details", "Cases", new { id = existingCase.CaseID });
+                }
+            }
+
             return View(new CreateServiceRequestViewModel {
                 LawyerProfileId = lawyer.LawyerProfileId,
                 LawyerId = lawyer.UserId,
-                LawyerName = $"{lawyer.User.FirstName} {lawyer.User.LastName}"
+                LawyerName = $"{lawyer.User.FirstName} {lawyer.User.LastName}",
+                CaseId = existingCase?.CaseID,
+                CaseName = existingCase?.CaseName,
+                Subject = existingCase?.CaseName ?? string.Empty,
+                Brief = existingCase?.Description ?? string.Empty
             });
         }
 
@@ -78,27 +104,66 @@ namespace JDSP.Controllers {
                 ModelState.AddModelError(string.Empty, "This lawyer is not currently available for new requests.");
             }
 
+            Case? existingCase = null;
+            if (model.CaseId.HasValue) {
+                existingCase = await _db.Cases
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.CaseID == model.CaseId.Value && x.CreatedBy_Id == client.Id);
+
+                if (existingCase == null) {
+                    ModelState.AddModelError(string.Empty, "The selected case could not be found.");
+                }
+                else {
+                    ModelState.Remove(nameof(model.Subject));
+                    ModelState.Remove(nameof(model.Brief));
+                    ModelState.Remove(nameof(model.CaseFile));
+                    model.Subject = existingCase.CaseName;
+                    model.Brief = existingCase.Description;
+                    model.CaseName = existingCase.CaseName;
+
+                    if (lawyer != null) {
+                        var alreadyAssigned = await _db.CaseLawyers.AsNoTracking().AnyAsync(x =>
+                            x.CaseId == existingCase.CaseID &&
+                            x.LawyerId == lawyer.Id &&
+                            x.Status != "Rejected");
+
+                        if (alreadyAssigned) {
+                            ModelState.AddModelError(string.Empty, "You already sent this case to that lawyer.");
+                        }
+                    }
+                }
+            }
+
             if (!ModelState.IsValid) {
                 model.LawyerName = lawyer == null ? model.LawyerName : $"{lawyer.FirstName} {lawyer.LastName}";
+                model.CaseName = existingCase?.CaseName ?? model.CaseName;
                 return View(model);
             }
 
-            var upload = await RequestFileHelper.SaveAsync(model.CaseFile, _environment);
-            if (!upload.Success) {
-                ModelState.AddModelError(nameof(model.CaseFile), upload.Error ?? "The file could not be uploaded.");
-                model.LawyerName = $"{lawyer!.FirstName} {lawyer.LastName}";
-                return View(model);
+            string? uploadPath = null;
+            string? uploadOriginalName = null;
+            if (existingCase == null) {
+                var upload = await RequestFileHelper.SaveAsync(model.CaseFile, _environment);
+                if (!upload.Success) {
+                    ModelState.AddModelError(nameof(model.CaseFile), upload.Error ?? "The file could not be uploaded.");
+                    model.LawyerName = $"{lawyer!.FirstName} {lawyer.LastName}";
+                    return View(model);
+                }
+
+                uploadPath = upload.Path;
+                uploadOriginalName = upload.OriginalName;
             }
 
             _db.LegalServiceRequests.Add(new LegalServiceRequest {
                 ClientId = client.Id,
                 LawyerId = lawyer!.Id,
-                Subject = model.Subject.Trim(),
-                Brief = model.Brief.Trim(),
+                CaseId = existingCase?.CaseID,
+                Subject = (existingCase?.CaseName ?? model.Subject).Trim(),
+                Brief = (existingCase?.Description ?? model.Brief).Trim(),
                 RequestType = "Direct",
                 Status = "Pending",
-                FilePath = upload.Path,
-                OriginalFileName = upload.OriginalName,
+                FilePath = uploadPath,
+                OriginalFileName = uploadOriginalName,
                 CreatedAt = DateTime.UtcNow
             });
 
@@ -311,6 +376,33 @@ namespace JDSP.Controllers {
         }
 
         private void EnsureAssignedCaseForAcceptedRequest(LegalServiceRequest request, string lawyerId) {
+            if (request.CaseId.HasValue) {
+                var existingCase = _db.Cases
+                    .Include(x => x.Documents)
+                    .FirstOrDefault(x => x.CaseID == request.CaseId.Value && x.CreatedBy_Id == request.ClientId);
+
+                if (existingCase == null) return;
+
+                var alreadyAssigned = _db.CaseLawyers.Any(x =>
+                    x.CaseId == existingCase.CaseID &&
+                    x.LawyerId == lawyerId &&
+                    x.Status != "Rejected");
+
+                if (!alreadyAssigned) {
+                    _db.CaseLawyers.Add(new CaseLawyer {
+                        CaseId = existingCase.CaseID,
+                        LawyerId = lawyerId,
+                        Status = "Accepted",
+                        AssignedAt = DateTime.Now
+                    });
+                }
+
+                if (existingCase.Status == "Open" || existingCase.Status == "Pending")
+                    existingCase.Status = "In Progress";
+
+                return;
+            }
+
             var caseType = request.RequestType == "Public" ? "Public Request" : "Direct Request";
 
             var assignedCase = new Case {
@@ -319,7 +411,7 @@ namespace JDSP.Controllers {
                 Description = request.Brief.Trim(),
                 CreatedBy_Id = request.ClientId,
                 CreatedAt = DateTime.Now,
-                Status = "Open"
+                Status = "In Progress"
             };
 
             assignedCase.Documents = new List<Document>();

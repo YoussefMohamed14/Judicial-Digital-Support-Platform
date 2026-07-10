@@ -9,7 +9,7 @@
 
 <div class="filters">
     <a asp-action="AssignedCases" class="@(string.IsNullOrWhiteSpace(Model.StatusFilter) ? "active" : "")">@(ar ? "الكل" : "All")</a>
-    @foreach (var status in new[] { "Open", "Pending", "In Progress", "Waiting for next hearing date", "Closed" }) {
+    @foreach (var status in new[] { "Open", "Pending", "In Progress", "Waiting for next hearing date", "Postponed", "Closed" }) {
         <a asp-action="AssignedCases" asp-route-status="@status" class="@(Model.StatusFilter == status ? "active" : "")">@UiText.Status(status, ar)</a>
     }
 </div>

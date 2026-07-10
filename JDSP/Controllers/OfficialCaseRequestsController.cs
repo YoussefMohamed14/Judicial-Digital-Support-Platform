@@ -249,6 +249,118 @@ namespace JDSP.Controllers {
             return RedirectToAction(nameof(Details), new { id = request.Id });
         }
 
+
+        [Authorize(Roles = Roles.CourtEmployee + "," + Roles.Admin), HttpGet]
+        public async Task<IActionResult> HearingFollowUps() {
+            await UpdateEndedHearingFollowUpsAsync();
+            var waitingCases = await BuildHearingFollowUpListQuery().ToListAsync();
+            return View(waitingCases);
+        }
+
+        [Authorize(Roles = Roles.CourtEmployee + "," + Roles.Admin), HttpGet]
+        public async Task<IActionResult> ManageHearingFollowUp(int caseId) {
+            await UpdateEndedHearingFollowUpsAsync();
+            var model = await BuildHearingFollowUpDecisionModelAsync(caseId);
+            if (model == null) return NotFound();
+
+            var defaultDate = DateTime.Now.AddDays(14);
+            var defaultStart = new DateTime(defaultDate.Year, defaultDate.Month, defaultDate.Day, 10, 0, 0);
+            model.HearingDate = defaultStart;
+            model.HearingEndDate = defaultStart.AddHours(2);
+            model.HearingType = "Physical";
+            return View(model);
+        }
+
+        [Authorize(Roles = Roles.CourtEmployee + "," + Roles.Admin), HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ManageHearingFollowUp(HearingFollowUpDecisionViewModel model) {
+            var employee = await _users.GetUserAsync(User);
+            if (employee == null) return Challenge();
+
+            var caseItem = await _db.Cases
+                .Include(c => c.Creator)
+                .FirstOrDefaultAsync(c => c.CaseID == model.CaseId &&
+                    (c.Status == "Waiting for next hearing date" || c.Status == "Postponed" || c.Status == "In Progress"));
+
+            if (caseItem == null) return NotFound();
+
+            var latestHearing = await _db.Hearings
+                .Where(h => h.CaseId == model.CaseId)
+                .OrderByDescending(h => h.HearingDate)
+                .FirstOrDefaultAsync();
+
+            var lawyerIds = await _db.CaseLawyers.AsNoTracking()
+                .Where(x => x.CaseId == model.CaseId &&
+                    (x.Status == "Accepted" || x.Status == "Price Proposed" || x.Status == "OfferAccepted"))
+                .Select(x => x.LawyerId)
+                .Distinct()
+                .ToListAsync();
+
+            var decision = model.Decision?.Trim() ?? string.Empty;
+            if (decision != "ScheduleNext" && decision != "Postpone" && decision != "Close")
+                ModelState.AddModelError(nameof(model.Decision), Text("Choose a valid follow-up decision.", "اختر قرار متابعة صحيح."));
+
+            if (decision == "ScheduleNext") {
+                if (!model.HearingDate.HasValue)
+                    ModelState.AddModelError(nameof(model.HearingDate), Text("Choose the next hearing start time.", "اختر وقت بداية الجلسة القادمة."));
+                if (!model.HearingEndDate.HasValue)
+                    ModelState.AddModelError(nameof(model.HearingEndDate), Text("Choose the next hearing end time.", "اختر وقت نهاية الجلسة القادمة."));
+                if (model.HearingDate.HasValue && model.HearingDate.Value <= DateTime.Now)
+                    ModelState.AddModelError(nameof(model.HearingDate), Text("Choose a future hearing start time.", "اختر وقت بداية جلسة في المستقبل."));
+                if (model.HearingDate.HasValue && model.HearingEndDate.HasValue && model.HearingEndDate.Value <= model.HearingDate.Value)
+                    ModelState.AddModelError(nameof(model.HearingEndDate), Text("The hearing end time must be after the start time.", "يجب أن يكون وقت نهاية الجلسة بعد وقت البداية."));
+            }
+
+            if (!ModelState.IsValid) {
+                await FillHearingFollowUpDisplayFieldsAsync(model);
+                return View(model);
+            }
+
+            if (latestHearing != null && latestHearing.EndDate <= DateTime.Now && latestHearing.Status == "Scheduled")
+                latestHearing.Status = "Completed";
+
+            if (decision == "ScheduleNext") {
+                caseItem.Status = "In Progress";
+                _db.Hearings.Add(new Hearing {
+                    CaseId = caseItem.CaseID,
+                    HearingDate = model.HearingDate!.Value,
+                    EndDate = model.HearingEndDate!.Value,
+                    HearingType = string.IsNullOrWhiteSpace(model.HearingType) ? "Physical" : model.HearingType,
+                    Location = model.Location,
+                    Status = "Scheduled",
+                    ScheduledById = employee.Id,
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                await NotifyCaseParticipantsAsync(caseItem, lawyerIds,
+                    "Next hearing scheduled", "تم تحديد الجلسة القادمة",
+                    $"The next hearing for case '{caseItem.CaseName}' was scheduled on {model.HearingDate:yyyy-MM-dd HH:mm} - {model.HearingEndDate:HH:mm}. Location: {model.Location ?? "To be confirmed"}.",
+                    $"تم تحديد الجلسة القادمة للقضية '{caseItem.CaseName}' بتاريخ {model.HearingDate:yyyy-MM-dd HH:mm} - {model.HearingEndDate:HH:mm}. المكان: {model.Location ?? "سيتم التأكيد"}.");
+
+                TempData["Success"] = Text("The next hearing was scheduled and both parties were notified.", "تم تحديد الجلسة القادمة وإبلاغ الطرفين.");
+            }
+            else if (decision == "Postpone") {
+                caseItem.Status = "Postponed";
+                await NotifyCaseParticipantsAsync(caseItem, lawyerIds,
+                    "Case hearing postponed", "تم تأجيل الجلسة",
+                    $"Case '{caseItem.CaseName}' was postponed. Notes: {model.CourtNotes ?? "No notes"}",
+                    $"تم تأجيل القضية '{caseItem.CaseName}'. الملاحظات: {model.CourtNotes ?? "لا توجد ملاحظات"}");
+
+                TempData["Success"] = Text("The case was marked as postponed and both parties were notified.", "تم وضع القضية كـ مؤجلة وإبلاغ الطرفين.");
+            }
+            else {
+                caseItem.Status = "Closed";
+                await NotifyCaseParticipantsAsync(caseItem, lawyerIds,
+                    "Case closed", "تم إغلاق القضية",
+                    $"Case '{caseItem.CaseName}' was closed by the Court Employee. Notes: {model.CourtNotes ?? "No notes"}",
+                    $"تم إغلاق القضية '{caseItem.CaseName}' بواسطة موظف المحكمة. الملاحظات: {model.CourtNotes ?? "لا توجد ملاحظات"}");
+
+                TempData["Success"] = Text("The case was closed and both parties were notified.", "تم إغلاق القضية وإبلاغ الطرفين.");
+            }
+
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(HearingFollowUps));
+        }
+
         private async Task<OfficialCaseRequestDetailsViewModel?> LoadDetailsAsync(int id) {
             return await _db.OfficialCaseRequests.AsNoTracking()
                 .Where(x => x.Id == id)
@@ -270,6 +382,142 @@ namespace JDSP.Controllers {
                     CourtNotes = x.CourtNotes
                 })
                 .FirstOrDefaultAsync();
+        }
+
+
+        private IQueryable<HearingFollowUpListItemViewModel> BuildHearingFollowUpListQuery() {
+            return _db.Cases.AsNoTracking()
+                .Where(c => c.Status == "Waiting for next hearing date" || c.Status == "Postponed")
+                .OrderByDescending(c => c.CreatedAt)
+                .Select(c => new HearingFollowUpListItemViewModel {
+                    CaseId = c.CaseID,
+                    CaseName = c.CaseName,
+                    CaseType = c.CaseType,
+                    CaseStatus = c.Status,
+                    ClientName = c.Creator == null ? "Client" : c.Creator.FirstName + " " + c.Creator.LastName,
+                    LawyerName = _db.CaseLawyers
+                        .Where(cl => cl.CaseId == c.CaseID && cl.Lawyer != null &&
+                            (cl.Status == "Accepted" || cl.Status == "Price Proposed" || cl.Status == "OfferAccepted"))
+                        .OrderByDescending(cl => cl.AssignedAt)
+                        .Select(cl => cl.Lawyer!.FirstName + " " + cl.Lawyer.LastName)
+                        .FirstOrDefault() ?? "Lawyer",
+                    LastHearingStart = _db.Hearings
+                        .Where(h => h.CaseId == c.CaseID)
+                        .OrderByDescending(h => h.HearingDate)
+                        .Select(h => (DateTime?)h.HearingDate)
+                        .FirstOrDefault(),
+                    LastHearingEnd = _db.Hearings
+                        .Where(h => h.CaseId == c.CaseID)
+                        .OrderByDescending(h => h.HearingDate)
+                        .Select(h => (DateTime?)h.EndDate)
+                        .FirstOrDefault(),
+                    LastHearingType = _db.Hearings
+                        .Where(h => h.CaseId == c.CaseID)
+                        .OrderByDescending(h => h.HearingDate)
+                        .Select(h => h.HearingType)
+                        .FirstOrDefault(),
+                    LastHearingLocation = _db.Hearings
+                        .Where(h => h.CaseId == c.CaseID)
+                        .OrderByDescending(h => h.HearingDate)
+                        .Select(h => h.Location)
+                        .FirstOrDefault()
+                });
+        }
+
+        private async Task<HearingFollowUpDecisionViewModel?> BuildHearingFollowUpDecisionModelAsync(int caseId) {
+            var model = await _db.Cases.AsNoTracking()
+                .Where(c => c.CaseID == caseId && (c.Status == "Waiting for next hearing date" || c.Status == "Postponed" || c.Status == "In Progress"))
+                .Select(c => new HearingFollowUpDecisionViewModel {
+                    CaseId = c.CaseID,
+                    CaseName = c.CaseName,
+                    CaseType = c.CaseType,
+                    CaseStatus = c.Status,
+                    ClientName = c.Creator == null ? "Client" : c.Creator.FirstName + " " + c.Creator.LastName,
+                    LawyerName = _db.CaseLawyers
+                        .Where(cl => cl.CaseId == c.CaseID && cl.Lawyer != null &&
+                            (cl.Status == "Accepted" || cl.Status == "Price Proposed" || cl.Status == "OfferAccepted"))
+                        .OrderByDescending(cl => cl.AssignedAt)
+                        .Select(cl => cl.Lawyer!.FirstName + " " + cl.Lawyer.LastName)
+                        .FirstOrDefault() ?? "Lawyer",
+                    LastHearingStart = _db.Hearings
+                        .Where(h => h.CaseId == c.CaseID)
+                        .OrderByDescending(h => h.HearingDate)
+                        .Select(h => (DateTime?)h.HearingDate)
+                        .FirstOrDefault(),
+                    LastHearingEnd = _db.Hearings
+                        .Where(h => h.CaseId == c.CaseID)
+                        .OrderByDescending(h => h.HearingDate)
+                        .Select(h => (DateTime?)h.EndDate)
+                        .FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
+
+            return model;
+        }
+
+        private async Task FillHearingFollowUpDisplayFieldsAsync(HearingFollowUpDecisionViewModel model) {
+            var details = await BuildHearingFollowUpDecisionModelAsync(model.CaseId);
+            if (details == null) return;
+            model.CaseName = details.CaseName;
+            model.CaseType = details.CaseType;
+            model.ClientName = details.ClientName;
+            model.LawyerName = details.LawyerName;
+            model.CaseStatus = details.CaseStatus;
+            model.LastHearingStart = details.LastHearingStart;
+            model.LastHearingEnd = details.LastHearingEnd;
+        }
+
+        private async Task UpdateEndedHearingFollowUpsAsync() {
+            var now = DateTime.Now;
+            var ended = await _db.Hearings
+                .Include(h => h.Case)
+                .Where(h => h.Status == "Scheduled" && h.EndDate <= now && h.CourtFollowUpNotifiedAt == null)
+                .Take(50)
+                .ToListAsync();
+
+            if (ended.Count == 0) return;
+
+            foreach (var hearing in ended) {
+                hearing.CourtFollowUpNotifiedAt = DateTime.UtcNow;
+                if (hearing.Case != null && hearing.Case.Status == "In Progress")
+                    hearing.Case.Status = "Waiting for next hearing date";
+
+                _db.SystemNotifications.Add(new SystemNotification {
+                    RecipientId = hearing.ScheduledById,
+                    Title = "Hearing needs follow-up",
+                    Body = $"The hearing for case '{hearing.Case?.CaseName ?? hearing.CaseId.ToString()}' ended. Please close the case, postpone it, or schedule the next hearing date.",
+                    Category = "HearingFollowUp",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task NotifyCaseParticipantsAsync(Case caseItem, IReadOnlyCollection<string> lawyerIds, string titleEn, string titleAr, string bodyEn, string bodyAr) {
+            var recipientIds = lawyerIds
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Append(caseItem.CreatedBy_Id)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .ToList();
+
+            var recipients = await _db.Users.AsNoTracking()
+                .Where(u => recipientIds.Contains(u.Id))
+                .Select(u => new { u.Id, u.PreferredLanguage })
+                .ToListAsync();
+
+            foreach (var recipient in recipients) {
+                var isAr = recipient.PreferredLanguage == "ar";
+                _db.SystemNotifications.Add(new SystemNotification {
+                    RecipientId = recipient.Id,
+                    Title = isAr ? titleAr : titleEn,
+                    Body = isAr ? bodyAr : bodyEn,
+                    Category = "HearingFollowUp",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
         }
 
         private void AddSystemNotification(string userId, string titleEn, string titleAr, string bodyEn, string bodyAr, string? language) {

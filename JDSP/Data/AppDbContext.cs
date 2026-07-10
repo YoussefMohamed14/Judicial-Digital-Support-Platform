@@ -89,6 +89,12 @@ namespace JDSP.Data {
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<LegalServiceRequest>()
+                .HasOne(x => x.Case)
+                .WithMany()
+                .HasForeignKey(x => x.CaseId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<LegalServiceRequest>()
                 .HasIndex(x => new { x.RequestType, x.Status, x.CreatedAt });
 
             builder.Entity<PublicRequestProposal>()

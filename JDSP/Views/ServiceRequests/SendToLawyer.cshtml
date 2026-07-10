@@ -2,10 +2,19 @@
 @{
     Layout = "_ClientLayout";
     var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var hasExistingCase = Model.CaseId.HasValue;
     ViewData["Title"] = ar ? "إرسال طلب" : "Send request";
 }
 
-<div class="page-head"><span class="eyebrow">@(ar ? "طلب مباشر" : "Direct request")</span><h1>@(ar ? "إرسال طلب إلى" : "Send a request to") @Model.LawyerName</h1><p>@(ar ? "أرفق ملف القضية واكتب نبذة واضحة. هذا طلب قبل القضية؛ القضية الرسمية ينشئها موظف المحكمة فقط." : "Attach the case file and write a clear brief. This is a pre-case request; the official case is created only by a Court Employee.")</p></div>
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "طلب مباشر" : "Direct request")</span>
+    <h1>@(ar ? "إرسال طلب إلى" : "Send a request to") @Model.LawyerName</h1>
+    <p>
+        @(hasExistingCase
+            ? (ar ? "سيتم إرسال القضية الرسمية الحالية إلى المحامي. عند قبول المحامي سيتم إسناد نفس القضية بدون إنشاء قضية جديدة." : "This sends the existing official case to the lawyer. If the lawyer accepts, the same case will be assigned without creating a duplicate case.")
+            : (ar ? "أرفق ملف القضية واكتب نبذة واضحة. هذا طلب قبل القضية؛ القضية الرسمية ينشئها موظف المحكمة فقط." : "Attach the case file and write a clear brief. This is a pre-case request; the official case is created only by a Court Employee."))
+    </p>
+</div>
 
 <div class="row justify-content-center"><div class="col-xl-8">
 <section class="card-panel request-form-card">
@@ -14,27 +23,64 @@
         <input asp-for="LawyerProfileId" type="hidden" />
         <input asp-for="LawyerId" type="hidden" />
         <input asp-for="LawyerName" type="hidden" />
+        <input asp-for="CaseId" type="hidden" />
+        <input asp-for="CaseName" type="hidden" />
         <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
 
-        <div class="mb-3">
-            <label asp-for="Subject" class="form-label fw-semibold">@(ar ? "موضوع الطلب" : "Request subject")</label>
-            <input asp-for="Subject" class="form-control" placeholder="@(ar ? "وصف قصير لما تحتاجه" : "Short description of what you need")" />
-            <span asp-validation-for="Subject" class="text-danger small"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Brief" class="form-label fw-semibold">@(ar ? "نبذة القضية" : "Case brief")</label>
-            <textarea asp-for="Brief" class="form-control" rows="8" placeholder="@(ar ? "اشرح الموقف والتواريخ المهمة والمساعدة التي تحتاجها..." : "Explain the situation, important dates, and the help you need...")"></textarea>
-            <span asp-validation-for="Brief" class="text-danger small"></span>
-        </div>
-        <div class="mb-4">
-            <label asp-for="CaseFile" class="form-label fw-semibold">@(ar ? "ملف القضية" : "Case file")</label>
-            <input asp-for="CaseFile" class="form-control" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" />
-            <small class="text-secondary">@(ar ? "PDF أو DOC أو DOCX أو TXT أو JPG أو PNG. الحد الأقصى 10 ميجابايت." : "PDF, DOC, DOCX, TXT, JPG or PNG. Maximum 10 MB.")</small>
-            <span asp-validation-for="CaseFile" class="text-danger small d-block"></span>
-        </div>
+        @if (hasExistingCase) {
+            <input asp-for="Subject" type="hidden" />
+            <input asp-for="Brief" type="hidden" />
+            <section class="inner-panel mb-4">
+                <div class="panel-head">
+                    <div>
+                        <h2>@(ar ? "القضية المختارة" : "Selected case")</h2>
+                        <p>@(ar ? "هذا الطلب مرتبط بالقضية الحالية ولن ينشئ قضية أخرى." : "This request is linked to the current case and will not create another case.")</p>
+                    </div>
+                    <span class="status open">#@Model.CaseId</span>
+                </div>
+                <div class="detail-grid compact-grid">
+                    <div>
+                        <span>@(ar ? "اسم القضية" : "Case name")</span>
+                        <strong>@Model.Subject</strong>
+                    </div>
+                    <div>
+                        <span>@(ar ? "المحامي" : "Lawyer")</span>
+                        <strong>@Model.LawyerName</strong>
+                    </div>
+                </div>
+                <div class="description mt-3">
+                    <span>@(ar ? "وصف القضية" : "Case description")</span>
+                    <p>@Model.Brief</p>
+                </div>
+            </section>
+        }
+        else {
+            <div class="mb-3">
+                <label asp-for="Subject" class="form-label fw-semibold">@(ar ? "موضوع الطلب" : "Request subject")</label>
+                <input asp-for="Subject" class="form-control" placeholder="@(ar ? "وصف قصير لما تحتاجه" : "Short description of what you need")" />
+                <span asp-validation-for="Subject" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Brief" class="form-label fw-semibold">@(ar ? "نبذة القضية" : "Case brief")</label>
+                <textarea asp-for="Brief" class="form-control" rows="8" placeholder="@(ar ? "اشرح الموقف والتواريخ المهمة والمساعدة التي تحتاجها..." : "Explain the situation, important dates, and the help you need...")"></textarea>
+                <span asp-validation-for="Brief" class="text-danger small"></span>
+            </div>
+            <div class="mb-4">
+                <label asp-for="CaseFile" class="form-label fw-semibold">@(ar ? "ملف القضية" : "Case file")</label>
+                <input asp-for="CaseFile" class="form-control" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png" />
+                <small class="text-secondary">@(ar ? "PDF أو DOC أو DOCX أو TXT أو JPG أو PNG. الحد الأقصى 10 ميجابايت." : "PDF, DOC, DOCX, TXT, JPG or PNG. Maximum 10 MB.")</small>
+                <span asp-validation-for="CaseFile" class="text-danger small d-block"></span>
+            </div>
+        }
+
         <div class="d-flex flex-wrap gap-2">
             <button class="btn btn-primary px-4">@(ar ? "إرسال إلى المحامي" : "Send to lawyer")</button>
-            <a asp-controller="Lawyers" asp-action="Details" asp-route-id="@Model.LawyerProfileId" class="btn btn-outline-secondary">@(ar ? "إلغاء" : "Cancel")</a>
+            @if (hasExistingCase) {
+                <a asp-controller="Cases" asp-action="Details" asp-route-id="@Model.CaseId" class="btn btn-outline-secondary">@(ar ? "إلغاء" : "Cancel")</a>
+            }
+            else {
+                <a asp-controller="Lawyers" asp-action="Details" asp-route-id="@Model.LawyerProfileId" class="btn btn-outline-secondary">@(ar ? "إلغاء" : "Cancel")</a>
+            }
         </div>
     </form>
 </section>

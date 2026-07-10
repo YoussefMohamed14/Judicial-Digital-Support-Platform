@@ -36,6 +36,7 @@
             <a asp-controller="LawyerApprovals" asp-action="Index">⚖ <span>@(ar ? "اعتماد المحامين" : "Lawyer approvals")</span></a>
             <a asp-controller="IdentityChangeRequests" asp-action="Index">☑ <span>@(ar ? "طلبات تعديل الهوية" : "Identity changes")</span></a>
             <a asp-controller="OfficialCaseRequests" asp-action="Index">◷ <span>@(ar ? "طلبات الجلسات" : "Hearing requests")</span></a>
+            <a asp-controller="OfficialCaseRequests" asp-action="HearingFollowUps">⏱ <span>@(ar ? "متابعة الجلسات" : "Hearing follow-up")</span></a>
             @if (!isAdmin) {
                 <a asp-controller="Cases" asp-action="Create">＋ <span>@(ar ? "إنشاء قضية" : "Create case")</span></a>
             }

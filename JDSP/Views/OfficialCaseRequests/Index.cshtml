@@ -17,6 +17,7 @@
     @foreach (var item in new[] { "Pending", "Approved", "Rejected" }) {
         <a asp-action="Index" asp-route-status="@item" class="@(status == item ? "active" : "")">@UiText.Status(item, ar)</a>
     }
+    <a asp-action="HearingFollowUps">@(ar ? "متابعة الجلسات المنتهية" : "Ended hearing follow-up")</a>
 </div>
 
 <section class="card-panel">

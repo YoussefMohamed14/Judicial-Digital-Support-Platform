@@ -44,3 +44,6 @@
 .balance-payment-item.partially-withdrawn{border-color:rgba(250,204,21,.5);background:linear-gradient(145deg,color-mix(in srgb,#facc15 9%,var(--card)),var(--card))}
 .balance-payment-item.partially-withdrawn .status{color:#8b640d;background:#fff4d9}
 .form-grid input[inputmode="numeric"],.js-card-number,.js-card-expiry{letter-spacing:.03em}
+.stat-link{color:var(--text);text-decoration:none;transition:.18s ease}.stat-link:hover{transform:translateY(-2px);border-color:var(--p);color:var(--text);box-shadow:0 16px 34px rgba(31,75,153,.16)}
+.decision-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}.decision-card{display:flex;align-items:flex-start;gap:.7rem;padding:1rem;border:1px solid var(--border);border-radius:.9rem;background:color-mix(in srgb,var(--bg) 65%,var(--card));cursor:pointer}.decision-card:has(input:checked){border-color:var(--p);box-shadow:0 0 0 3px color-mix(in srgb,var(--p) 10%,transparent)}.decision-card input{margin-top:.2rem}.decision-card span{display:flex;flex-direction:column;gap:.25rem}.decision-card small{color:var(--muted);line-height:1.45}.status.postponed{color:#7a4e12;background:#fff0d6}.status.completed,.status.scheduled{color:#255ea9;background:#e8f1ff}
+@media(max-width:767px){.decision-grid{grid-template-columns:1fr}}

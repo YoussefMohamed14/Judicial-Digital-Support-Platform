@@ -1,2 +1,72 @@
-﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+<script>
+    // JDSP file upload validation fix.
+    // jQuery Validate additional-methods validates the accept attribute as MIME types only.
+    // Our forms use both extensions (.pdf, .png) and MIME types, so PNG/JPG files could be rejected
+    // with: "Please enter a value with a valid mimetype." even when the server allows them.
+    // This override keeps client validation aligned with RequestFileHelper/IdentityFileHelper.
+    (function ($) {
+        if (!$ || !$.validator) {
+            return;
+        }
+
+        $.validator.addMethod("accept", function (value, element, param) {
+            if (this.optional(element)) {
+                return true;
+            }
+
+            var files = element.files;
+            if (!files || files.length === 0) {
+                return true;
+            }
+
+            var rawRules = (param || element.getAttribute("accept") || "").toString();
+            if (!rawRules.trim()) {
+                return true;
+            }
+
+            var rules = rawRules
+                .split(/[|,]/)
+                .map(function (rule) { return rule.trim().toLowerCase(); })
+                .filter(Boolean);
+
+            if (rules.length === 0) {
+                return true;
+            }
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var fileName = (file.name || "").toLowerCase();
+                var mimeType = (file.type || "").toLowerCase();
+                var accepted = false;
+
+                for (var j = 0; j < rules.length; j++) {
+                    var rule = rules[j];
+
+                    if (rule.charAt(0) === "." && fileName.endsWith(rule)) {
+                        accepted = true;
+                        break;
+                    }
+
+                    if (rule.endsWith("/*") && mimeType.startsWith(rule.substring(0, rule.length - 1))) {
+                        accepted = true;
+                        break;
+                    }
+
+                    if (mimeType && mimeType === rule) {
+                        accepted = true;
+                        break;
+                    }
+                }
+
+                if (!accepted) {
+                    return false;
+                }
+            }
+
+            return true;
+        }, "Please upload a valid file type.");
+    })(window.jQuery);
+</script>
 <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
