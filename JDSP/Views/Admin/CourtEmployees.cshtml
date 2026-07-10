@@ -1,0 +1,50 @@
+@using System.Globalization
+@model List<JDSP.ViewModels.Admin.CourtEmployeeAccountListViewModel>
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "موظفو المحكمة" : "Court employees";
+}
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <span class="eyebrow">@(ar ? "إدارة داخلية" : "Internal administration")</span>
+        <h1>@(ar ? "موظفو المحكمة" : "Court employees")</h1>
+        <p>@(ar ? "لا يمكن إنشاء هذا الدور من التسجيل العام. المدير العام فقط ينشئه." : "This role cannot be created from public registration. Only the super admin creates it.")</p>
+    </div>
+    <a asp-action="CreateCourtEmployee" class="btn btn-primary">@(ar ? "+ إنشاء موظف محكمة" : "+ Create court employee")</a>
+</div>
+
+<section class="card-panel">
+    @if (!Model.Any()) {
+        <div class="empty compact"><b>▣</b><p>@(ar ? "لا توجد حسابات موظفي محكمة." : "No court employee accounts found.")</p></div>
+    }
+    else {
+        <div class="table-responsive"><table class="table clean-table align-middle">
+            <thead><tr><th>@(ar ? "الاسم" : "Name")</th><th>@(ar ? "البريد" : "Email")</th><th>@(ar ? "الهاتف" : "Phone")</th><th>@(ar ? "الرقم القومي" : "National number")</th><th>@(ar ? "الحالة" : "Status")</th><th>@(ar ? "تاريخ الإنشاء" : "Created")</th><th>@(ar ? "إجراءات" : "Actions")</th></tr></thead>
+            <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td class="fw-semibold">@item.FullName</td>
+                    <td>@item.Email</td>
+                    <td>@item.PhoneNumber</td>
+                    <td>@item.NationalNumber</td>
+                    <td><span class="status @(item.AccountStatus == "Active" ? "open" : "closed")">@UiText.Status(item.AccountStatus, ar)</span></td>
+                    <td>@item.CreatedAt.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a asp-action="CourtEmployeeDetails" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm">@(ar ? "التفاصيل" : "Details")</a>
+                            @if (item.AccountStatus == "Active") {
+                                <form asp-action="RemoveCourtEmployee" asp-route-id="@item.Id" method="post" onsubmit="return confirm('@(ar ? "إزالة صلاحية دخول هذا الموظف؟" : "Remove this employee access?")');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">@(ar ? "إزالة" : "Remove")</button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table></div>
+    }
+</section>

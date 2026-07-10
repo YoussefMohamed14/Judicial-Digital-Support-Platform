@@ -5,7 +5,10 @@ namespace JDSP.ViewModels.Dashboard {
         public int CurrentClients { get; set; }
         public int PendingRequests { get; set; }
         public int AssignedCases { get; set; }
+        public decimal AvailableBalance { get; set; }
         public DateTime? NextHearingDate { get; set; }
+        public DateTime? NextHearingEndDate { get; set; }
+        public string HearingCountdownPhase { get; set; } = string.Empty;
         public string? NextHearingLocation { get; set; }
         public string? NextHearingCaseName { get; set; }
         public IReadOnlyList<LawyerDashboardRequestViewModel> RecentRequests { get; set; } = Array.Empty<LawyerDashboardRequestViewModel>();

@@ -1,7 +1,11 @@
 @model JDSP.ViewModels.Lawyers.LawyerProfileViewModel
-@{ Layout = "_LawyerLayout"; ViewData["Title"] = "Professional profile"; }
+@{
+    Layout = "_LawyerLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "الملف المهني" : "Professional profile";
+}
 
-<div class="page-head"><span class="eyebrow">Lawyer profile</span><h1>Edit professional profile</h1><p>These details are shown to clients when they browse lawyers and decide who to contact.</p></div>
+<div class="page-head"><span class="eyebrow">@(ar ? "ملف المحامي" : "Lawyer profile")</span><h1>@(ar ? "تعديل الملف المهني" : "Edit professional profile")</h1><p>@(ar ? "تظهر هذه التفاصيل للعملاء عند تصفح المحامين واختيار من يريدون التواصل معه." : "These details are shown to clients when they browse lawyers and decide who to contact.")</p></div>
 <div class="row g-4">
     <div class="col-xl-8">
         <section class="card-panel">
@@ -9,14 +13,14 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="LawyerProfileId" />
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
-                <div class="mb-3"><label asp-for="Specialization" class="form-label fw-semibold"></label><input asp-for="Specialization" class="form-control" placeholder="e.g. Family law" /><span asp-validation-for="Specialization" class="text-danger small"></span></div>
-                <div class="mb-3"><label asp-for="Bio" class="form-label fw-semibold"></label><textarea asp-for="Bio" class="form-control" rows="7" placeholder="Describe your background and the legal services you provide..."></textarea><span asp-validation-for="Bio" class="text-danger small"></span></div>
-                <div class="row g-3"><div class="col-md-6"><label asp-for="YearsOfExperience" class="form-label fw-semibold"></label><input asp-for="YearsOfExperience" class="form-control" /><span asp-validation-for="YearsOfExperience" class="text-danger small"></span></div><div class="col-md-6"><label asp-for="ConsultationPrice" class="form-label fw-semibold"></label><input asp-for="ConsultationPrice" class="form-control" /><span asp-validation-for="ConsultationPrice" class="text-danger small"></span></div></div>
-                <div class="form-check form-switch my-4"><input asp-for="IsAvailable" class="form-check-input" /><label asp-for="IsAvailable" class="form-check-label fw-semibold">Available to receive new requests</label></div>
-                <button type="submit" class="btn btn-primary px-4">Save professional profile</button>
+                <div class="mb-3"><label asp-for="Specialization" class="form-label fw-semibold">@(ar ? "التخصص" : "Specialization")</label><input asp-for="Specialization" class="form-control" placeholder="@(ar ? "مثال: قانون الأسرة" : "e.g. Family law")" /><span asp-validation-for="Specialization" class="text-danger small"></span></div>
+                <div class="mb-3"><label asp-for="Bio" class="form-label fw-semibold">@(ar ? "النبذة المهنية" : "Professional bio")</label><textarea asp-for="Bio" class="form-control" rows="7" placeholder="@(ar ? "اكتب خلفيتك والخدمات القانونية التي تقدمها..." : "Describe your background and the legal services you provide...")"></textarea><span asp-validation-for="Bio" class="text-danger small"></span></div>
+                <div class="row g-3"><div class="col-md-6"><label asp-for="YearsOfExperience" class="form-label fw-semibold">@(ar ? "سنوات الخبرة" : "Years of experience")</label><input asp-for="YearsOfExperience" class="form-control" /><span asp-validation-for="YearsOfExperience" class="text-danger small"></span></div><div class="col-md-6"><label asp-for="ConsultationPrice" class="form-label fw-semibold">@(ar ? "سعر الاستشارة" : "Consultation price")</label><input asp-for="ConsultationPrice" class="form-control" /><span asp-validation-for="ConsultationPrice" class="text-danger small"></span></div></div>
+                <div class="form-check form-switch my-4"><input asp-for="IsAvailable" class="form-check-input" /><label asp-for="IsAvailable" class="form-check-label fw-semibold">@(ar ? "متاح لاستقبال طلبات جديدة" : "Available to receive new requests")</label></div>
+                <button type="submit" class="btn btn-primary px-4">@(ar ? "حفظ الملف المهني" : "Save professional profile")</button>
             </form>
         </section>
     </div>
-    <div class="col-xl-4"><section class="card-panel"><div class="panel-head"><div><h2>Identity and photo</h2><p>Update your photo and general bio from the account profile.</p></div></div><p class="text-secondary">Legal identity fields remain locked and require Court Employee approval to change.</p><a asp-controller="Profile" asp-action="Index" class="btn btn-outline-primary w-100">Open account profile</a></section></div>
+    <div class="col-xl-4"><section class="card-panel"><div class="panel-head"><div><h2>@(ar ? "الهوية والصورة" : "Identity and photo")</h2><p>@(ar ? "حدّث صورتك ونبذتك العامة من ملف الحساب." : "Update your photo and general bio from the account profile.")</p></div></div><p class="text-secondary">@(ar ? "حقول الهوية القانونية مقفلة وتتطلب موافقة موظف المحكمة لتغييرها." : "Legal identity fields remain locked and require Court Employee approval to change.")</p><a asp-controller="Profile" asp-action="Index" class="btn btn-outline-primary w-100">@(ar ? "فتح ملف الحساب" : "Open account profile")</a></section></div>
 </div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,16 +1,16 @@
 @model IEnumerable<JDSP.Models.Document>
-
 @{
     Layout = User.IsInRole("Client") ? "_ClientLayout" : "_Layout";
-    ViewData["Title"] = "Documents";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "المستندات" : "Documents";
 }
 
-<h2>Case Documents</h2>
+<h2>@(ar ? "مستندات القضية" : "Case Documents")</h2>
 
 @if (!Model.Any())
 {
     <div class="alert alert-info">
-        No documents found for this case.
+        @(ar ? "لا توجد مستندات لهذه القضية." : "No documents found for this case.")
     </div>
 }
 else
@@ -18,43 +18,26 @@ else
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>File Name</th>
-                <th>Uploaded At</th>
-                <th>Uploaded By</th>
-                <th>Actions</th>
+                <th>@(ar ? "اسم الملف" : "File Name")</th>
+                <th>@(ar ? "تاريخ الرفع" : "Uploaded At")</th>
+                <th>@(ar ? "تم الرفع بواسطة" : "Uploaded By")</th>
+                <th>@(ar ? "الإجراءات" : "Actions")</th>
             </tr>
         </thead>
 
         <tbody>
-
             @foreach (var document in Model)
             {
                 <tr>
-
                     <td>@document.FileName</td>
-
                     <td>@document.UploadedAt.ToString("dd/MM/yyyy HH:mm")</td>
-
                     <td>@document.UploadedById</td>
-
                     <td>
-                        <a class="btn btn-sm btn-primary"
-                           asp-action="Download"
-                           asp-route-id="@document.Id">
-                            Download
-                        </a>
-
-                        <a class="btn btn-sm btn-danger"
-                           asp-action="Delete"
-                           asp-route-id="@document.Id">
-                            Delete
-                        </a>
+                        <a class="btn btn-sm btn-primary" asp-action="Download" asp-route-id="@document.Id">@(ar ? "تحميل" : "Download")</a>
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@document.Id">@(ar ? "حذف" : "Delete")</a>
                     </td>
-
                 </tr>
             }
-
         </tbody>
-
     </table>
 }

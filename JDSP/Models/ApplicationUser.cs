@@ -12,6 +12,11 @@ namespace JDSP.Models {
         [MaxLength(1000)] public string? Bio { get; set; }
         [Required, MaxLength(5)] public string PreferredLanguage { get; set; } = "en";
         public bool IsProfileCompleted { get; set; }
+        [Required, MaxLength(20)] public string LawyerApprovalStatus { get; set; } = "NotRequired";
+        [MaxLength(1000)] public string? LawyerApprovalRejectionReason { get; set; }
+        public DateTime? LawyerApprovalReviewedAt { get; set; }
+        public string? LawyerApprovalReviewedById { get; set; }
+        public bool MustChangePassword { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public ICollection<Document> UploadedDocuments { get; set; } = new List<Document>();
     }

@@ -1,0 +1,45 @@
+@using System.Globalization
+@model JDSP.ViewModels.Admin.CreateCourtEmployeeViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "إنشاء موظف محكمة" : "Create court employee";
+}
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "حساب داخلي" : "Internal account")</span>
+    <h1>@(ar ? "إنشاء موظف محكمة" : "Create court employee")</h1>
+    <p>@(ar ? "شارك البريد وكلمة المرور المؤقتة مع الموظف بشكل آمن. سيُجبر الموظف على تغييرها عند أول دخول." : "Share the email and temporary password securely. The employee will be forced to change it on first login.")</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="card-panel">
+            <form asp-action="CreateCourtEmployee" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div class="row g-3">
+                    <div class="col-md-4"><label asp-for="FirstName" class="form-label fw-semibold">@(ar ? "الاسم الأول" : "First name")</label><input asp-for="FirstName" class="form-control" /><span asp-validation-for="FirstName" class="text-danger small"></span></div>
+                    <div class="col-md-4"><label asp-for="MiddleName" class="form-label fw-semibold">@(ar ? "الاسم الأوسط" : "Middle name")</label><input asp-for="MiddleName" class="form-control" /><span asp-validation-for="MiddleName" class="text-danger small"></span></div>
+                    <div class="col-md-4"><label asp-for="LastName" class="form-label fw-semibold">@(ar ? "اسم العائلة" : "Last name")</label><input asp-for="LastName" class="form-control" /><span asp-validation-for="LastName" class="text-danger small"></span></div>
+                    <div class="col-md-6"><label asp-for="Email" class="form-label fw-semibold">@(ar ? "البريد الإلكتروني" : "Email")</label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+                    <div class="col-md-6"><label asp-for="PhoneNumber" class="form-label fw-semibold">@(ar ? "رقم الهاتف" : "Phone number")</label><input asp-for="PhoneNumber" class="form-control" /><span asp-validation-for="PhoneNumber" class="text-danger small"></span></div>
+                    <div class="col-md-6"><label asp-for="NationalNumber" class="form-label fw-semibold">@(ar ? "الرقم القومي" : "National number")</label><input asp-for="NationalNumber" class="form-control" /><span asp-validation-for="NationalNumber" class="text-danger small"></span></div>
+                    <div class="col-md-6"><label asp-for="TemporaryPassword" class="form-label fw-semibold">@(ar ? "كلمة المرور المؤقتة" : "Temporary password")</label><input asp-for="TemporaryPassword" class="form-control" autocomplete="new-password" /><span asp-validation-for="TemporaryPassword" class="text-danger small"></span></div>
+                </div>
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-primary px-4">@(ar ? "إنشاء الحساب" : "Create account")</button>
+                    <a asp-action="CourtEmployees" class="btn btn-outline-secondary">@(ar ? "إلغاء" : "Cancel")</a>
+                </div>
+            </form>
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <section class="card-panel">
+            <div class="setting-title"><b>!</b><div><h2>@(ar ? "ملاحظة أمنية" : "Security note")</h2><p>@(ar ? "لا تعطي هذا الدور إلا لموظفي المحكمة الداخليين." : "Give this role only to internal court employees.")</p></div></div>
+            <p class="text-secondary mb-0">@(ar ? "هذا الحساب يستطيع مراجعة المحامين وطلبات تعديل الهوية وإنشاء القضايا الرسمية." : "This account can review lawyers, identity change requests, and create official cases.")</p>
+        </section>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

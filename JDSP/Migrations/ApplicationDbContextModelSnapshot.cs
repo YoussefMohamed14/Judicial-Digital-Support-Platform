@@ -61,6 +61,24 @@ namespace JDSP.Migrations
                     b.Property<bool>("IsProfileCompleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LawyerApprovalRejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("LawyerApprovalReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LawyerApprovalReviewedById")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LawyerApprovalStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -217,6 +235,92 @@ namespace JDSP.Migrations
                     b.HasIndex("CreatedBy_Id");
 
                     b.ToTable("Cases");
+                });
+
+
+            modelBuilder.Entity("JDSP.Models.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MessageType")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<int?>("PaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("RelatedCaseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("RelatedCaseId");
+
+                    b.HasIndex("ReceiverId", "IsRead", "CreatedAt");
+
+                    b.HasIndex("SenderId", "ReceiverId", "CreatedAt");
+
+                    b.ToTable("ChatMessages");
+                });
+
+
+            modelBuilder.Entity("JDSP.Models.ChatMessage", b =>
+                {
+                    b.HasOne("JDSP.Models.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("JDSP.Models.ApplicationUser", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("JDSP.Models.Case", "RelatedCase")
+                        .WithMany()
+                        .HasForeignKey("RelatedCaseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("JDSP.Models.ApplicationUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("RelatedCase");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("JDSP.Models.CaseLawyer", b =>
@@ -415,6 +519,11 @@ namespace JDSP.Migrations
                     b.Property<decimal>("ConsultationPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("ConsultationPriceUnit")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -440,6 +549,188 @@ namespace JDSP.Migrations
 
                     b.ToTable("LawyerProfiles");
                 });
+
+
+            modelBuilder.Entity("JDSP.Models.LawyerVerificationRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("LawyerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LawyerIdFileName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LawyerIdFilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("NationalIdFileName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NationalIdFilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReviewedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LawyerId");
+
+                    b.HasIndex("ReviewedById");
+
+                    b.HasIndex("Status", "RequestedAt");
+
+                    b.ToTable("LawyerVerificationRequests");
+                });
+
+            modelBuilder.Entity("JDSP.Models.IdentityChangeRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CurrentFullName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("CurrentNationalNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("CurrentPhoneNumber")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("LegalIdFileName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LegalIdFilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReviewedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequestedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RequestedFullName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("RequestedNationalNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("RequestedPhoneNumber")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestedById");
+
+                    b.HasIndex("ReviewedById");
+
+                    b.HasIndex("Status", "RequestedAt");
+
+                    b.ToTable("IdentityChangeRequests");
+                });
+
+            modelBuilder.Entity("JDSP.Models.SystemNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RecipientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientId", "IsRead", "CreatedAt");
+
+                    b.ToTable("SystemNotifications");
+                });
+
 
             modelBuilder.Entity("JDSP.Models.LegalServiceRequest", b =>
                 {
@@ -838,6 +1129,55 @@ namespace JDSP.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+
+
+            modelBuilder.Entity("JDSP.Models.IdentityChangeRequest", b =>
+                {
+                    b.HasOne("JDSP.Models.ApplicationUser", "RequestedBy")
+                        .WithMany()
+                        .HasForeignKey("RequestedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("JDSP.Models.ApplicationUser", "ReviewedBy")
+                        .WithMany()
+                        .HasForeignKey("ReviewedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("RequestedBy");
+
+                    b.Navigation("ReviewedBy");
+                });
+
+            modelBuilder.Entity("JDSP.Models.SystemNotification", b =>
+                {
+                    b.HasOne("JDSP.Models.ApplicationUser", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipient");
+                });
+
+            modelBuilder.Entity("JDSP.Models.LawyerVerificationRequest", b =>
+                {
+                    b.HasOne("JDSP.Models.ApplicationUser", "Lawyer")
+                        .WithMany()
+                        .HasForeignKey("LawyerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("JDSP.Models.ApplicationUser", "ReviewedBy")
+                        .WithMany()
+                        .HasForeignKey("ReviewedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Lawyer");
+
+                    b.Navigation("ReviewedBy");
                 });
 
             modelBuilder.Entity("JDSP.Models.LegalServiceRequest", b =>

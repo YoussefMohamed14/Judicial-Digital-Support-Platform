@@ -16,6 +16,11 @@ namespace JDSP.Models
         [Required(ErrorMessage = "Hearing date is required.")]
         public DateTime HearingDate { get; set; }
 
+        [Required(ErrorMessage = "Hearing end date is required.")]
+        public DateTime EndDate { get; set; }
+
+        public DateTime? CourtFollowUpNotifiedAt { get; set; }
+
         [Required(ErrorMessage = "Hearing type is required.")]
         [MaxLength(20)]
         public string HearingType { get; set; } = "Physical"; // Online / Physical

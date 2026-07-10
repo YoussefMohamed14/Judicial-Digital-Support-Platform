@@ -1,68 +1,36 @@
-﻿@*
-    this will be changed in the future
-*@
-
-
 @model JDSP.ViewModel.SubscriptionConfirmationViewModel
 @{
-    ViewData["Title"] = "Subscription Confirmed";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تم تأكيد الاشتراك" : "Subscription Confirmed";
 }
 
 <div class="container mt-4" style="max-width:580px">
-
     <div class="text-center mb-4">
         <div class="fs-1">✅</div>
-        <h2 class="mt-2">Subscription Active!</h2>
-        <p class="text-muted">Your case is now being handled by the lawyer below.</p>
+        <h2 class="mt-2">@(ar ? "الاشتراك نشط!" : "Subscription Active!")</h2>
+        <p class="text-muted">@(ar ? "يتم الآن التعامل مع قضيتك بواسطة المحامي أدناه." : "Your case is now being handled by the lawyer below.")</p>
     </div>
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-5 text-muted small">Subscription ID</div>
-                <div class="col-7 fw-semibold">#@Model.SubscriptionId</div>
-            </div>
+            <div class="row mb-3"><div class="col-5 text-muted small">@(ar ? "رقم الاشتراك" : "Subscription ID")</div><div class="col-7 fw-semibold">#@Model.SubscriptionId</div></div>
             <hr class="my-2" />
-            <div class="row mb-3">
-                <div class="col-5 text-muted small">Case</div>
-                <div class="col-7 fw-semibold">@Model.CaseName</div>
-            </div>
+            <div class="row mb-3"><div class="col-5 text-muted small">@(ar ? "القضية" : "Case")</div><div class="col-7 fw-semibold">@Model.CaseName</div></div>
             <hr class="my-2" />
-            <div class="row mb-3">
-                <div class="col-5 text-muted small">Lawyer</div>
-                <div class="col-7 fw-semibold">@Model.LawyerName</div>
-            </div>
+            <div class="row mb-3"><div class="col-5 text-muted small">@(ar ? "المحامي" : "Lawyer")</div><div class="col-7 fw-semibold">@Model.LawyerName</div></div>
             <hr class="my-2" />
-            <div class="row mb-3">
-                <div class="col-5 text-muted small">Price</div>
-                <div class="col-7 fw-bold text-primary fs-5">
-                    EGP @Model.Price.ToString("N2") / @Model.BillingCycle
-                </div>
-            </div>
+            <div class="row mb-3"><div class="col-5 text-muted small">@(ar ? "السعر" : "Price")</div><div class="col-7 fw-bold text-primary fs-5">EGP @Model.Price.ToString("N2") / @UiText.BillingCycle(Model.BillingCycle, ar)</div></div>
             <hr class="my-2" />
-            <div class="row mb-3">
-                <div class="col-5 text-muted small">Status</div>
-                <div class="col-7">
-                    <span class="badge bg-success">@Model.Status</span>
-                </div>
-            </div>
+            <div class="row mb-3"><div class="col-5 text-muted small">@(ar ? "الحالة" : "Status")</div><div class="col-7"><span class="badge bg-success">@UiText.Status(Model.Status, ar)</span></div></div>
             <hr class="my-2" />
-            <div class="row mb-3">
-                <div class="col-5 text-muted small">Start Date</div>
-                <div class="col-7">@Model.StartDate.ToString("dd MMM yyyy")</div>
-            </div>
+            <div class="row mb-3"><div class="col-5 text-muted small">@(ar ? "تاريخ البداية" : "Start Date")</div><div class="col-7">@Model.StartDate.ToString("dd MMM yyyy")</div></div>
             <hr class="my-2" />
-            <div class="row">
-                <div class="col-5 text-muted small">End Date</div>
-                <div class="col-7">@Model.EndDate.ToString("dd MMM yyyy")</div>
-            </div>
+            <div class="row"><div class="col-5 text-muted small">@(ar ? "تاريخ النهاية" : "End Date")</div><div class="col-7">@Model.EndDate.ToString("dd MMM yyyy")</div></div>
         </div>
     </div>
 
     <div class="d-flex gap-2 mt-4">
-        <a asp-controller="Cases" asp-action="MyCases"
-           class="btn btn-primary px-4">Go to My Cases</a>
-        <a asp-controller="Account" asp-action="Login"
-           class="btn btn-outline-secondary">Home</a>
+        <a asp-controller="Cases" asp-action="MyCases" class="btn btn-primary px-4">@(ar ? "الذهاب إلى قضاياي" : "Go to My Cases")</a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">@(ar ? "الرئيسية" : "Home")</a>
     </div>
 </div>

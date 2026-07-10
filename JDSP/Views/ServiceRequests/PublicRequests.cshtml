@@ -1,19 +1,23 @@
 @model IReadOnlyList<JDSP.ViewModels.ServiceRequests.ServiceRequestListItemViewModel>
-@{ Layout = "_LawyerLayout"; ViewData["Title"] = "Public requests"; }
+@{
+    Layout = "_LawyerLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "الطلبات العامة" : "Public requests";
+}
 
-<div class="page-head"><span class="eyebrow">Opportunities</span><h1>Public requests</h1><p>Review public client briefs and send a proposal when the request matches your practice.</p></div>
+<div class="page-head"><span class="eyebrow">@(ar ? "فرص" : "Opportunities")</span><h1>@(ar ? "الطلبات العامة" : "Public requests")</h1><p>@(ar ? "راجع طلبات العملاء العامة وأرسل عرضاً عندما يناسب الطلب تخصصك." : "Review public client briefs and send a proposal when the request matches your practice.")</p></div>
 
 @if (Model.Count == 0) {
-    <section class="card-panel empty"><b>◎</b><h3>No public requests</h3><p>Open public requests will appear here.</p></section>
+    <section class="card-panel empty"><b>◎</b><h3>@(ar ? "لا توجد طلبات عامة" : "No public requests")</h3><p>@(ar ? "ستظهر الطلبات العامة المفتوحة هنا." : "Open public requests will appear here.")</p></section>
 }
 else {
     <div class="row g-4">
     @foreach (var item in Model) {
         <div class="col-md-6 col-xl-4"><article class="case-card request-card">
-            <div class="d-flex justify-content-between align-items-start gap-2"><span class="request-type">Public</span><span class="status pending">@item.Status</span></div>
-            <h2>@item.Subject</h2><div class="case-type">Client: @item.ClientName</div><p class="case-desc">@item.Brief</p>
-            <div class="case-meta"><div><span>Published</span><strong>@item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</strong></div><div><span>Proposals</span><strong>@item.ProposalCount</strong></div><div><span>Attachment</span><strong>@(item.OriginalFileName ?? "No file")</strong></div></div>
-            <div class="d-grid gap-2 mt-3">@if (!string.IsNullOrWhiteSpace(item.FilePath)) { <a asp-action="Download" asp-route-id="@item.RequestId" class="btn btn-outline-secondary">Download case file</a> }@if (item.HasProposed) { <button class="btn btn-light" disabled>Proposal already sent</button> } else { <a asp-action="Propose" asp-route-id="@item.RequestId" class="btn btn-primary">Send proposal</a> }</div>
+            <div class="d-flex justify-content-between align-items-start gap-2"><span class="request-type">@UiText.RequestType("Public", ar)</span><span class="status pending">@UiText.Status(item.Status, ar)</span></div>
+            <h2>@item.Subject</h2><div class="case-type">@(ar ? "العميل" : "Client"): @item.ClientName</div><p class="case-desc">@item.Brief</p>
+            <div class="case-meta"><div><span>@(ar ? "تاريخ النشر" : "Published")</span><strong>@item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</strong></div><div><span>@(ar ? "العروض" : "Proposals")</span><strong>@item.ProposalCount</strong></div><div><span>@(ar ? "المرفق" : "Attachment")</span><strong>@(item.OriginalFileName ?? (ar ? "لا يوجد ملف" : "No file"))</strong></div></div>
+            <div class="d-grid gap-2 mt-3">@if (!string.IsNullOrWhiteSpace(item.FilePath)) { <a asp-action="Download" asp-route-id="@item.RequestId" class="btn btn-outline-secondary">@(ar ? "تحميل ملف القضية" : "Download case file")</a> }@if (item.HasProposed) { <button class="btn btn-light" disabled>@(ar ? "تم إرسال العرض بالفعل" : "Proposal already sent")</button> } else { <a asp-action="Propose" asp-route-id="@item.RequestId" class="btn btn-primary">@(ar ? "إرسال عرض" : "Send proposal")</a> }</div>
         </article></div>
     }
     </div>

@@ -1,0 +1,43 @@
+@using System.Globalization
+@using JDSP.Helpers
+@model IReadOnlyList<JDSP.ViewModels.IdentityChangeRequests.IdentityChangeRequestListItemViewModel>
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var selected = (ViewBag.Status as string) ?? VerificationStatus.Pending;
+    ViewData["Title"] = ar ? "طلبات تعديل الهوية" : "Identity change requests";
+}
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "مراجعة الهوية" : "Identity review")</span>
+    <h1>@(ar ? "طلبات تعديل الهوية" : "Identity change requests")</h1>
+    <p>@(ar ? "راجع طلبات تغيير الاسم أو الهاتف أو الرقم القومي بناءً على بطاقة الهوية المرفقة." : "Review requests to change name, phone, or national number using the attached legal ID.")</p>
+</div>
+
+<div class="filters">
+    <a asp-action="Index" asp-route-status="@VerificationStatus.Pending" class="@(selected == VerificationStatus.Pending ? "active" : "")">@(ar ? "قيد المراجعة" : "Pending")</a>
+    <a asp-action="Index" asp-route-status="@VerificationStatus.Approved" class="@(selected == VerificationStatus.Approved ? "active" : "")">@(ar ? "مقبول" : "Approved")</a>
+    <a asp-action="Index" asp-route-status="@VerificationStatus.Rejected" class="@(selected == VerificationStatus.Rejected ? "active" : "")">@(ar ? "مرفوض" : "Rejected")</a>
+</div>
+
+<section class="card-panel">
+    @if (!Model.Any()) {
+        <div class="empty compact"><b>☑</b><p>@(ar ? "لا توجد طلبات في هذه الحالة." : "No requests with this status.")</p></div>
+    }
+    else {
+        <div class="table-responsive"><table class="table clean-table align-middle">
+            <thead><tr><th>@(ar ? "المستخدم" : "User")</th><th>@(ar ? "الاسم الحالي" : "Current name")</th><th>@(ar ? "الاسم المطلوب" : "Requested name")</th><th>@(ar ? "تاريخ الطلب" : "Requested")</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td class="fw-semibold">@item.RequestedByName<br /><small class="text-secondary">@item.Email</small></td>
+                    <td>@item.CurrentFullName</td>
+                    <td>@item.RequestedFullName</td>
+                    <td>@item.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td class="text-end"><a asp-action="Details" asp-route-id="@item.RequestId" class="btn btn-sm btn-outline-primary">@(ar ? "مراجعة" : "Review")</a></td>
+                </tr>
+            }
+            </tbody>
+        </table></div>
+    }
+</section>

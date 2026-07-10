@@ -16,3 +16,8 @@
 [data-bs-theme=dark] .auth-card .form-control,[data-bs-theme=dark] .auth-card .form-select{color:var(--ink);border-color:var(--border);background:#111a2b}
 [data-bs-theme=dark] .public-footer{border-top-color:var(--border);color:var(--muted)}
 [data-bs-theme=dark] .public-header .nav-link{color:#c2cad8!important}
+.public-language-toggle{min-width:42px;height:42px;border-radius:.75rem;font-weight:800}
+
+/* JDSP official logo and public responsive cleanup */
+.brand .brand-logo{width:2.35rem;height:2.35rem;flex:0 0 2.35rem;border-radius:.75rem;object-fit:cover;background:#fff;box-shadow:0 0 0 1px color-mix(in srgb,var(--border) 70%,transparent)}
+.brand span{display:none}.brand{min-width:0}.hero-card,.feature,.steps>div,.auth-card,.preview{min-width:0;overflow-wrap:anywhere}.hero h1{overflow-wrap:anywhere}.public-header .navbar-collapse{min-width:0}.public-header .d-flex{flex-wrap:wrap}.btn{white-space:normal}@media(max-width:767px){.public-header .d-flex{align-items:stretch!important}.public-header .d-flex .btn{flex:1 1 auto}.hero h1{max-width:100%;font-size:clamp(2.4rem,11vw,4rem)}}

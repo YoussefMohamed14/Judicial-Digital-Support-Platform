@@ -1,33 +1,28 @@
-@*
-   //this is only for test and it will be changed in the future
-
-*@
-
-
 @model IEnumerable<JDSP.ViewModel.MyRequestStatusViewModel>
 @{
     Layout = User.IsInRole("Client") ? "_ClientLayout" : "_Layout";
-    ViewData["Title"] = "My Requests";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "طلباتي" : "My Requests";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-1">My Requests</h2>
-    <p class="text-muted mb-4">Track the status of your lawyer requests.</p>
+    <h2 class="mb-1">@(ar ? "طلباتي" : "My Requests")</h2>
+    <p class="text-muted mb-4">@(ar ? "تابع حالة طلبات المحامين." : "Track the status of your lawyer requests.")</p>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">You have not sent any requests yet.</div>
+        <div class="alert alert-info">@(ar ? "لم ترسل أي طلبات بعد." : "You have not sent any requests yet.")</div>
     }
     else
     {
         <table class="table table-bordered align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Case</th>
-                    <th>Lawyer</th>
-                    <th>Status</th>
-                    <th>Proposed Price</th>
-                    <th>Action</th>
+                    <th>@(ar ? "القضية" : "Case")</th>
+                    <th>@(ar ? "المحامي" : "Lawyer")</th>
+                    <th>@(ar ? "الحالة" : "Status")</th>
+                    <th>@(ar ? "السعر المقترح" : "Proposed Price")</th>
+                    <th>@(ar ? "الإجراء" : "Action")</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,21 +43,13 @@
                                     _ => "secondary"
                                 };
                             }
-                            <span class="badge bg-@badge">@req.Status</span>
+                            <span class="badge bg-@badge">@UiText.Status(req.Status, ar)</span>
                         </td>
-                        <td>
-                            @(req.ProposedPrice.HasValue
-                                ? req.ProposedPrice.Value.ToString("C")
-                                : "—")
-                        </td>
+                        <td>@(req.ProposedPrice.HasValue ? req.ProposedPrice.Value.ToString("C") : "—")</td>
                         <td>
                             @if (req.Status == "Price Proposed")
                             {
-                                <a asp-action="OfferDetails"
-                                   asp-route-caseLawyerId="@req.CaseLawyerId"
-                                   class="btn btn-primary btn-sm">
-                                    View Offer →
-                                </a>
+                                <a asp-action="OfferDetails" asp-route-caseLawyerId="@req.CaseLawyerId" class="btn btn-primary btn-sm">@(ar ? "عرض العرض ←" : "View Offer →")</a>
                             }
                         </td>
                     </tr>

@@ -1,0 +1,39 @@
+@{
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var code = ViewBag.Code as int? ?? 500;
+    var title = code == 404 ? (ar ? "الصفحة غير موجودة" : "Page not found") : code == 403 ? (ar ? "تم رفض الوصول" : "Access denied") : (ar ? "حدث خطأ" : "Something went wrong");
+    var message = code == 404
+        ? (ar ? "الرابط الذي فتحته غير موجود أو تم نقله." : "The page you opened does not exist or was moved.")
+        : code == 403
+            ? (ar ? "ليس لديك صلاحية للوصول إلى هذه الصفحة." : "You do not have permission to access this page.")
+            : (ar ? "حدث خطأ أثناء معالجة الطلب. حاول مرة أخرى أو ارجع للوحة التحكم." : "An error occurred while processing your request. Try again or return to your dashboard.");
+    Layout = User.Identity?.IsAuthenticated == true
+        ? (User.IsInRole("Admin") || User.IsInRole("CourtEmployee") ? "_CourtLayout" : (User.IsInRole("Lawyer") ? "_LawyerLayout" : "_ClientLayout"))
+        : "_PublicLayout";
+    ViewData["Title"] = title;
+}
+
+<section class="card-panel text-center mx-auto" style="max-width:760px">
+    <img src="~/images/jdsp-court-system.png" alt="JDSP" style="width:110px;height:110px;object-fit:contain" class="mb-3" />
+    <span class="eyebrow">JDSP Error @code</span>
+    <h1 class="mt-2">@title</h1>
+    <p class="text-secondary mb-4">@message</p>
+    @if (ViewBag.RequestId != null) {
+        <div class="detail-grid text-start mb-4">
+            <div><span>@(ar ? "رقم الطلب" : "Request ID")</span><strong>@ViewBag.RequestId</strong></div>
+            <div><span>@(ar ? "المسار" : "Path")</span><strong>@(ViewBag.Path ?? "-")</strong></div>
+        </div>
+    }
+    <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">@(ar ? "الرئيسية" : "Home")</a>
+        @if (User.Identity?.IsAuthenticated == true) {
+            if (User.IsInRole("Admin")) { <a asp-controller="Dashboard" asp-action="AdminDashboard" class="btn btn-primary">@(ar ? "لوحة التحكم" : "Dashboard")</a> }
+            else if (User.IsInRole("CourtEmployee")) { <a asp-controller="Dashboard" asp-action="CourtEmployeeDashboard" class="btn btn-primary">@(ar ? "لوحة التحكم" : "Dashboard")</a> }
+            else if (User.IsInRole("Lawyer")) { <a asp-controller="Dashboard" asp-action="LawyerDashboard" class="btn btn-primary">@(ar ? "لوحة التحكم" : "Dashboard")</a> }
+            else { <a asp-controller="Dashboard" asp-action="ClientDashboard" class="btn btn-primary">@(ar ? "لوحة التحكم" : "Dashboard")</a> }
+        }
+        else {
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary">@(ar ? "تسجيل الدخول" : "Login")</a>
+        }
+    </div>
+</section>

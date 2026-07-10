@@ -217,19 +217,24 @@ namespace JDSP.Controllers {
         }
 
         private async Task<bool> HasHearingConflictAsync(string lawyerId, int requestedCaseId) {
-            var requestedHearingDates = _context.Hearings.AsNoTracking()
-                .Where(h => h.CaseId == requestedCaseId && h.Status == "Scheduled" && h.HearingDate >= DateTime.Now)
-                .Select(h => h.HearingDate);
+            var requestedHearings = await _context.Hearings.AsNoTracking()
+                .Where(h => h.CaseId == requestedCaseId && h.Status == "Scheduled" && h.EndDate >= DateTime.Now)
+                .Select(h => new { h.HearingDate, h.EndDate })
+                .ToListAsync();
+
+            if (requestedHearings.Count == 0) return false;
 
             var activeCaseIds = _context.CaseLawyers.AsNoTracking()
                 .Where(x => x.LawyerId == lawyerId && x.CaseId != requestedCaseId &&
                     (x.Status == "Accepted" || x.Status == "Price Proposed" || x.Status == "OfferAccepted"))
                 .Select(x => x.CaseId);
 
-            return await _context.Hearings.AsNoTracking().AnyAsync(h =>
-                activeCaseIds.Contains(h.CaseId) &&
-                h.Status == "Scheduled" &&
-                requestedHearingDates.Contains(h.HearingDate));
+            var otherHearings = await _context.Hearings.AsNoTracking()
+                .Where(h => activeCaseIds.Contains(h.CaseId) && h.Status == "Scheduled" && h.EndDate >= DateTime.Now)
+                .Select(h => new { h.HearingDate, h.EndDate })
+                .ToListAsync();
+
+            return requestedHearings.Any(a => otherHearings.Any(b => a.HearingDate < b.EndDate && b.HearingDate < a.EndDate));
         }
     }
 }

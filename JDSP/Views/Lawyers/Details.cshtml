@@ -1,16 +1,17 @@
-@model JDSP.ViewModels.Lawyers.LawyerListItemViewModel
+﻿@model JDSP.ViewModels.Lawyers.LawyerListItemViewModel
 @{
     Layout = User.IsInRole("Client") ? "_ClientLayout" : User.IsInRole("Lawyer") ? "_LawyerLayout" : "_Layout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
     ViewData["Title"] = Model.FullName;
     var initials = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
     var isLawyer = User.IsInRole("Lawyer");
 }
 
 @if (User.IsInRole("Client")) {
-    <a asp-action="Index" class="back-link">← Back to lawyers</a>
+    <a asp-action="Index" class="back-link">@(ar ? "→ الرجوع إلى المحامين" : "← Back to lawyers")</a>
 }
 else if (isLawyer) {
-    <a asp-action="EditProfile" class="back-link">← Back to professional profile</a>
+    <a asp-controller="Profile" asp-action="Index" class="back-link">@(ar ? "→ الرجوع إلى تعديل الملف" : "← Back to edit profile")</a>
 }
 
 <div class="row g-4 mt-2">
@@ -18,43 +19,43 @@ else if (isLawyer) {
         <section class="card-panel profile-summary text-center">
             @if (!string.IsNullOrWhiteSpace(Model.PhotoPath)) { <img src="@Model.PhotoPath" class="profile-avatar" alt="@Model.FullName" /> }
             else { <div class="profile-avatar avatar-fallback">@initials</div> }
-            <h2>@Model.FullName</h2><span class="role-pill">@Model.Specialization</span>
-            <p class="text-secondary mt-3">@Model.YearsOfExperience years of experience</p>
-            <span class="status @(Model.IsAvailable ? "open" : "closed")">@(Model.IsAvailable ? "Available" : "Not available")</span>
+            <h2>@Model.FullName</h2><span class="role-pill">@UiText.Specialization(Model.Specialization, ar)</span>
+            <p class="text-secondary mt-3">@UiText.Years(Model.YearsOfExperience, ar)</p>
+            <span class="status @(Model.IsAvailable ? "open" : "closed")">@UiText.Availability(Model.IsAvailable, ar)</span>
         </section>
     </div>
     <div class="col-lg-8">
         <section class="card-panel mb-4">
             <div class="panel-head">
                 <div>
-                    <h2>Professional profile</h2>
-                    <p>@(isLawyer ? "This is how clients see your professional profile." : "Review the lawyer's experience before sending a request.")</p>
+                    <h2>@(ar ? "الملف المهني" : "Professional profile")</h2>
+                    <p>@(isLawyer ? (ar ? "هكذا يرى العملاء ملفك المهني." : "This is how clients see your professional profile.") : (ar ? "راجع خبرة المحامي قبل إرسال طلب." : "Review the lawyer's experience before sending a request."))</p>
                 </div>
                 @if (isLawyer) {
-                    <a asp-action="EditProfile" class="btn btn-sm btn-outline-primary">Edit profile</a>
+                    <a asp-controller="Profile" asp-action="Index" class="btn btn-sm btn-outline-primary">@(ar ? "تعديل الملف" : "Edit profile")</a>
                 }
             </div>
             <div class="detail-grid">
-                <div><span>Email</span><strong>@Model.Email</strong></div>
-                <div><span>Specialization</span><strong>@Model.Specialization</strong></div>
-                <div><span>Experience</span><strong>@Model.YearsOfExperience years</strong></div>
-                <div><span>Consultation price</span><strong>@Model.ConsultationPrice.ToString("N2")</strong></div>
+                <div><span>@(ar ? "البريد الإلكتروني" : "Email")</span><strong>@Model.Email</strong></div>
+                <div><span>@(ar ? "التخصص" : "Specialization")</span><strong>@UiText.Specialization(Model.Specialization, ar)</strong></div>
+                <div><span>@(ar ? "الخبرة" : "Experience")</span><strong>@UiText.YearsShort(Model.YearsOfExperience, ar)</strong></div>
+                <div><span>@(ar ? "السعر" : "Price")</span><strong>@UiText.Price(Model.ConsultationPrice, Model.ConsultationPriceUnit, ar)</strong></div>
             </div>
-            <div class="description mt-3"><span>Bio</span><p>@ViewBag.Bio</p></div>
+            <div class="description mt-3"><span>@(ar ? "النبذة" : "Bio")</span><p>@ViewBag.Bio</p></div>
         </section>
         @if (User.IsInRole("Client")) {
             <section class="card-panel">
-                <div class="panel-head"><div><h2>Work with this lawyer</h2><p>Upload the case file and send a brief directly to the lawyer.</p></div></div>
+                <div class="panel-head"><div><h2>@(ar ? "العمل مع هذا المحامي" : "Work with this lawyer")</h2><p>@(ar ? "ارفع ملف القضية وأرسل نبذة مباشرة إلى المحامي." : "Upload the case file and send a brief directly to the lawyer.")</p></div></div>
                 <div class="d-flex flex-wrap gap-2">
-                    @if (Model.IsAvailable) { <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@Model.LawyerProfileId" class="btn btn-primary">Send case request</a> }
-                    else { <button class="btn btn-secondary" disabled>Currently unavailable</button> }
+                    @if (Model.IsAvailable) { <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@Model.LawyerProfileId" class="btn btn-primary">@(ar ? "إرسال طلب قضية" : "Send case request")</a> }
+                    else { <button class="btn btn-secondary" disabled>@(ar ? "غير متاح حالياً" : "Currently unavailable")</button> }
                     @if (Model.IsFollowed) {
-                        <form asp-action="Unfollow" method="post">@Html.AntiForgeryToken()<input type="hidden" name="lawyerProfileId" value="@Model.LawyerProfileId" /><button type="submit" class="btn btn-outline-warning">Unfollow</button></form>
+                        <form asp-action="Unfollow" method="post">@Html.AntiForgeryToken()<input type="hidden" name="lawyerProfileId" value="@Model.LawyerProfileId" /><button type="submit" class="btn btn-outline-warning">@(ar ? "إلغاء المتابعة" : "Unfollow")</button></form>
                     }
                     else {
-                        <form asp-action="Follow" method="post">@Html.AntiForgeryToken()<input type="hidden" name="lawyerProfileId" value="@Model.LawyerProfileId" /><button type="submit" class="btn btn-outline-success">Follow</button></form>
+                        <form asp-action="Follow" method="post">@Html.AntiForgeryToken()<input type="hidden" name="lawyerProfileId" value="@Model.LawyerProfileId" /><button type="submit" class="btn btn-outline-success">@(ar ? "متابعة" : "Follow")</button></form>
                     }
-                    <a asp-controller="Messages" asp-action="Index" class="btn btn-outline-secondary">Message</a>
+                    <a asp-controller="Messages" asp-action="Index" class="btn btn-outline-secondary">@(ar ? "رسالة" : "Message")</a>
                 </div>
             </section>
         }

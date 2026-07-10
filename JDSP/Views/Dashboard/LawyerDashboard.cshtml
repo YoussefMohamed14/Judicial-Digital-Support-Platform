@@ -1,44 +1,50 @@
+﻿@using System.Globalization
 @model JDSP.ViewModels.Dashboard.LawyerDashboardViewModel
-@{ Layout = "_LawyerLayout"; ViewData["Title"] = "Lawyer dashboard"; }
+@{
+    Layout = "_LawyerLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "لوحة تحكم المحامي" : "Lawyer dashboard";
+}
 
 <div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
     <div>
-        <span class="eyebrow">Lawyer workspace</span>
-        <h1>Welcome back, @Model.LawyerName</h1>
-        <p>Review client requests, public opportunities, assigned cases, and your next hearing.</p>
+        <span class="eyebrow">@(ar ? "مساحة المحامي" : "Lawyer workspace")</span>
+        <h1>@(ar ? "مرحباً بعودتك،" : "Welcome back,") @Model.LawyerName</h1>
+        <p>@(ar ? "راجع طلبات العملاء، الفرص العامة، القضايا المسندة، وأقرب جلسة لك." : "Review client requests, public opportunities, assigned cases, and your next hearing.")</p>
     </div>
-    <a asp-controller="ServiceRequests" asp-action="PublicRequests" class="btn btn-primary px-4">Browse public requests</a>
+    <a asp-controller="ServiceRequests" asp-action="PublicRequests" class="btn btn-primary px-4">@(ar ? "تصفح الطلبات العامة" : "Browse public requests")</a>
 </div>
 
 <div class="row g-3 stats-row">
-    <div class="col-sm-6 col-xl-3"><div class="stat"><span>☆</span><div><small>Followers</small><strong>@Model.Followers</strong></div></div></div>
-    <div class="col-sm-6 col-xl-3"><div class="stat"><span>◉</span><div><small>Current clients</small><strong>@Model.CurrentClients</strong></div></div></div>
-    <div class="col-sm-6 col-xl-3"><div class="stat"><span>⇄</span><div><small>Pending requests</small><strong>@Model.PendingRequests</strong></div></div></div>
-    <div class="col-sm-6 col-xl-3"><div class="stat"><span>▣</span><div><small>Assigned cases</small><strong>@Model.AssignedCases</strong></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat"><span>☆</span><div><small>@(ar ? "المتابعون" : "Followers")</small><strong>@Model.Followers</strong></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat"><span>◉</span><div><small>@(ar ? "العملاء الحاليون" : "Current clients")</small><strong>@Model.CurrentClients</strong></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat"><span>⇄</span><div><small>@(ar ? "الطلبات المعلقة" : "Pending requests")</small><strong>@Model.PendingRequests</strong></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat"><span>▣</span><div><small>@(ar ? "القضايا المسندة" : "Assigned cases")</small><strong>@Model.AssignedCases</strong></div></div></div>
+    <div class="col-sm-6 col-xl-3"><a asp-controller="LawyerBalance" asp-action="Index" class="stat text-decoration-none"><span>💳</span><div><small>@(ar ? "الرصيد المتاح" : "Available balance")</small><strong>@Model.AvailableBalance.ToString("0.00")</strong></div></a></div>
 </div>
 
 <div class="row g-4 mt-1">
     <div class="col-lg-8">
         <section class="card-panel h-100">
             <div class="panel-head">
-                <div><h2>Recent client requests</h2><p>Direct requests sent to your profile.</p></div>
-                <a asp-controller="ServiceRequests" asp-action="Incoming" class="btn btn-sm btn-outline-secondary">View all</a>
+                <div><h2>@(ar ? "أحدث طلبات العملاء" : "Recent client requests")</h2><p>@(ar ? "الطلبات المباشرة المرسلة إلى ملفك المهني." : "Direct requests sent to your profile.")</p></div>
+                <a asp-controller="ServiceRequests" asp-action="Incoming" class="btn btn-sm btn-outline-secondary">@(ar ? "عرض الكل" : "View all")</a>
             </div>
             @if (Model.RecentRequests.Count == 0) {
-                <div class="empty"><b>⇄</b><h3>No direct requests yet</h3><p>Public requests are still available for you to browse and submit proposals.</p><a asp-controller="ServiceRequests" asp-action="PublicRequests" class="btn btn-primary">Browse public requests</a></div>
+                <div class="empty"><b>⇄</b><h3>@(ar ? "لا توجد طلبات مباشرة بعد" : "No direct requests yet")</h3><p>@(ar ? "لا تزال الطلبات العامة متاحة لتصفحها وإرسال العروض." : "Public requests are still available for you to browse and submit proposals.")</p><a asp-controller="ServiceRequests" asp-action="PublicRequests" class="btn btn-primary">@(ar ? "تصفح الطلبات العامة" : "Browse public requests")</a></div>
             }
             else {
                 <div class="table-responsive">
                     <table class="table align-middle clean-table">
-                        <thead><tr><th>Request</th><th>Client</th><th>Status</th><th>Received</th><th></th></tr></thead>
+                        <thead><tr><th>@(ar ? "الطلب" : "Request")</th><th>@(ar ? "العميل" : "Client")</th><th>@(ar ? "الحالة" : "Status")</th><th>@(ar ? "تاريخ الاستلام" : "Received")</th><th></th></tr></thead>
                         <tbody>
                         @foreach (var item in Model.RecentRequests) {
                             <tr>
                                 <td class="fw-semibold">@item.Subject</td>
                                 <td>@item.ClientName</td>
-                                <td><span class="status @item.Status.ToLower().Replace(" ", "-")">@item.Status</span></td>
+                                <td><span class="status @item.Status.ToLower().Replace(" ", "-")">@UiText.Status(item.Status, ar)</span></td>
                                 <td>@item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
-                                <td><a asp-controller="ServiceRequests" asp-action="Incoming" class="btn btn-sm btn-light">Open</a></td>
+                                <td><a asp-controller="ServiceRequests" asp-action="Incoming" class="btn btn-sm btn-light">@(ar ? "فتح" : "Open")</a></td>
                             </tr>
                         }
                         </tbody>
@@ -49,22 +55,28 @@
     </div>
     <div class="col-lg-4">
         <section class="card-panel mb-4">
-            <div class="panel-head"><div><h2>Next hearing</h2><p>Nearest hearing for an assigned case.</p></div></div>
+            <div class="panel-head"><div><h2>@(ar ? "الجلسة القادمة" : "Next hearing")</h2><p>@(ar ? "أقرب جلسة لقضية مسندة إليك." : "Nearest hearing for an assigned case.")</p></div></div>
             @if (Model.NextHearingDate.HasValue) {
                 <div class="hearing"><b>@Model.NextHearingDate.Value.Day</b><div><strong>@Model.NextHearingDate.Value.ToString("MMMM yyyy")</strong><small>@Model.NextHearingDate.Value.ToString("dddd, h:mm tt")</small></div></div>
-                <div class="info-row"><span>Case</span><strong>@Model.NextHearingCaseName</strong></div>
-                <div class="info-row"><span>Location</span><strong>@(Model.NextHearingLocation ?? "To be confirmed")</strong></div>
+                <div class="info-row"><span>@(ar ? "القضية" : "Case")</span><strong>@Model.NextHearingCaseName</strong></div>
+                <div class="info-row"><span>@(ar ? "المكان" : "Location")</span><strong>@(Model.NextHearingLocation ?? (ar ? "لم يتم التأكيد بعد" : "To be confirmed"))</strong></div>
+                <div class="hearing-countdown mt-3" data-hearing-start="@Model.NextHearingDate.Value.ToString("o")" data-hearing-end="@(Model.NextHearingEndDate?.ToString("o") ?? Model.NextHearingDate.Value.ToString("o"))"><span>@(ar ? "يبدأ بعد" : "Starts in")</span><strong>--</strong></div>
             }
-            else { <div class="empty compact"><b>◷</b><p>No upcoming hearing.</p></div> }
+            else { <div class="empty compact"><b>◷</b><p>@(ar ? "لا توجد جلسات قادمة." : "No upcoming hearing.")</p></div> }
         </section>
         <section class="card-panel">
-            <div class="panel-head"><div><h2>Quick actions</h2><p>Common lawyer actions.</p></div></div>
+            <div class="panel-head"><div><h2>@(ar ? "إجراءات سريعة" : "Quick actions")</h2><p>@(ar ? "الإجراءات الشائعة للمحامي." : "Common lawyer actions.")</p></div></div>
             <div class="quick">
-                <a asp-controller="ServiceRequests" asp-action="Incoming">⇄ <span><strong>Client requests</strong><small>Accept or reject direct requests</small></span></a>
-                <a asp-controller="ServiceRequests" asp-action="PublicRequests">◎ <span><strong>Public requests</strong><small>Review files and send proposals</small></span></a>
-                <a asp-controller="Cases" asp-action="AssignedCases">▣ <span><strong>Assigned cases</strong><small>View case status and hearing details</small></span></a>
-                <a asp-controller="Messages" asp-action="Index">✉ <span><strong>Messages</strong><small>Conversation logic will be added later</small></span></a>
+                <a asp-controller="ServiceRequests" asp-action="Incoming">⇄ <span><strong>@(ar ? "طلبات العملاء" : "Client requests")</strong><small>@(ar ? "اقبل أو ارفض الطلبات المباشرة" : "Accept or reject direct requests")</small></span></a>
+                <a asp-controller="ServiceRequests" asp-action="PublicRequests">◎ <span><strong>@(ar ? "الطلبات العامة" : "Public requests")</strong><small>@(ar ? "راجع الملفات وأرسل العروض" : "Review files and send proposals")</small></span></a>
+                <a asp-controller="Cases" asp-action="AssignedCases">▣ <span><strong>@(ar ? "القضايا المسندة" : "Assigned cases")</strong><small>@(ar ? "اعرض حالة القضية وتفاصيل الجلسة" : "View case status and hearing details")</small></span></a>
+                <a asp-controller="Messages" asp-action="Index">✉ <span><strong>@(ar ? "الرسائل" : "Messages")</strong><small>@(ar ? "محادثات العملاء والمدفوعات" : "Client chats and payments")</small></span></a>
+                <a asp-controller="LawyerBalance" asp-action="Index">💳 <span><strong>@(ar ? "الرصيد" : "Balance")</strong><small>@(ar ? "اسحب المدفوعات الناجحة" : "Withdraw successful payments")</small></span></a>
             </div>
         </section>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/hearing-countdown.js" asp-append-version="true"></script>
+}

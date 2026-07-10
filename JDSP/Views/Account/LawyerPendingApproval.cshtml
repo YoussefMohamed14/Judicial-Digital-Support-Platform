@@ -1,0 +1,33 @@
+@using System.Globalization
+@using JDSP.Helpers
+@{
+    Layout = "_PublicLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var status = ViewBag.Status as string ?? VerificationStatus.Pending;
+    var rejected = status == VerificationStatus.Rejected;
+    ViewData["Title"] = rejected ? (ar ? "تم رفض الاعتماد" : "Verification rejected") : (ar ? "بانتظار اعتماد المحامي" : "Pending lawyer approval");
+}
+<section class="auth-section"><div class="container py-5"><div class="auth-card mx-auto text-center">
+    <div class="icon-badge mx-auto mb-3">@(rejected ? "!" : "⌛")</div>
+    <h1 class="h3 fw-bold">@(rejected ? (ar ? "تم رفض طلب اعتماد المحامي" : "Lawyer verification was rejected") : (ar ? "حسابك بانتظار موافقة موظف المحكمة" : "Your lawyer account is waiting for court approval"))</h1>
+    <p class="text-secondary">@(rejected ? (ar ? "راجع سبب الرفض أدناه ثم تواصل مع إدارة المنصة أو أعد التسجيل بالمستندات الصحيحة." : "Review the rejection reason below, then contact platform administration or register again with the correct documents.") : (ar ? "تم استلام مستنداتك. لن تتمكن من استخدام مساحة المحامي حتى يراجع موظف المحكمة بطاقة الهوية وإثبات المحاماة." : "Your documents were received. You cannot use the lawyer workspace until a court employee reviews your ID and lawyer proof."))</p>
+
+    @if (ViewBag.RequestedAt != null) {
+        <div class="alert alert-info text-start mt-4">
+            <strong>@(ar ? "تاريخ الطلب:" : "Request date:")</strong>
+            @(((DateTime)ViewBag.RequestedAt).ToString("yyyy-MM-dd HH:mm"))
+        </div>
+    }
+
+    @if (rejected && !string.IsNullOrWhiteSpace(ViewBag.RejectionReason as string)) {
+        <div class="alert alert-danger text-start mt-4">
+            <strong>@(ar ? "سبب الرفض:" : "Rejection reason:")</strong>
+            <div>@ViewBag.RejectionReason</div>
+        </div>
+    }
+
+    <form asp-action="Logout" asp-controller="Account" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-outline-primary w-100">@(ar ? "تسجيل الخروج" : "Logout")</button>
+    </form>
+</div></div></section>

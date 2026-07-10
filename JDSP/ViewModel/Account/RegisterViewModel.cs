@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace JDSP.ViewModels.Account {
@@ -27,6 +28,10 @@ namespace JDSP.ViewModels.Account {
 
         [Required]
         public string Role { get; set; } = string.Empty;
+
+        public IFormFile? NationalIdFile { get; set; }
+
+        public IFormFile? LawyerIdFile { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

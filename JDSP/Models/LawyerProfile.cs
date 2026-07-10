@@ -23,6 +23,10 @@ namespace JDSP.Models {
         [Range(0, 100000)]
         public decimal ConsultationPrice { get; set; }
 
+        [Required]
+        [MaxLength(20)]
+        public string ConsultationPriceUnit { get; set; } = "Hour";
+
         public bool IsAvailable { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

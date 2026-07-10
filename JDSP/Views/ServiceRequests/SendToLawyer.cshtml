@@ -1,7 +1,11 @@
-@model JDSP.ViewModels.ServiceRequests.CreateServiceRequestViewModel
-@{ Layout = "_ClientLayout"; ViewData["Title"] = "Send request"; }
+﻿@model JDSP.ViewModels.ServiceRequests.CreateServiceRequestViewModel
+@{
+    Layout = "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "إرسال طلب" : "Send request";
+}
 
-<div class="page-head"><span class="eyebrow">Direct request</span><h1>Send a request to @Model.LawyerName</h1><p>Attach the case file and write a clear brief. This is a pre-case request; the official case is created only by a Court Employee.</p></div>
+<div class="page-head"><span class="eyebrow">@(ar ? "طلب مباشر" : "Direct request")</span><h1>@(ar ? "إرسال طلب إلى" : "Send a request to") @Model.LawyerName</h1><p>@(ar ? "أرفق ملف القضية واكتب نبذة واضحة. هذا طلب قبل القضية؛ القضية الرسمية ينشئها موظف المحكمة فقط." : "Attach the case file and write a clear brief. This is a pre-case request; the official case is created only by a Court Employee.")</p></div>
 
 <div class="row justify-content-center"><div class="col-xl-8">
 <section class="card-panel request-form-card">
@@ -13,24 +17,24 @@
         <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
 
         <div class="mb-3">
-            <label asp-for="Subject" class="form-label fw-semibold"></label>
-            <input asp-for="Subject" class="form-control" placeholder="Short description of what you need" />
+            <label asp-for="Subject" class="form-label fw-semibold">@(ar ? "موضوع الطلب" : "Request subject")</label>
+            <input asp-for="Subject" class="form-control" placeholder="@(ar ? "وصف قصير لما تحتاجه" : "Short description of what you need")" />
             <span asp-validation-for="Subject" class="text-danger small"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Brief" class="form-label fw-semibold"></label>
-            <textarea asp-for="Brief" class="form-control" rows="8" placeholder="Explain the situation, important dates, and the help you need..."></textarea>
+            <label asp-for="Brief" class="form-label fw-semibold">@(ar ? "نبذة القضية" : "Case brief")</label>
+            <textarea asp-for="Brief" class="form-control" rows="8" placeholder="@(ar ? "اشرح الموقف والتواريخ المهمة والمساعدة التي تحتاجها..." : "Explain the situation, important dates, and the help you need...")"></textarea>
             <span asp-validation-for="Brief" class="text-danger small"></span>
         </div>
         <div class="mb-4">
-            <label asp-for="CaseFile" class="form-label fw-semibold"></label>
+            <label asp-for="CaseFile" class="form-label fw-semibold">@(ar ? "ملف القضية" : "Case file")</label>
             <input asp-for="CaseFile" class="form-control" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" />
-            <small class="text-secondary">PDF, DOC, DOCX, TXT, JPG or PNG. Maximum 10 MB.</small>
+            <small class="text-secondary">@(ar ? "PDF أو DOC أو DOCX أو TXT أو JPG أو PNG. الحد الأقصى 10 ميجابايت." : "PDF, DOC, DOCX, TXT, JPG or PNG. Maximum 10 MB.")</small>
             <span asp-validation-for="CaseFile" class="text-danger small d-block"></span>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-primary px-4">Send to lawyer</button>
-            <a asp-controller="Lawyers" asp-action="Details" asp-route-id="@Model.LawyerProfileId" class="btn btn-outline-secondary">Cancel</a>
+            <button class="btn btn-primary px-4">@(ar ? "إرسال إلى المحامي" : "Send to lawyer")</button>
+            <a asp-controller="Lawyers" asp-action="Details" asp-route-id="@Model.LawyerProfileId" class="btn btn-outline-secondary">@(ar ? "إلغاء" : "Cancel")</a>
         </div>
     </form>
 </section>

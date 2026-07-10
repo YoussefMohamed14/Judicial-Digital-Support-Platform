@@ -1,16 +1,13 @@
-@*
-    // this is for test only and will be changed later
-*@
-
 @model IEnumerable<JDSP.ViewModel.RespondToRequestViewModel>
 @{
     Layout = "_LawyerLayout";
-    ViewData["Title"] = "Incoming Requests";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "الطلبات الواردة" : "Incoming Requests";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-1">Incoming Requests</h2>
-    <p class="text-muted mb-4">Cases waiting for your response.</p>
+    <h2 class="mb-1">@(ar ? "الطلبات الواردة" : "Incoming Requests")</h2>
+    <p class="text-muted mb-4">@(ar ? "قضايا تنتظر ردك." : "Cases waiting for your response.")</p>
 
     @if (TempData["Success"] != null)
     {
@@ -19,7 +16,7 @@
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">No pending requests.</div>
+        <div class="alert alert-info">@(ar ? "لا توجد طلبات معلقة." : "No pending requests.")</div>
     }
     else
     {
@@ -30,7 +27,7 @@
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
                             <h5 class="card-title mb-1">@req.CaseName</h5>
-                            <p class="text-muted small mb-3">Client: @req.ClientName</p>
+                            <p class="text-muted small mb-3">@(ar ? "العميل" : "Client"): @req.ClientName</p>
 
                             <form asp-action="Respond" method="post" class="d-flex gap-2">
                                 @Html.AntiForgeryToken()
@@ -38,14 +35,8 @@
                                 <input type="hidden" name="CaseName" value="@req.CaseName" />
                                 <input type="hidden" name="ClientName" value="@req.ClientName" />
 
-                                <button type="submit" name="Decision" value="Accepted"
-                                        class="btn btn-success btn-sm flex-fill">
-                                    ✓ Accept
-                                </button>
-                                <button type="submit" name="Decision" value="Rejected"
-                                        class="btn btn-danger btn-sm flex-fill">
-                                    ✗ Reject
-                                </button>
+                                <button type="submit" name="Decision" value="Accepted" class="btn btn-success btn-sm flex-fill">✓ @(ar ? "قبول" : "Accept")</button>
+                                <button type="submit" name="Decision" value="Rejected" class="btn btn-danger btn-sm flex-fill">✗ @(ar ? "رفض" : "Reject")</button>
                             </form>
                         </div>
                     </div>

@@ -1,10 +1,15 @@
-﻿@{
-    ViewData["Title"] = "Access Denied";
+@{
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    Layout = User.Identity?.IsAuthenticated == true
+        ? (User.IsInRole("Admin") || User.IsInRole("CourtEmployee") ? "_CourtLayout" : (User.IsInRole("Lawyer") ? "_LawyerLayout" : "_ClientLayout"))
+        : "_PublicLayout";
+    ViewData["Title"] = ar ? "تم رفض الوصول" : "Access Denied";
 }
 
-<div class="alert alert-danger">
-    <h3>Access Denied</h3>
-    <p>You do not have permission to access this page.</p>
-</div>
-
-<a asp-controller="Account" asp-action="Login" class="btn btn-primary">Back to Home</a>
+<section class="card-panel text-center mx-auto" style="max-width:680px">
+    <img src="~/images/jdsp-court-system.png" alt="JDSP" style="width:96px;height:96px;object-fit:contain" class="mb-3" />
+    <span class="eyebrow">403</span>
+    <h1 class="mt-2">@(ar ? "تم رفض الوصول" : "Access denied")</h1>
+    <p class="text-secondary mb-4">@(ar ? "ليس لديك صلاحية للوصول إلى هذه الصفحة." : "You do not have permission to access this page.")</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">@(ar ? "الرجوع إلى الرئيسية" : "Back to Home")</a>
+</section>

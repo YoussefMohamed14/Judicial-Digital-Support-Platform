@@ -18,6 +18,8 @@ namespace JDSP.ViewModels.Lawyers {
 
         public decimal ConsultationPrice { get; set; }
 
+        public string ConsultationPriceUnit { get; set; } = "Hour";
+
         public bool IsAvailable { get; set; }
 
         public bool IsFollowed { get; set; }

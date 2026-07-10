@@ -24,8 +24,29 @@ namespace JDSP.Controllers {
         public async Task<IActionResult> Index(string? searchTerm, string? specialization) {
             var currentUserId = _userManager.GetUserId(User);
 
+            // The lawyer directory must be based on accounts that actually have the Lawyer role,
+            // not only on rows that already exist in LawyerProfiles.
+            // Incomplete lawyer accounts get a profile row, but they are not listed
+            // to clients until the required professional details are completed.
+            var lawyerUsers = await _userManager.GetUsersInRoleAsync(Roles.Lawyer);
+            lawyerUsers = lawyerUsers
+                .Where(x => x.AccountStatus == "Active" && x.LawyerApprovalStatus == VerificationStatus.Approved)
+                .OrderBy(x => x.FirstName)
+                .ThenBy(x => x.LastName)
+                .ToList();
+
+            await EnsureLawyerProfilesExistAsync(lawyerUsers);
+
+            var lawyerUserIds = lawyerUsers.Select(x => x.Id).ToList();
+
             var query = _context.LawyerProfiles
                 .Include(x => x.User)
+                .Where(x => lawyerUserIds.Contains(x.UserId))
+                .Where(x => x.ConsultationPrice > 0 &&
+                    x.Bio != LawyerProfileRules.DefaultIncompleteBio &&
+                    x.Bio.Length >= 10 &&
+                    x.Specialization != "" &&
+                    (x.ConsultationPriceUnit == UiText.PriceUnitHour || x.ConsultationPriceUnit == UiText.PriceUnitMonth))
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm)) {
@@ -40,6 +61,8 @@ namespace JDSP.Controllers {
             }
 
             var lawyers = await query
+                .OrderBy(x => x.User.FirstName)
+                .ThenBy(x => x.User.LastName)
                 .Select(x => new LawyerListItemViewModel {
                     LawyerProfileId = x.LawyerProfileId,
                     LawyerUserId = x.UserId,
@@ -49,6 +72,7 @@ namespace JDSP.Controllers {
                     Specialization = x.Specialization,
                     YearsOfExperience = x.YearsOfExperience,
                     ConsultationPrice = x.ConsultationPrice,
+                    ConsultationPriceUnit = x.ConsultationPriceUnit,
                     IsAvailable = x.IsAvailable,
                     IsFollowed = currentUserId != null &&
                         _context.LawyerFollows.Any(f =>
@@ -77,6 +101,11 @@ namespace JDSP.Controllers {
                 return NotFound();
 
             var currentUserId = _userManager.GetUserId(User);
+            if (User.IsInRole(Roles.Client) &&
+                (lawyer.User.AccountStatus != "Active" ||
+                 lawyer.User.LawyerApprovalStatus != VerificationStatus.Approved ||
+                 !LawyerProfileRules.IsProfessionalProfileComplete(lawyer)))
+                return NotFound();
 
             if (User.IsInRole(Roles.Lawyer) && lawyer.UserId != currentUserId) {
                 return Forbid();
@@ -100,6 +129,7 @@ namespace JDSP.Controllers {
                 Specialization = lawyer.Specialization,
                 YearsOfExperience = lawyer.YearsOfExperience,
                 ConsultationPrice = lawyer.ConsultationPrice,
+                ConsultationPriceUnit = lawyer.ConsultationPriceUnit,
                 IsAvailable = lawyer.IsAvailable,
                 IsFollowed = isFollowed
             };
@@ -117,10 +147,7 @@ namespace JDSP.Controllers {
             var existingProfile = await _context.LawyerProfiles
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
-            if (existingProfile != null)
-                return RedirectToAction(nameof(EditProfile));
-
-            return View(new LawyerProfileViewModel());
+            return RedirectToAction("Index", "Profile", new { professionalRequired = existingProfile == null });
         }
 
         [Authorize(Roles = Roles.Lawyer)]
@@ -128,7 +155,7 @@ namespace JDSP.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateProfile(LawyerProfileViewModel model) {
             if (!ModelState.IsValid)
-                return View(model);
+                return RedirectToAction("Index", "Profile", new { professionalRequired = true });
 
             var userId = _userManager.GetUserId(User);
 
@@ -140,15 +167,16 @@ namespace JDSP.Controllers {
 
             if (existingProfile) {
                 TempData["Error"] = "You already have a lawyer profile.";
-                return RedirectToAction(nameof(EditProfile));
+                return RedirectToAction("Index", "Profile");
             }
 
             var profile = new LawyerProfile {
                 UserId = userId,
                 Bio = model.Bio,
-                Specialization = model.Specialization,
+                Specialization = LawyerProfileRules.NormalizeSpecialization(model.Specialization, model.CustomSpecialization),
                 YearsOfExperience = model.YearsOfExperience,
                 ConsultationPrice = model.ConsultationPrice,
+                ConsultationPriceUnit = model.ConsultationPriceUnit,
                 IsAvailable = model.IsAvailable,
                 CreatedAt = DateTime.Now
             };
@@ -157,7 +185,7 @@ namespace JDSP.Controllers {
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Lawyer profile created successfully.";
-            return RedirectToAction(nameof(EditProfile));
+            return RedirectToAction("Index", "Profile");
         }
 
         [Authorize(Roles = Roles.Lawyer)]
@@ -168,19 +196,7 @@ namespace JDSP.Controllers {
             var profile = await _context.LawyerProfiles
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
-            if (profile == null)
-                return RedirectToAction(nameof(CreateProfile));
-
-            var model = new LawyerProfileViewModel {
-                LawyerProfileId = profile.LawyerProfileId,
-                Bio = profile.Bio,
-                Specialization = profile.Specialization,
-                YearsOfExperience = profile.YearsOfExperience,
-                ConsultationPrice = profile.ConsultationPrice,
-                IsAvailable = profile.IsAvailable
-            };
-
-            return View(model);
+            return RedirectToAction("Index", "Profile", new { professionalRequired = profile == null || !LawyerProfileRules.IsProfessionalProfileComplete(profile) });
         }
 
         [Authorize(Roles = Roles.Lawyer)]
@@ -188,7 +204,7 @@ namespace JDSP.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(LawyerProfileViewModel model) {
             if (!ModelState.IsValid)
-                return View(model);
+                return RedirectToAction("Index", "Profile", new { professionalRequired = true });
 
             var userId = _userManager.GetUserId(User);
 
@@ -199,15 +215,16 @@ namespace JDSP.Controllers {
                 return NotFound();
 
             profile.Bio = model.Bio;
-            profile.Specialization = model.Specialization;
+            profile.Specialization = LawyerProfileRules.NormalizeSpecialization(model.Specialization, model.CustomSpecialization);
             profile.YearsOfExperience = model.YearsOfExperience;
             profile.ConsultationPrice = model.ConsultationPrice;
+            profile.ConsultationPriceUnit = model.ConsultationPriceUnit;
             profile.IsAvailable = model.IsAvailable;
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Lawyer profile updated successfully.";
-            return RedirectToAction(nameof(EditProfile));
+            return RedirectToAction("Index", "Profile");
         }
 
         [Authorize(Roles = Roles.Client)]
@@ -275,10 +292,14 @@ namespace JDSP.Controllers {
             var clientId = _userManager.GetUserId(User);
 
             var lawyers = await _context.LawyerFollows
-                .Where(x => x.FollowerId == clientId)
+                .Where(x => x.FollowerId == clientId && x.Lawyer != null && x.Lawyer.AccountStatus == "Active" && x.Lawyer.LawyerApprovalStatus == VerificationStatus.Approved)
                 .Include(x => x.Lawyer)
                 .Join(
-                    _context.LawyerProfiles,
+                    _context.LawyerProfiles.Where(p => p.ConsultationPrice > 0 &&
+                        p.Bio != LawyerProfileRules.DefaultIncompleteBio &&
+                        p.Bio.Length >= 10 &&
+                        p.Specialization != "" &&
+                        (p.ConsultationPriceUnit == UiText.PriceUnitHour || p.ConsultationPriceUnit == UiText.PriceUnitMonth)),
                     follow => follow.LawyerId,
                     profile => profile.UserId,
                     (follow, profile) => new LawyerListItemViewModel {
@@ -290,6 +311,7 @@ namespace JDSP.Controllers {
                         Specialization = profile.Specialization,
                         YearsOfExperience = profile.YearsOfExperience,
                         ConsultationPrice = profile.ConsultationPrice,
+                        ConsultationPriceUnit = profile.ConsultationPriceUnit,
                         IsAvailable = profile.IsAvailable,
                         IsFollowed = true
                     })
@@ -297,5 +319,38 @@ namespace JDSP.Controllers {
 
             return View(lawyers);
         }
+        private async Task EnsureLawyerProfilesExistAsync(IEnumerable<ApplicationUser> lawyerUsers) {
+            var lawyers = lawyerUsers.ToList();
+            if (!lawyers.Any())
+                return;
+
+            var lawyerUserIds = lawyers.Select(x => x.Id).ToList();
+            var existingProfileUserIds = await _context.LawyerProfiles
+                .Where(x => lawyerUserIds.Contains(x.UserId))
+                .Select(x => x.UserId)
+                .ToListAsync();
+
+            var existingSet = existingProfileUserIds.ToHashSet();
+            var missingLawyers = lawyers.Where(x => !existingSet.Contains(x.Id)).ToList();
+
+            if (!missingLawyers.Any())
+                return;
+
+            foreach (var lawyer in missingLawyers) {
+                _context.LawyerProfiles.Add(new LawyerProfile {
+                    UserId = lawyer.Id,
+                    Bio = LawyerProfileRules.DefaultIncompleteBio,
+                    Specialization = LawyerProfileRules.DefaultSpecialization,
+                    YearsOfExperience = 0,
+                    ConsultationPrice = 0,
+                    ConsultationPriceUnit = UiText.PriceUnitHour,
+                    IsAvailable = true,
+                    CreatedAt = DateTime.Now
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

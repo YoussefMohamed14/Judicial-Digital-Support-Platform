@@ -1,11 +1,15 @@
 @model JDSP.ViewModels.ServiceRequests.ClientRequestDetailsViewModel
-@{ Layout = "_ClientLayout"; ViewData["Title"] = "Request details"; }
+@{
+    Layout = "_ClientLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "تفاصيل الطلب" : "Request details";
+}
 
-<a asp-action="MyRequests" class="back-link">← Back to my requests</a>
+<a asp-action="MyRequests" class="back-link">@(ar ? "→ الرجوع إلى طلباتي" : "← Back to my requests")</a>
 <div class="page-head mt-3">
-    <span class="eyebrow">@Model.Request.RequestType request</span>
+    <span class="eyebrow">@UiText.RequestType(Model.Request.RequestType, ar) @(ar ? "طلب" : "request")</span>
     <h1>@Model.Request.Subject</h1>
-    <p>Sent @Model.Request.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, h:mm tt")</p>
+    <p>@(ar ? "أُرسل" : "Sent") @Model.Request.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, h:mm tt")</p>
 </div>
 
 <div class="row g-4">
@@ -13,21 +17,21 @@
         <section class="card-panel h-100">
             <div class="panel-head">
                 <div>
-                    <h2>Request information</h2>
-                    <p>The brief and attachment shared with lawyers.</p>
+                    <h2>@(ar ? "معلومات الطلب" : "Request information")</h2>
+                    <p>@(ar ? "النبذة والمرفق الذي تمت مشاركته مع المحامين." : "The brief and attachment shared with lawyers.")</p>
                 </div>
-                <span class="status large @Model.Request.Status.ToLower().Replace(" ", "-")">@Model.Request.Status</span>
+                <span class="status large @Model.Request.Status.ToLower().Replace(" ", "-")">@UiText.Status(Model.Request.Status, ar)</span>
             </div>
             <div class="description mb-3">
-                <span>Case brief</span>
+                <span>@(ar ? "نبذة القضية" : "Case brief")</span>
                 <p>@Model.Request.Brief</p>
             </div>
             <div class="detail-grid">
-                <div><span>Request type</span><strong>@Model.Request.RequestType</strong></div>
-                <div><span>Selected lawyer</span><strong>@(Model.Request.LawyerName ?? "Open to public proposals")</strong></div>
+                <div><span>@(ar ? "نوع الطلب" : "Request type")</span><strong>@UiText.RequestType(Model.Request.RequestType, ar)</strong></div>
+                <div><span>@(ar ? "المحامي المحدد" : "Selected lawyer")</span><strong>@(Model.Request.LawyerName ?? (ar ? "مفتوح للعروض العامة" : "Open to public proposals"))</strong></div>
             </div>
             @if (!string.IsNullOrWhiteSpace(Model.Request.FilePath)) {
-                <a asp-action="Download" asp-route-id="@Model.Request.RequestId" class="btn btn-outline-primary mt-3">Download @Model.Request.OriginalFileName</a>
+                <a asp-action="Download" asp-route-id="@Model.Request.RequestId" class="btn btn-outline-primary mt-3">@(ar ? "تحميل" : "Download") @Model.Request.OriginalFileName</a>
             }
         </section>
     </div>
@@ -35,17 +39,17 @@
         <section class="card-panel h-100">
             <div class="panel-head">
                 <div>
-                    <h2>Lawyer proposals</h2>
-                    <p>Select one lawyer for this public request.</p>
+                    <h2>@(ar ? "عروض المحامين" : "Lawyer proposals")</h2>
+                    <p>@(ar ? "اختر محامياً واحداً لهذا الطلب العام." : "Select one lawyer for this public request.")</p>
                 </div>
                 <span class="role-pill">@Model.Proposals.Count</span>
             </div>
 
             @if (Model.Request.RequestType != "Public") {
-                <div class="empty compact"><b>⚖</b><p>Direct requests do not use public proposals.</p></div>
+                <div class="empty compact"><b>⚖</b><p>@(ar ? "الطلبات المباشرة لا تستخدم العروض العامة." : "Direct requests do not use public proposals.")</p></div>
             }
             else if (Model.Proposals.Count == 0) {
-                <div class="empty compact"><b>◎</b><p>No proposals have been received yet.</p></div>
+                <div class="empty compact"><b>◎</b><p>@(ar ? "لم يتم استلام أي عروض بعد." : "No proposals have been received yet.")</p></div>
             }
             else {
                 <div class="proposal-list">
@@ -53,18 +57,18 @@
                         <article>
                             <div class="d-flex justify-content-between gap-2">
                                 <strong>@proposal.LawyerName</strong>
-                                <span class="status @proposal.Status.ToLower()">@proposal.Status</span>
+                                <span class="status @proposal.Status.ToLower()">@UiText.Status(proposal.Status, ar)</span>
                             </div>
                             <p>@proposal.Message</p>
                             <div class="d-flex justify-content-between text-secondary small">
                                 <span>@proposal.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
-                                <strong>@(proposal.ProposedPrice.HasValue ? proposal.ProposedPrice.Value.ToString("N2") : "Price not specified")</strong>
+                                <strong>@(proposal.ProposedPrice.HasValue ? proposal.ProposedPrice.Value.ToString("N2") : (ar ? "لم يتم تحديد السعر" : "Price not specified"))</strong>
                             </div>
                             @if (Model.Request.Status == "Pending" && proposal.Status == "Pending") {
                                 <form asp-action="AcceptProposal" method="post" class="mt-3">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="proposalId" value="@proposal.ProposalId" />
-                                    <button type="submit" class="btn btn-primary w-100">Select this lawyer</button>
+                                    <button type="submit" class="btn btn-primary w-100">@(ar ? "اختيار هذا المحامي" : "Select this lawyer")</button>
                                 </form>
                             }
                         </article>

@@ -241,6 +241,8 @@ namespace JDSP.Controllers {
             proposal.Request.LawyerId = proposal.LawyerId;
             proposal.Request.RespondedAt = DateTime.UtcNow;
 
+            EnsureAssignedCaseForAcceptedRequest(proposal.Request, proposal.LawyerId);
+
             var otherProposals = await _db.PublicRequestProposals
                 .Where(x =>
                     x.LegalServiceRequestId == proposal.LegalServiceRequestId &&
@@ -298,9 +300,45 @@ namespace JDSP.Controllers {
 
             request.Status = decision;
             request.RespondedAt = DateTime.UtcNow;
+
+            if (decision == "Accepted" && !string.IsNullOrWhiteSpace(request.LawyerId)) {
+                EnsureAssignedCaseForAcceptedRequest(request, request.LawyerId);
+            }
+
             await _db.SaveChangesAsync();
             TempData["Success"] = $"The request was {decision.ToLowerInvariant()}.";
             return RedirectToAction(nameof(Incoming));
+        }
+
+        private void EnsureAssignedCaseForAcceptedRequest(LegalServiceRequest request, string lawyerId) {
+            var caseType = request.RequestType == "Public" ? "Public Request" : "Direct Request";
+
+            var assignedCase = new Case {
+                CaseName = request.Subject.Trim(),
+                CaseType = caseType,
+                Description = request.Brief.Trim(),
+                CreatedBy_Id = request.ClientId,
+                CreatedAt = DateTime.Now,
+                Status = "Open"
+            };
+
+            assignedCase.Documents = new List<Document>();
+            if (!string.IsNullOrWhiteSpace(request.FilePath)) {
+                assignedCase.Documents.Add(new Document {
+                    FileName = string.IsNullOrWhiteSpace(request.OriginalFileName) ? "case-file" : request.OriginalFileName,
+                    FilePath = request.FilePath,
+                    UploadedAt = DateTime.UtcNow,
+                    UploadedById = request.ClientId
+                });
+            }
+
+            _db.Cases.Add(assignedCase);
+            _db.CaseLawyers.Add(new CaseLawyer {
+                Case = assignedCase,
+                LawyerId = lawyerId,
+                Status = "Accepted",
+                AssignedAt = DateTime.Now
+            });
         }
 
         [Authorize(Roles = Roles.Lawyer), HttpGet]

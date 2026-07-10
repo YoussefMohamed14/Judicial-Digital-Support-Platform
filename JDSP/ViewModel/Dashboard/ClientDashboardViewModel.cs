@@ -8,6 +8,8 @@ namespace JDSP.ViewModels.Dashboard {
         public int PendingRequests { get; set; }
         public int PublicRequests { get; set; }
         public DateTime? NextHearingDate { get; set; }
+        public DateTime? NextHearingEndDate { get; set; }
+        public string HearingCountdownPhase { get; set; } = string.Empty;
         public string? NextHearingLocation { get; set; }
         public string? NextHearingCaseName { get; set; }
         public IReadOnlyList<ClientDashboardCaseViewModel> RecentCases { get; set; } = Array.Empty<ClientDashboardCaseViewModel>();

@@ -1,0 +1,43 @@
+@using System.Globalization
+@using JDSP.Helpers
+@model IReadOnlyList<JDSP.ViewModels.CourtEmployee.PendingLawyerApprovalItemViewModel>
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    var selected = (ViewBag.Status as string) ?? VerificationStatus.Pending;
+    ViewData["Title"] = ar ? "اعتماد المحامين" : "Lawyer approvals";
+}
+
+<div class="page-head">
+    <span class="eyebrow">@(ar ? "مراجعة المحامين" : "Lawyer verification")</span>
+    <h1>@(ar ? "اعتماد المحامين" : "Lawyer approvals")</h1>
+    <p>@(ar ? "راجع مستندات المحامين الجدد قبل السماح لهم باستخدام مساحة المحامي." : "Review new lawyer documents before allowing them to use the lawyer workspace.")</p>
+</div>
+
+<div class="filters">
+    <a asp-action="Index" asp-route-status="@VerificationStatus.Pending" class="@(selected == VerificationStatus.Pending ? "active" : "")">@(ar ? "قيد المراجعة" : "Pending")</a>
+    <a asp-action="Index" asp-route-status="@VerificationStatus.Approved" class="@(selected == VerificationStatus.Approved ? "active" : "")">@(ar ? "مقبول" : "Approved")</a>
+    <a asp-action="Index" asp-route-status="@VerificationStatus.Rejected" class="@(selected == VerificationStatus.Rejected ? "active" : "")">@(ar ? "مرفوض" : "Rejected")</a>
+</div>
+
+<section class="card-panel">
+    @if (!Model.Any()) {
+        <div class="empty compact"><b>⚖</b><p>@(ar ? "لا توجد طلبات في هذه الحالة." : "No requests with this status.")</p></div>
+    }
+    else {
+        <div class="table-responsive"><table class="table clean-table align-middle">
+            <thead><tr><th>@(ar ? "المحامي" : "Lawyer")</th><th>@(ar ? "البريد" : "Email")</th><th>@(ar ? "الرقم القومي" : "National number")</th><th>@(ar ? "تاريخ الطلب" : "Requested")</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td class="fw-semibold">@item.LawyerName</td>
+                    <td>@item.Email</td>
+                    <td>@item.NationalNumber</td>
+                    <td>@item.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td class="text-end"><a asp-action="Details" asp-route-id="@item.RequestId" class="btn btn-sm btn-outline-primary">@(ar ? "التفاصيل" : "Details")</a></td>
+                </tr>
+            }
+            </tbody>
+        </table></div>
+    }
+</section>

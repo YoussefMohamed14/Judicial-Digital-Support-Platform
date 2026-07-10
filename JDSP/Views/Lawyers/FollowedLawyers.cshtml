@@ -1,24 +1,25 @@
-@model List<JDSP.ViewModels.Lawyers.LawyerListItemViewModel>
+﻿@model List<JDSP.ViewModels.Lawyers.LawyerListItemViewModel>
 @{
     Layout = "_ClientLayout";
-    ViewData["Title"] = "Followed lawyers";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "المحامون المتابعون" : "Followed lawyers";
 }
 
 <div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
     <div>
-        <span class="eyebrow">Following</span>
-        <h1>Followed lawyers</h1>
-        <p>Quickly return to lawyers you follow and send a request when you are ready.</p>
+        <span class="eyebrow">@(ar ? "المتابعة" : "Following")</span>
+        <h1>@(ar ? "المحامون المتابعون" : "Followed lawyers")</h1>
+        <p>@(ar ? "ارجع بسرعة إلى المحامين الذين تتابعهم وأرسل طلباً عندما تكون مستعداً." : "Quickly return to lawyers you follow and send a request when you are ready.")</p>
     </div>
-    <a asp-action="Index" class="btn btn-primary px-4">Find more lawyers</a>
+    <a asp-action="Index" class="btn btn-primary px-4">@(ar ? "ابحث عن محامين أكثر" : "Find more lawyers")</a>
 </div>
 
 @if (!Model.Any()) {
     <section class="card-panel empty">
         <b>☆</b>
-        <h3>You are not following any lawyers yet</h3>
-        <p>Open the lawyer directory and follow the profiles you want to keep.</p>
-        <a asp-action="Index" class="btn btn-primary">Find lawyers</a>
+        <h3>@(ar ? "أنت لا تتابع أي محامين بعد" : "You are not following any lawyers yet")</h3>
+        <p>@(ar ? "افتح دليل المحامين وتابع الملفات التي تريد الاحتفاظ بها." : "Open the lawyer directory and follow the profiles you want to keep.")</p>
+        <a asp-action="Index" class="btn btn-primary">@(ar ? "ابحث عن محامين" : "Find lawyers")</a>
     </section>
 }
 else {
@@ -36,24 +37,24 @@ else {
                         }
                         <div>
                             <h2>@lawyer.FullName</h2>
-                            <span class="case-type">@lawyer.Specialization</span>
+                            <span class="case-type">@UiText.Specialization(lawyer.Specialization, ar)</span>
                         </div>
                     </div>
 
                     <div class="detail-grid compact-grid">
-                        <div><span>Experience</span><strong>@lawyer.YearsOfExperience years</strong></div>
-                        <div><span>Price</span><strong>@lawyer.ConsultationPrice.ToString("N2")</strong></div>
+                        <div><span>@(ar ? "الخبرة" : "Experience")</span><strong>@UiText.YearsShort(lawyer.YearsOfExperience, ar)</strong></div>
+                        <div><span>@(ar ? "السعر" : "Price")</span><strong>@UiText.Price(lawyer.ConsultationPrice, lawyer.ConsultationPriceUnit, ar)</strong></div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="status @(lawyer.IsAvailable ? "open" : "closed")">@(lawyer.IsAvailable ? "Available" : "Unavailable")</span>
-                        <span class="small text-secondary">★ Followed</span>
+                        <span class="status @(lawyer.IsAvailable ? "open" : "closed")">@UiText.Availability(lawyer.IsAvailable, ar)</span>
+                        <span class="small text-secondary">★ @(ar ? "متابَع" : "Followed")</span>
                     </div>
 
                     <div class="lawyer-card-actions">
-                        <a asp-action="Details" asp-route-id="@lawyer.LawyerProfileId" class="btn btn-outline-primary">Details</a>
+                        <a asp-action="Details" asp-route-id="@lawyer.LawyerProfileId" class="btn btn-outline-primary">@(ar ? "التفاصيل" : "Details")</a>
                         @if (lawyer.IsAvailable) {
-                            <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@lawyer.LawyerProfileId" class="btn btn-primary">Send request</a>
+                            <a asp-controller="ServiceRequests" asp-action="SendToLawyer" asp-route-lawyerProfileId="@lawyer.LawyerProfileId" class="btn btn-primary">@(ar ? "إرسال طلب" : "Send request")</a>
                         }
                     </div>
                 </article>

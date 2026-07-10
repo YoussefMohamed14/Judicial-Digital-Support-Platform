@@ -88,3 +88,5 @@ node_modules/
 # Uploaded legal request files (keep files outside source control)
 App_Data/service-requests/*
 !App_Data/service-requests/.gitkeep
+App_Data/lawyer-verifications/*
+!App_Data/lawyer-verifications/.gitkeep

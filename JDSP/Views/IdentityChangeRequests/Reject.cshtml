@@ -1,0 +1,27 @@
+@using System.Globalization
+@model JDSP.ViewModels.IdentityChangeRequests.RejectIdentityChangeRequestViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "رفض طلب تعديل الهوية" : "Reject identity request";
+}
+
+<div class="page-head">
+    <span class="eyebrow text-danger">@(ar ? "رفض الطلب" : "Reject request")</span>
+    <h1>@(ar ? "رفض طلب تعديل الهوية" : "Reject identity change request")</h1>
+    <p>@(ar ? "اكتب سببًا واضحًا. سيظهر للمستخدم في الرسائل كرسالة نظام لا يمكن الرد عليها." : "Write a clear reason. It will appear to the user in Messages as a read-only system message.")</p>
+</div>
+
+<section class="card-panel" style="max-width:760px">
+    <form asp-action="Reject" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="RequestId" />
+        <input type="hidden" asp-for="RequestedByName" />
+        <input type="hidden" asp-for="Email" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="mb-3"><label class="form-label fw-semibold">@(ar ? "المستخدم" : "User")</label><div class="description"><strong>@Model.RequestedByName</strong><span>@Model.Email</span></div></div>
+        <div class="mb-4"><label asp-for="RejectionReason" class="form-label fw-semibold">@(ar ? "سبب الرفض" : "Rejection reason")</label><textarea asp-for="RejectionReason" class="form-control" rows="5"></textarea><span asp-validation-for="RejectionReason" class="text-danger small"></span></div>
+        <div class="d-flex gap-2"><button class="btn btn-danger">@(ar ? "تأكيد الرفض" : "Confirm rejection")</button><a asp-action="Details" asp-route-id="@Model.RequestId" class="btn btn-outline-secondary">@(ar ? "إلغاء" : "Cancel")</a></div>
+    </form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,28 @@
+@model JDSP.ViewModels.OfficialCaseRequests.OfficialCaseRequestApproveViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "الموافقة على الطلب" : "Approve request";
+}
+
+<a asp-action="Details" asp-route-id="@Model.RequestId" class="back-link">@(ar ? "→ الرجوع" : "← Back")</a>
+<div class="page-head mt-3"><span class="eyebrow">@(ar ? "جدولة جلسة" : "Schedule hearing")</span><h1>@(ar ? "الموافقة وتحديد موعد الجلسة" : "Approve and schedule hearing")</h1><p>@Model.CaseName</p></div>
+
+<section class="card-panel request-form-card">
+    <form asp-action="Approve" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="RequestId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="detail-grid mb-4"><div><span>@(ar ? "القضية" : "Case")</span><strong>@Model.CaseName</strong></div><div><span>@(ar ? "المحامي" : "Lawyer")</span><strong>@Model.LawyerName</strong></div><div><span>@(ar ? "العميل" : "Client")</span><strong>@Model.ClientName</strong></div></div>
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="HearingDate" class="form-label fw-semibold">@(ar ? "وقت بداية الجلسة" : "Hearing start time")</label><input asp-for="HearingDate" class="form-control" type="datetime-local" /><span asp-validation-for="HearingDate" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="HearingEndDate" class="form-label fw-semibold">@(ar ? "وقت نهاية الجلسة" : "Hearing end time")</label><input asp-for="HearingEndDate" class="form-control" type="datetime-local" /><span asp-validation-for="HearingEndDate" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="HearingType" class="form-label fw-semibold">@(ar ? "نوع الجلسة" : "Hearing type")</label><select asp-for="HearingType" class="form-select"><option value="Physical">@(ar ? "حضورية" : "Physical")</option><option value="Online">@(ar ? "عن بعد" : "Online")</option></select><span asp-validation-for="HearingType" class="text-danger small"></span></div>
+        </div>
+        <div class="mb-3 mt-3"><label asp-for="Location" class="form-label fw-semibold">@(ar ? "المكان / الرابط" : "Location / link")</label><input asp-for="Location" class="form-control" /><span asp-validation-for="Location" class="text-danger small"></span></div>
+        <div class="mb-3"><label asp-for="CourtNotes" class="form-label fw-semibold">@(ar ? "ملاحظات المحكمة" : "Court notes")</label><textarea asp-for="CourtNotes" class="form-control" rows="4" maxlength="1000"></textarea><span asp-validation-for="CourtNotes" class="text-danger small"></span></div>
+        <button class="btn btn-success px-4" type="submit">@(ar ? "اعتماد وجدولة" : "Approve and schedule")</button>
+    </form>
+</section>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
