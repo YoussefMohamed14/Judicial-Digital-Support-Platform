@@ -84,7 +84,7 @@
                         </div>
                         <div class="col-md-6">
                             <label asp-for="LegalIdFile" class="form-label fw-semibold">@(ar ? "إرفاق بطاقة الهوية القانونية" : "Attach legal ID")</label>
-                            <input asp-for="LegalIdFile" class="form-control" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" />
+                            <input asp-for="LegalIdFile" class="form-control" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" />
                             <small class="text-secondary">@(ar ? "PDF أو JPG أو PNG أو WEBP. الحد الأقصى 10 ميجابايت." : "PDF, JPG, PNG, or WEBP. Max 10 MB.")</small>
                             <span asp-validation-for="LegalIdFile" class="text-danger small d-block"></span>
                         </div>

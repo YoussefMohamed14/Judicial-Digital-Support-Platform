@@ -18,6 +18,7 @@
     <div class="col"><div class="stat"><span>👥</span><div><small>@(ar ? "العملاء" : "Clients")</small><strong>@Model.TotalClients</strong></div></div></div>
     <div class="col"><div class="stat"><span>▣</span><div><small>@(ar ? "القضايا" : "Cases")</small><strong>@Model.TotalCases</strong></div></div></div>
     <div class="col"><div class="stat"><span>◷</span><div><small>@(ar ? "طلبات جلسات معلقة" : "Pending hearing requests")</small><strong>@Model.PendingOfficialCaseRequests</strong></div></div></div>
+    <div class="col"><a asp-controller="OfficialCaseRequests" asp-action="HearingFollowUps" class="stat stat-link"><span>⏱</span><div><small>@(ar ? "بانتظار جلسة جديدة" : "Need next hearing")</small><strong>@Model.WaitingForHearingFollowUp</strong></div></a></div>
 </div>
 
 <div class="row g-4">
@@ -52,6 +53,15 @@
             <a asp-controller="OfficialCaseRequests" asp-action="Index" class="btn btn-outline-primary position-relative">
                 @(ar ? "مراجعة الطلبات" : "Review requests")
                 @if (Model.PendingOfficialCaseRequests > 0) { <span class="message-badge ms-2">@Model.PendingOfficialCaseRequests</span> }
+            </a>
+        </section>
+    </div>
+    <div class="col-md-4">
+        <section class="card-panel h-100">
+            <div class="setting-title"><b>⏱</b><div><h2>@(ar ? "متابعة الجلسات" : "Hearing follow-up")</h2><p>@(ar ? "أغلق القضية أو أجّلها أو حدد الجلسة القادمة بعد انتهاء الجلسة." : "Close, postpone, or schedule the next hearing after a hearing ends.")</p></div></div>
+            <a asp-controller="OfficialCaseRequests" asp-action="HearingFollowUps" class="btn btn-outline-primary position-relative">
+                @(ar ? "فتح المتابعة" : "Open follow-up")
+                @if (Model.WaitingForHearingFollowUp > 0) { <span class="message-badge ms-2">@Model.WaitingForHearingFollowUp</span> }
             </a>
         </section>
     </div>

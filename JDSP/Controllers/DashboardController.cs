@@ -41,7 +41,7 @@ namespace JDSP.Controllers {
                 RejectedLawyers = await _db.LawyerVerificationRequests.CountAsync(x => x.Status == VerificationStatus.Rejected),
                 PendingIdentityChangeRequests = await _db.IdentityChangeRequests.CountAsync(x => x.Status == VerificationStatus.Pending),
                 PendingOfficialCaseRequests = await _db.OfficialCaseRequests.CountAsync(x => x.Status == VerificationStatus.Pending),
-                WaitingForHearingFollowUp = await _db.Cases.CountAsync(x => x.Status == "Waiting for next hearing date"),
+                WaitingForHearingFollowUp = await _db.Cases.CountAsync(x => x.Status == "Waiting for next hearing date" || x.Status == "Postponed"),
                 TotalClients = clients.Count,
                 TotalCases = await _db.Cases.CountAsync(),
                 PendingLawyers = await _db.LawyerVerificationRequests.AsNoTracking()

@@ -63,7 +63,7 @@ namespace JDSP.Controllers {
             await UpdateEndedHearingFollowUpsAsync();
 
             var query = _db.Cases.AsNoTracking().Where(c => c.CreatedBy_Id == userId);
-            var allowed = new[] { "Open", "Pending", "In Progress", "Waiting for next hearing date", "Closed" };
+            var allowed = new[] { "Open", "Pending", "In Progress", "Waiting for next hearing date", "Postponed", "Closed" };
             if (!string.IsNullOrWhiteSpace(status) && allowed.Contains(status))
                 query = query.Where(c => c.Status == status);
 

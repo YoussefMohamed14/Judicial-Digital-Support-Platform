@@ -34,6 +34,13 @@
                     <div><span>@(ar ? "المكان" : "Location")</span><strong>@(Model.Location ?? (ar ? "سيتم التأكيد" : "To be confirmed"))</strong></div>
                     <div><span>@(ar ? "ملاحظات" : "Notes")</span><strong>@(Model.CourtNotes ?? "-")</strong></div>
                 </div>
+                @if (Model.HearingEndDate.HasValue && Model.HearingEndDate.Value <= DateTime.Now) {
+                    <div class="rule-banner mt-3">
+                        <strong>⏱</strong>
+                        <span>@(ar ? "انتهت هذه الجلسة. يجب تحديد جلسة قادمة أو تأجيل القضية أو إغلاقها." : "This hearing has ended. Schedule the next hearing, postpone the case, or close it.")</span>
+                        <a asp-action="ManageHearingFollowUp" asp-route-caseId="@Model.CaseId" class="btn btn-sm btn-primary ms-auto">@(ar ? "متابعة الجلسة" : "Manage follow-up")</a>
+                    </div>
+                }
             </section>
         }
         @if (Model.Status == "Rejected") {

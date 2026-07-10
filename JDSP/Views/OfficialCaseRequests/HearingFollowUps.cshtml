@@ -1,0 +1,65 @@
+@model IReadOnlyList<JDSP.ViewModels.OfficialCaseRequests.HearingFollowUpListItemViewModel>
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "متابعة الجلسات المنتهية" : "Hearing follow-up";
+}
+
+<div class="page-head d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div>
+        <span class="eyebrow">@(ar ? "متابعة المحكمة" : "Court follow-up")</span>
+        <h1>@(ar ? "قضايا تحتاج إلى جلسة قادمة" : "Cases needing next hearing")</h1>
+        <p>@(ar ? "بعد انتهاء الجلسة، اختر هل سيتم تحديد جلسة جديدة، تأجيل القضية، أو إغلاقها." : "After a hearing ends, choose whether to schedule the next hearing, postpone the case, or close it.")</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-primary">@(ar ? "طلبات الجلسات" : "Hearing requests")</a>
+</div>
+
+<section class="card-panel">
+    @if (!Model.Any()) {
+        <div class="empty compact">
+            <b>✓</b>
+            <p>@(ar ? "لا توجد قضايا تحتاج إلى متابعة جلسة الآن." : "No cases need hearing follow-up right now.")</p>
+        </div>
+    }
+    else {
+        <div class="table-responsive">
+            <table class="table clean-table align-middle">
+                <thead>
+                    <tr>
+                        <th>@(ar ? "القضية" : "Case")</th>
+                        <th>@(ar ? "المحامي" : "Lawyer")</th>
+                        <th>@(ar ? "العميل" : "Client")</th>
+                        <th>@(ar ? "آخر جلسة" : "Last hearing")</th>
+                        <th>@(ar ? "الحالة" : "Status")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td class="fw-semibold">
+                            @item.CaseName<br />
+                            <small class="text-secondary">@UiText.CaseType(item.CaseType, ar)</small>
+                        </td>
+                        <td>@item.LawyerName</td>
+                        <td>@item.ClientName</td>
+                        <td>
+                            @if (item.LastHearingStart.HasValue) {
+                                <span>@item.LastHearingStart.Value.ToString("yyyy-MM-dd HH:mm")</span><br />
+                                <small class="text-secondary">@(ar ? "انتهت" : "Ended") @item.LastHearingEnd?.ToString("yyyy-MM-dd HH:mm")</small>
+                            }
+                            else {
+                                <span class="text-secondary">@(ar ? "لا توجد جلسة مسجلة" : "No hearing recorded")</span>
+                            }
+                        </td>
+                        <td><span class="status @item.CaseStatus.ToLower().Replace(" ", "-")">@UiText.Status(item.CaseStatus, ar)</span></td>
+                        <td class="text-end">
+                            <a asp-action="ManageHearingFollowUp" asp-route-caseId="@item.CaseId" class="btn btn-sm btn-primary">@(ar ? "اتخاذ قرار" : "Take action")</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

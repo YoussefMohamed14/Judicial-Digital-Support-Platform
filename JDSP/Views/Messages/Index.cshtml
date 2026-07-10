@@ -209,8 +209,25 @@
         const bubbleHtml = '<div class="chat-bubble">' + content + '<time>' + escapeHtml(message.createdAtText || '') + '</time></div>';
         const existing = chatWindow.querySelector('[data-message-id="' + message.id + '"]');
         if (existing) {
+            const declineInput = existing.querySelector('.decline-form input[name="reason"]');
+            const preservedReason = declineInput ? declineInput.value : '';
+            const shouldRestoreReason = !!(declineInput && (preservedReason || document.activeElement === declineInput));
+            const selectionStart = declineInput ? declineInput.selectionStart : null;
+            const selectionEnd = declineInput ? declineInput.selectionEnd : null;
+
             existing.className = 'chat-message ' + (message.isMine ? 'mine' : 'theirs') + (message.payment ? ' payment-message' : '');
             existing.innerHTML = bubbleHtml;
+
+            if (shouldRestoreReason && message.payment && message.payment.status === 'Requested') {
+                const restored = existing.querySelector('.decline-form input[name="reason"]');
+                if (restored) {
+                    restored.value = preservedReason;
+                    restored.focus();
+                    if (selectionStart !== null && selectionEnd !== null) {
+                        restored.setSelectionRange(selectionStart, selectionEnd);
+                    }
+                }
+            }
             return;
         }
         const article = document.createElement('article');
@@ -220,7 +237,15 @@
         chatWindow.appendChild(article);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
+    function hasActiveDraft(){
+        const active = document.activeElement;
+        if (active && chatWindow.contains(active) && active.matches('.decline-form input[name="reason"]')) return true;
+        return Array.from(chatWindow.querySelectorAll('.decline-form input[name="reason"]')).some(function(input){
+            return (input.value || '').trim().length > 0;
+        });
+    }
     async function poll(){
+        if (hasActiveDraft()) return;
         try{
             const response = await fetch('/Messages/Conversation?contactId=' + encodeURIComponent(contactId) + '&afterId=0', { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
             if (!response.ok) return;

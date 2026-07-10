@@ -23,8 +23,8 @@
         <h2 class="h6 fw-bold mb-1">@(ar ? "مستندات اعتماد المحامي" : "Lawyer verification documents")</h2>
         <p class="text-secondary small mb-3">@(ar ? "يجب رفع بطاقة الرقم القومي وإثبات قيد/كارنيه المحاماة. لن يتم تفعيل حساب المحامي إلا بعد موافقة موظف المحكمة." : "Upload your national/legal ID and lawyer ID/proof. A court employee must approve the account before the lawyer workspace is available.")</p>
         <div class="row g-3">
-            <div class="col-md-6"><label asp-for="NationalIdFile" class="form-label fw-semibold">@(ar ? "بطاقة الرقم القومي / الهوية القانونية" : "National / legal ID")</label><input asp-for="NationalIdFile" class="form-control" accept=".pdf,image/jpeg,image/png,image/webp"/><span asp-validation-for="NationalIdFile" class="text-danger small"></span></div>
-            <div class="col-md-6"><label asp-for="LawyerIdFile" class="form-label fw-semibold">@(ar ? "كارنيه المحامي / إثبات القيد" : "Lawyer ID / proof")</label><input asp-for="LawyerIdFile" class="form-control" accept=".pdf,image/jpeg,image/png,image/webp"/><span asp-validation-for="LawyerIdFile" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="NationalIdFile" class="form-label fw-semibold">@(ar ? "بطاقة الرقم القومي / الهوية القانونية" : "National / legal ID")</label><input asp-for="NationalIdFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"/><span asp-validation-for="NationalIdFile" class="text-danger small"></span></div>
+            <div class="col-md-6"><label asp-for="LawyerIdFile" class="form-label fw-semibold">@(ar ? "كارنيه المحامي / إثبات القيد" : "Lawyer ID / proof")</label><input asp-for="LawyerIdFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"/><span asp-validation-for="LawyerIdFile" class="text-danger small"></span></div>
         </div>
         <small class="text-secondary d-block mt-2">@(ar ? "الصيغ المسموحة: PDF أو JPG أو PNG أو WEBP · الحد الأقصى 10 ميجابايت لكل ملف." : "Allowed: PDF, JPG, PNG or WEBP · Max 10 MB per file.")</small>
     </div>

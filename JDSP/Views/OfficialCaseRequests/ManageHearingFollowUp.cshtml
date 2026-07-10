@@ -1,0 +1,77 @@
+@model JDSP.ViewModels.OfficialCaseRequests.HearingFollowUpDecisionViewModel
+@{
+    Layout = "_CourtLayout";
+    var ar = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+    ViewData["Title"] = ar ? "متابعة الجلسة" : "Manage hearing follow-up";
+}
+
+<a asp-action="HearingFollowUps" class="back-link">@(ar ? "→ الرجوع إلى المتابعة" : "← Back to follow-up")</a>
+<div class="page-head mt-3">
+    <span class="eyebrow">@(ar ? "قرار موظف المحكمة" : "Court employee decision")</span>
+    <h1>@(ar ? "متابعة الجلسة المنتهية" : "Manage ended hearing")</h1>
+    <p>@Model.CaseName</p>
+</div>
+
+<section class="card-panel request-form-card">
+    <div class="detail-grid mb-4">
+        <div><span>@(ar ? "القضية" : "Case")</span><strong>@Model.CaseName</strong></div>
+        <div><span>@(ar ? "النوع" : "Type")</span><strong>@UiText.CaseType(Model.CaseType, ar)</strong></div>
+        <div><span>@(ar ? "العميل" : "Client")</span><strong>@Model.ClientName</strong></div>
+        <div><span>@(ar ? "المحامي" : "Lawyer")</span><strong>@Model.LawyerName</strong></div>
+        <div><span>@(ar ? "آخر بداية جلسة" : "Last hearing start")</span><strong>@(Model.LastHearingStart?.ToString("yyyy-MM-dd HH:mm") ?? "-")</strong></div>
+        <div><span>@(ar ? "آخر نهاية جلسة" : "Last hearing end")</span><strong>@(Model.LastHearingEnd?.ToString("yyyy-MM-dd HH:mm") ?? "-")</strong></div>
+    </div>
+
+    <form asp-action="ManageHearingFollowUp" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="CaseId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-4">
+            <label asp-for="Decision" class="form-label fw-semibold">@(ar ? "القرار" : "Decision")</label>
+            <div class="decision-grid">
+                <label class="decision-card">
+                    <input asp-for="Decision" type="radio" value="ScheduleNext" checked />
+                    <span><strong>@(ar ? "تحديد الجلسة القادمة" : "Schedule next hearing")</strong><small>@(ar ? "اختر بداية ونهاية الجلسة القادمة." : "Choose the next hearing start and end time.")</small></span>
+                </label>
+                <label class="decision-card">
+                    <input asp-for="Decision" type="radio" value="Postpone" />
+                    <span><strong>@(ar ? "تأجيل" : "Postpone")</strong><small>@(ar ? "ضع القضية كـ مؤجلة لحين تحديد موعد لاحق." : "Mark the case as postponed until a later decision.")</small></span>
+                </label>
+                <label class="decision-card">
+                    <input asp-for="Decision" type="radio" value="Close" />
+                    <span><strong>@(ar ? "إغلاق القضية" : "Close case")</strong><small>@(ar ? "إنهاء القضية وإبلاغ العميل والمحامي." : "End the case and notify client and lawyer.")</small></span>
+                </label>
+            </div>
+            <span asp-validation-for="Decision" class="text-danger small"></span>
+        </div>
+
+        <div class="schedule-fields">
+            <div class="row g-3">
+                <div class="col-md-6"><label asp-for="HearingDate" class="form-label fw-semibold">@(ar ? "بداية الجلسة القادمة" : "Next hearing start")</label><input asp-for="HearingDate" class="form-control" type="datetime-local" /><span asp-validation-for="HearingDate" class="text-danger small"></span></div>
+                <div class="col-md-6"><label asp-for="HearingEndDate" class="form-label fw-semibold">@(ar ? "نهاية الجلسة القادمة" : "Next hearing end")</label><input asp-for="HearingEndDate" class="form-control" type="datetime-local" /><span asp-validation-for="HearingEndDate" class="text-danger small"></span></div>
+                <div class="col-md-6"><label asp-for="HearingType" class="form-label fw-semibold">@(ar ? "نوع الجلسة" : "Hearing type")</label><select asp-for="HearingType" class="form-select"><option value="Physical">@(ar ? "حضورية" : "Physical")</option><option value="Online">@(ar ? "عن بعد" : "Online")</option></select><span asp-validation-for="HearingType" class="text-danger small"></span></div>
+                <div class="col-md-6"><label asp-for="Location" class="form-label fw-semibold">@(ar ? "المكان / الرابط" : "Location / link")</label><input asp-for="Location" class="form-control" /><span asp-validation-for="Location" class="text-danger small"></span></div>
+            </div>
+        </div>
+
+        <div class="mb-3 mt-3"><label asp-for="CourtNotes" class="form-label fw-semibold">@(ar ? "ملاحظات القرار" : "Decision notes")</label><textarea asp-for="CourtNotes" class="form-control" rows="4" maxlength="1000"></textarea><span asp-validation-for="CourtNotes" class="text-danger small"></span></div>
+        <button class="btn btn-primary px-4" type="submit">@(ar ? "حفظ القرار وإبلاغ الأطراف" : "Save decision and notify parties")</button>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function(){
+            const cards = document.querySelectorAll('.decision-card input');
+            const schedule = document.querySelector('.schedule-fields');
+            function update(){
+                const selected = document.querySelector('.decision-card input:checked')?.value;
+                if(schedule) schedule.style.display = selected === 'ScheduleNext' ? '' : 'none';
+            }
+            cards.forEach(x => x.addEventListener('change', update));
+            update();
+        })();
+    </script>
+}
